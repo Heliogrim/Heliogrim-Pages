@@ -1,0 +1,28 @@
+site_name: Heliogrim
+site_description: Architecture, decisions and guides for the Heliogrim engine
+repo_url: https://github.com/Heliogrim/Heliogrim-Engine
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - search.suggest
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - architecture/index.md
+  - Decisions:
+      - adr/README.md
+  - Guides:
+      - guides/index.md
