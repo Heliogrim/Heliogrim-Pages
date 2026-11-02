@@ -22,6 +22,7 @@ nav:
   - Home: index.md
   - Architecture:
       - architecture/index.md
+      - Actor system (exploration): architecture/actor-system.md
   - Decisions:
       - adr/README.md
   - Guides:
