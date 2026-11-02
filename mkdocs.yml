@@ -25,6 +25,7 @@ nav:
       - Actor system (exploration): architecture/actor-system.md
       - Sealed actor archetypes (design): architecture/actor-archetypes-design.md
       - Audio and DSP (exploration): architecture/audio-dsp.md
+      - Bounding volumes (exploration): architecture/bounding-volumes.md
   - Decisions:
       - adr/README.md
   - Guides:
