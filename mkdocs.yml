@@ -23,6 +23,7 @@ nav:
   - Architecture:
       - architecture/index.md
       - Actor system (exploration): architecture/actor-system.md
+      - Sealed actor archetypes (design): architecture/actor-archetypes-design.md
   - Decisions:
       - adr/README.md
   - Guides:
