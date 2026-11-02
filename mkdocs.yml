@@ -24,6 +24,7 @@ nav:
       - architecture/index.md
       - Actor system (exploration): architecture/actor-system.md
       - Sealed actor archetypes (design): architecture/actor-archetypes-design.md
+      - Audio and DSP (exploration): architecture/audio-dsp.md
   - Decisions:
       - adr/README.md
   - Guides:
