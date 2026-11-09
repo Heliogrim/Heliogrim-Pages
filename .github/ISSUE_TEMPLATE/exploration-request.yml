@@ -1,0 +1,22 @@
+name: Request an exploration
+description: A question or outside claim worth checking against the engine.
+title: "[Exploration] "
+labels: [exploration]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question or claim
+      description: What should be checked? Include the source of the claim.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why now
+      description: What does it block or unblock?
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence you have
+      description: Measurements, links, source files.

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block extrahead %}
+  {# Preload the fonts used above the fold and restore the width mode before first paint: no swap, no jump. #}
+  {% for f in ["ibm-plex-sans-latin-400-normal", "barlow-condensed-latin-500-normal", "barlow-condensed-latin-600-normal", "barlow-condensed-latin-700-normal", "ibm-plex-mono-latin-400-normal"] %}
+  <link rel="preload" href="{{ ('assets/fonts/' ~ f ~ '.woff2') | url }}" as="font" type="font/woff2" crossorigin>
+  {% endfor %}
+  <link rel="preload" href="{{ 'assets/logo.svg' | url }}" as="image">
+  {% if page and page.is_homepage %}
+  <link rel="preload" href="{{ 'assets/dial.svg' | url }}" as="image">
+  {% endif %}
+  <script>try{if(localStorage.getItem("hg-width")==="fluid")document.documentElement.setAttribute("data-hg-width","fluid")}catch(e){}</script>
+{% endblock %}
+{% block header %}
+  {{ super() }}
+  {# Inserted synchronously right after the header so the button is there on first paint. #}
+  <script src="{{ 'javascripts/width.js' | url }}"></script>
+{% endblock %}

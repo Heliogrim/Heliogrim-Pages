@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report an engine or editor bug
+    url: https://github.com/Heliogrim/Heliogrim-Engine/issues/new?labels=bug
+    about: Engine defects belong in the engine repository.
+  - name: Request an engine feature or task
+    url: https://github.com/Heliogrim/Heliogrim-Engine/issues/new?labels=enhancement
+    about: Feature requests and tasks belong in the engine repository.
