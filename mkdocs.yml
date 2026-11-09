@@ -93,12 +93,16 @@ nav:
           - Audio runtime: architecture/audio-runtime-design.md
           - Scheduler waitables: architecture/scheduler-waitable-design.md
           - Promise and future: architecture/promise-future-design.md
+          - Affine threads: architecture/affine-thread-design.md
+          - Storage: architecture/storage-design.md
       - Explorations:
           - Actor system: architecture/actor-system.md
+          - Agent and player sync: architecture/agent-sync-exploration.md
           - Audio and DSP: architecture/audio-dsp.md
           - Bounding volumes: architecture/bounding-volumes.md
           - Fiber scheduler iteration: architecture/fiber-scheduler-exploration.md
           - Input backends: architecture/input-exploration.md
+          - Navmesh library fit: architecture/navigation-exploration.md
           - Observability and profiling: architecture/observability-exploration.md
           - Pointer sets: architecture/pointer-sets-exploration.md
           - Scripting by native codegen: architecture/scripting-native-codegen-exploration.md
@@ -197,6 +201,7 @@ nav:
       - Micropoly renderer: systems/micropoly-renderer.md
       - Animation pipeline: systems/animation-pipeline.md
       - Page template: systems/template.md
+  - Glossary: glossary.md
   - Decisions:
       - adr/README.md
       - "Placeholder: pointer sets": adr/placeholder-pointer-sets.md
@@ -209,6 +214,7 @@ nav:
       - "Placeholder: queue ownership": adr/placeholder-queue-ownership.md
       - "Placeholder: in-house crash handler": adr/placeholder-in-house-crash-handler.md
       - "Placeholder: input backends": adr/placeholder-input-backend-sdl3-base.md
+      - "Placeholder: navmesh library": adr/placeholder-navmesh-recastnavigation.md
       - Template: adr/template.md
   - Guides:
       - guides/index.md
