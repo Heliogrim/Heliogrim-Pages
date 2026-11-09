@@ -22,5 +22,6 @@ Drafts derived from exploration outcomes, kept so the pages have a place to land
 | [Per-queue ownership, no single submit thread](placeholder-queue-ownership.md) | [Concurrency work page](../plan/work/concurrency-fibers.md) | <span class="hg-status placeholder">placeholder</span> |
 | [In-house crash handler](placeholder-in-house-crash-handler.md) | [Diagnostics work page](../plan/work/diagnostics-and-crash.md) | <span class="hg-status placeholder">placeholder</span> |
 | [SDL3 base input backend, native side channels](placeholder-input-backend-sdl3-base.md) | [Input backends exploration](../architecture/input-exploration.md) | <span class="hg-status placeholder">placeholder</span> |
+| [Vendor recastnavigation for navmesh build and queries](placeholder-navmesh-recastnavigation.md) | [Navmesh library fit](../architecture/navigation-exploration.md) | <span class="hg-status placeholder">placeholder</span> |
 
 How a record gets here: [Documenting an ADR](../guides/writing-adrs.md). The [template](template.md) mirrors the engine project's format.

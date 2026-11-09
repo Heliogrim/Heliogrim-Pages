@@ -1,6 +1,6 @@
 # Promise and Future Rework (Design)
 
-**Status**: design, draft 2026-11-08. Companion to the [scheduler waitables design](scheduler-waitable-design.md), which gives it the `Event` it completes on. Agreed in the design conversation of 2026-11-08 (W02.1 follow-up on the [concurrency work page](../plan/work/concurrency-fibers.md)). Implementation plan untracked in the engine checkout (`docs/superpowers/plans/2026-11-08-promise-future.md`).
+**Status**: design, draft 2026-11-08. Companion to the [scheduler waitables design](scheduler-waitable-design.md), which gives it the `Signal` it completes on. Agreed in the design conversation of 2026-11-08 (W02.1 follow-up on the [concurrency work page](../plan/work/concurrency-fibers.md)). Implementation plan untracked in the engine checkout (`docs/superpowers/plans/2026-11-08-promise-future.md`).
 
 Markers: **Decided** = agreed by the owner. **Proposal** = this document's call, open to correction. **Builder's call** = left to the implementer.
 
@@ -54,7 +54,7 @@ template <typename E> struct Failed { Fail<E> error; };
 
 template <typename T, typename E>
 class FutureState : public ArcFromThis<FutureState<T, E>> {
-    engine::scheduler::Event _done;                       // from the waitable design
+    engine::scheduler::Signal _done;                       // from the waitable design
     Variant<Pending, Resolved<T>, Failed<E>> _slot;       // written once, before _done.set()
     std::atomic<u8> _contState { eNone };                 // eNone, eStored, eClaimed
     Continuation _cont;                                   // the successor's work, see 7.3
@@ -82,10 +82,11 @@ public:
     void reject(E&& error_) noexcept;            // exactly once
     [[nodiscard]] bool isPending() const noexcept;
 };
-template <typename E> class Promise<void, E>;    // resolve() without a value
+// void: handled by constrained members and `if constexpr` on the primary template (resolve() without a value,
+// Future<void>::ready(), await -> Result<void, Fail<E>>), not by a separate specialisation (as built, W02.2).
 ```
 
-`resolve` and `reject` store into `_slot`, call `_done.set()`, then run the continuation arbitration, exactly once per promise: the destructor's break path runs only when the promise never finished (a flag on the handle, not on the state, so a resolve followed by a late `then` cannot double-schedule). Both are `noexcept` and callable from an affine thread (platform queue, IO completion): `Event::set` is thread-safe and `Scheduler::exec` is a spin-locked queue push with no thread affinity. A continuation scheduled after the scheduler has stopped is dropped with the queue; that is the existing behaviour of any task pushed late and is accepted here.
+`resolve` and `reject` store into `_slot`, call `_done.set()`, then run the continuation arbitration, exactly once per promise: the destructor's break path runs only when the promise never finished (a flag on the handle, not on the state, so a resolve followed by a late `then` cannot double-schedule). Both are `noexcept` and callable from an affine thread (platform queue, IO completion): `Signal::set` is thread-safe and `Scheduler::exec` is a spin-locked queue push with no thread affinity. A continuation scheduled after the scheduler has stopped is dropped with the queue; that is the existing behaviour of any task pushed late and is accepted here.
 
 ### 7.2 Consumer
 
@@ -127,7 +128,7 @@ Exactly one side sees the other's state, so the continuation is scheduled once, 
 template <typename Fn> [[nodiscard]] auto async(Fn&& fn_, task::TaskMask mask_ = eNormal) -> Future<T, E>;
 ```
 
-`T, E` are deduced from `fn_`'s return: `U` gives `Future<U, Broken>`, `Result<U, E>` gives `Future<U, E>`. Implementation: allocate the state, `exec` a task capturing the state and `fn_` by move, task body calls `fn_` and resolves or rejects. `Future::ready(value)` covers the sites that today build a promise only to run it inline (`Actor.cpp`).
+`T, E` are deduced from `fn_`'s return: `U` gives `Future<U, Broken>`, `Result<U, E>` gives `Future<U, E>`, `Future<U, E>` is flattened. Implementation, as built (W02.2): `async(fn_, mask_)` is `Future<void>::ready(mask_).then(fn_)`, so there is one scheduling path, the body may be move-only (it lives in the `UniqueFn`), and the continuation task inherits `mask_`. One queue hop per call, like every `then`. `Future::ready(value)` covers the sites that today build a promise only to run it inline (`Actor.cpp`).
 
 The scheduler-level `scheduler::async(std::function<Ty()>)` in `Engine.Scheduler/Async.hpp` is deleted; its two callers move to `hg::async`.
 
@@ -150,7 +151,7 @@ The scheduler-level `scheduler::async(std::function<Ty()>)` in `Engine.Scheduler
 | `hg::Future` wrapper, `concurrent::future`, `nxpromise` | `Heliogrim/Async/Future.hpp`, `Engine.Async/Await/{Future,Promise}.hpp` | deleted; `Heliogrim/Async/Future.hpp` declares the new `Future`, `Promise`, `async`, `await` |
 | Tests | `Engine.Async.Test/Promise.cpp`, `Engine.Scheduler.Test/test.cpp:89` | rewritten against the new API (section 10) |
 
-Order relative to the waitable plan: this lands after its Task 4 (`Event`) and replaces its Task 6.
+Order relative to the waitable plan: this lands after its Task 4 (`Signal`) and replaces its Task 6.
 
 ## 10. Tests
 

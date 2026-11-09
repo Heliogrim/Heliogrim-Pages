@@ -2,6 +2,8 @@
 
 **Status**: design, draft 2026-11-08 (work chunk [W02.1](../plan/work/concurrency-fibers.md), issues [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84), [#157](https://github.com/Heliogrim/Heliogrim-Engine/issues/157), [#77](https://github.com/Heliogrim/Heliogrim-Engine/issues/77)). Builds on the [fiber scheduler exploration](fiber-scheduler-exploration.md) and the owner decisions on the [concurrency work page](../plan/work/concurrency-fibers.md#decisions-2026-11-08). The implementation plan lives untracked in the engine checkout (`docs/superpowers/plans/2026-11-08-scheduler-waitables.md`).
 
+> Amended 2026-11-09: the one-shot waitable first designed here as `Event` was renamed `Signal` (`Engine.Scheduler/Waitable/Signal.hpp`, PR #159); the text below uses the new name.
+
 Markers: **Decided** = owner decision on the work page. **Proposal** = this document's call, open to correction. **Builder's call** = left to the implementer.
 
 ## 1. Intent
@@ -55,7 +57,7 @@ Consequence: this chunk does not design `Arci`; it uses it. The "SpinLock fix" i
 - **Waiter**: a fiber or a plain thread that wants to be resumed when something happens.
 - **Park**: the waiter stops running and does not occupy a worker (fiber) or spins down into `atomic::wait` (thread).
 - **Unpark**: the completer makes the waiter runnable again: the fiber's task goes back into its priority FIFO through `Schedule::push`, or the thread's flag is set and notified.
-- **One-shot**: completes once, stays completed; late waiters return inline (`Event`, `JoinCounter`, `Promise` state).
+- **One-shot**: completes once, stays completed; late waiters return inline (`Signal`, `JoinCounter`, `Promise` state).
 - **Reusable**: a gate that opens and closes repeatedly; a woken waiter must re-check its predicate (`FiberMutex`, `FiberSharedMutex`).
 
 ### 6.2 Park node and the wake handshake (**Proposal**)
@@ -112,10 +114,10 @@ The first draft had `locked` without the view; re-checking and then calling the 
 
 The lock is `concurrent::SpinMutex` + `SpinLock` (ownerless, header-only), held for a handful of instructions and never across a suspension. Why not the lock-free intrusive stack from the exploration: the one-shot and the reusable primitives need different list semantics (close-with-sentinel versus wake-one in FIFO order), and the reusable case needs a predicate re-check under the same lock to avoid lost wakeups without node withdrawal (section 6.5). One guarded queue serves both and has no ABA surface. W02.0's experiment 5 measures polling against this queue; a lock-free push for the one-shot case is a later optimisation only if that measurement shows the lock on the wait path.
 
-### 6.4 One-shot: `Event` and `JoinCounter`
+### 6.4 One-shot: `Signal` and `JoinCounter`
 
 ```cpp
-class Event {                          // Waitable, one-shot
+class Signal {                          // Waitable, one-shot
     std::atomic<u32> _state { 0 };     // 0 pending, 1 completed
     ParkQueue _waiters;
 public:
@@ -130,12 +132,12 @@ public:
 Two invariants come out of this ordering (corrected 2026-11-08 during implementation review, W02.2):
 
 - **No lost wakeup**: `_closed` and the queue change together under the lock, so a waiter either pushes before the drain or sees the closed flag.
-- **Destruction safety**: the setter's `_state` store is its last access to the `Event`. A waiter that observed `isSet()` or returned from `wait()` may destroy the object at once; a stack-allocated `JoinCounter` whose creator returns right after `wait()` is therefore safe even while the last child is still inside `set()`. The first draft stored `_state` before draining the queue and had a use-after-free window there. Nodes are waiter-owned, so unparking them after the store touches no event memory.
+- **Destruction safety**: the setter's `_state` store is its last access to the `Signal`. A waiter that observed `isSet()` or returned from `wait()` may destroy the object at once; a stack-allocated `JoinCounter` whose creator returns right after `wait()` is therefore safe even while the last child is still inside `set()`. The first draft stored `_state` before draining the queue and had a use-after-free window there. Nodes are waiter-owned, so unparking them after the store touches no event memory.
 
 ```cpp
 class JoinCounter {                    // Waitable, one-shot, completes when the count reaches zero
     std::atomic<u32> _pending;
-    Event _done;
+    Signal _done;
 public:
     explicit JoinCounter(u32 children_);  // initialises to children_ + 1 (creator guard)
     void add(u32 n_ = 1) noexcept;        // before the matching children are started
@@ -161,7 +163,7 @@ This is a parking-lot mutex with a per-object queue instead of a global hash tab
 
 `FiberSharedMutex` word: `std::atomic<u32>` with bit 31 `eWriter`, bit 30 `eWriterWaiting`, bits 0..29 reader count. Two queues: `_readers`, `_writers`. **Ownership is handed off** to parked waiters: a woken reader or writer returns holding the lock without retrying. That is what makes the batch claim below true. All changes to `eWriterWaiting`, all pops and all handoffs happen under the queue lock.
 
-- `lock_shared()`: `prev = fetch_add(1, acquire)`; if `prev` has neither writer bit, done. Otherwise `unlock_shared()` the transient count (this may wake a writer, see below) and take the slow path under the queue lock: re-read; if no writer bit is set, `fetch_add(1)` and return; else push onto `_readers`, release the lock, `park()`, return (handed off).
+- `lock_shared()`: `prev = fetch_add(1, acquire)`; if `prev` has neither writer bit, done. Otherwise `unlock_shared()` the transient count (this may wake a writer, see below) and take the slow path under the queue lock: admit yourself with a CAS loop that only succeeds on a word without writer bits (not a plain `fetch_add` after a re-read: a fast-path writer may CAS `0 -> eWriter` outside the queue lock between the re-read and the add; corrected 2026-11-09 in W02.2); if a writer bit is set, push onto `_readers`, release the lock, `park()`, return (handed off).
 - `lock()`: CAS `0 -> eWriter`. Slow path under the queue lock: `prev = fetch_or(eWriterWaiting)`; if `prev` has no readers and no writer, the last reader left between the fast path and here and saw no waiting bit, so take the lock now: CAS `prev | eWriterWaiting -> eWriter | (waiting if _writers non-empty)`, return. Else push onto `_writers`, release the lock, `park()`, return (handed off, `eWriter` already set for us).
 - `unlock_shared()`: `prev = fetch_sub(1, acq_rel)`; if `prev` had reader count 1 and `eWriterWaiting`: under the queue lock re-check that the reader count is 0 and `eWriter` is clear (a transient fast-path reader may be in flight; whichever `fetch_sub` reaches 0 takes this path); if so, pop one writer, `fetch_or(eWriter)`, clear `eWriterWaiting` if `_writers` is now empty, release the lock, `unpark(writer)`.
 - `unlock()` (writer): under the queue lock, if `_readers` is non-empty take all `n` of them and hand off: `fetch_sub(eWriter - n)` (atomically clears the writer bit and admits `n` readers; `eWriterWaiting` stays as it is, so new fast-path readers keep backing off while writers are queued), release the lock, unpark the batch. Else if `_writers` is non-empty pop one, leave `eWriter` set (handed off), clear `eWriterWaiting` if the queue is now empty, release the lock, unpark it. Else `fetch_and(~eWriter)`.
@@ -190,7 +192,7 @@ A task may be started with a token (`exec(task, token)` overload; default none).
 
 | Operation | Order | Why |
 |---|---|---|
-| `Event::_state` set / check | release / acquire | publishes everything the completer wrote before `set()` to the waiter |
+| `Signal::_state` set / check | release / acquire | publishes everything the completer wrote before `set()` to the waiter |
 | `ParkNode::state` exchanges | acq_rel | both sides must see each other's prior writes (task fields, the node's `fiber`) |
 | `JoinCounter::_pending` | acq_rel on `fetch_sub` | the last child's writes become visible to the creator; standard counter rule |
 | Mutex word CAS | acquire on lock, release on unlock | normal mutex semantics |
@@ -220,19 +222,19 @@ struct Fiber {
 
 ## 8. Public surface (`Heliogrim/Async`)
 
-> Amended 2026-11-08: the `Future`/`future_state` rows below are superseded by the [promise and future rework](promise-future-design.md), which replaces the type instead of porting it. The `Event` and `JoinCounter` rows and the deprecation of the atomic-flag `await` stand.
+> Amended 2026-11-08: the `Future`/`future_state` rows below are superseded by the [promise and future rework](promise-future-design.md), which replaces the type instead of porting it. The `Signal` and `JoinCounter` rows and the deprecation of the atomic-flag `await` stand.
 
 | Today | After | Compatibility |
 |---|---|---|
-| `hg::await(ptr<await_signal_sub_type>)` | `hg::await(ref<Event>)`, `hg::await(ref<JoinCounter>)` | old overload kept one release as `[[deprecated]]`, body polls with `yield()` as today |
-| `hg::await(Future<T>&&) -> T` | same signature; body awaits the state's `Event` | unchanged for callers |
-| `hg::Future<T>::operator ptr<await_signal_sub_type>` | `Future<T>::event() -> ref<Event>` | the conversion operator is removed with the old `await` |
+| `hg::await(ptr<await_signal_sub_type>)` | `hg::await(ref<Signal>)`, `hg::await(ref<JoinCounter>)` | old overload kept one release as `[[deprecated]]`, body polls with `yield()` as today |
+| `hg::await(Future<T>&&) -> T` | same signature; body awaits the state's `Signal` | unchanged for callers |
+| `hg::Future<T>::operator ptr<await_signal_sub_type>` | `Future<T>::event() -> ref<Signal>` | the conversion operator is removed with the old `await` |
 | `hg::yield()` | unchanged | |
-| `concurrent::future_state` (`std::mutex` + `condition_variable` + `atomic_flag`) | `Event _done;` replaces all three; `wait()` is `_done.wait()`; `signal()` returns `ref<Event>` | `future::get`, `join`, `ready` keep their names |
-| `Action::operator ptr<await_signal_sub_type>` (editor) | `Action::finished() -> ref<Event>`; `_finished` becomes `Event` | `ActionDispatcher` calls `await(action.finished())` |
-| `io::Dispatcher::operator() -> smr<await_signal_type>` | `-> Arci<Event>` | the dispatcher is a stub; its sole caller shape changes with it |
+| `concurrent::future_state` (`std::mutex` + `condition_variable` + `atomic_flag`) | `Signal _done;` replaces all three; `wait()` is `_done.wait()`; `signal()` returns `ref<Signal>` | `future::get`, `join`, `ready` keep their names |
+| `Action::operator ptr<await_signal_sub_type>` (editor) | `Action::finished() -> ref<Signal>`; `_finished` becomes a `Signal` owned by the dispatch: `ActionDispatcher` re-arms it (`reset()`) before `execute`, the executed lambda sets it after the action call, and the dispatcher awaits it; action bodies no longer set it | Found in W02.2: resetting inside `apply()` fired the no-waiters assert while the dispatcher was parked, and `undo` would otherwise await a signal `apply` had left set |
+| `io::Dispatcher::operator() -> smr<await_signal_type>` | `-> hg::Future<void>` (ready, since the stub runs inline) | the dispatcher is a stub with no caller outside its bundle; W02.3 rewrites it |
 
-`Event` and `JoinCounter` are declared in `Engine.Scheduler/Waitable/{Event,JoinCounter}.hpp`, which include only `<atomic>`, `Engine.Common` and `Park.hpp`. `Heliogrim/Async/Waitable.hpp` re-exports them under `hg::` as **`hg::Signal`** and `hg::JoinCounter`: `hg::Event` is already taken by `Engine.Event` (found 2026-11-09 in W02.2), and "await the signal" reads well.
+`Signal` and `JoinCounter` are declared in `Engine.Scheduler/Waitable/{Signal,JoinCounter}.hpp`, which include only `<atomic>`, `Engine.Common` and `Park.hpp`. `Heliogrim/Async/Waitable.hpp` re-exports them under `hg::` as `hg::Signal` and `hg::JoinCounter`. The type itself was first named `Event` and renamed `engine::scheduler::Signal` on 2026-11-09: `hg::Event` is already the `Engine.Event` emitter base, both are included side by side in the engine startup code, and "await the signal" reads well.
 
 ## 9. Migration list
 
@@ -240,11 +242,11 @@ Every current wait class, its sites and its replacement. Each row becomes one ta
 
 | Class | Sites | Replacement |
 |---|---|---|
-| **A. Spin-yield loops** `while (!cond) fiber::self::yield()` | `Engine.GFX/Swapchain/VkSwapchain.cpp` (2, ring buffer full/empty), `Engine.Scheduler/Pipeline/CompositePipeline.cpp:69` (stop flag, has the `TODO: waitOnAtomic`) | Swapchain: keep the yield loop (it waits on the presentation engine, a bounded spin is correct there) and mark it `shortcut:` until W02.3 gives presentation an affine seam. CompositePipeline: `Event _stopped`; the last stage sets it; `stop()` awaits it |
+| **A. Spin-yield loops** `while (!cond) fiber::self::yield()` | `Engine.GFX/Swapchain/VkSwapchain.cpp` (2, ring buffer full/empty), `Engine.Scheduler/Pipeline/CompositePipeline.cpp:69` (stop flag, has the `TODO: waitOnAtomic`) | Swapchain: keep the yield loop (it waits on the presentation engine, a bounded spin is correct there) and mark it `shortcut:` until W02.3 gives presentation an affine seam. CompositePipeline: `Signal _stopped`; the last stage sets it; `stop()` awaits it |
 | **B. Atomic-flag signals** `await_signal`, `hg::await(ptr<await_signal_sub_type>)` | `Engine.GFX/Surface/Surface.cpp:73`, `Editor.Action/Log/ActionDispatcher.cpp` (3), `Editor.Boot/Boot/AssetInit.cpp:453`, `Engine.Reflow/Window/WindowManager.cpp` (2), `Editor.Assets.Actions/UnknownImport.cpp:140`, `Editor.Action/Action/{Action,SimpleAction,AutoImportAction}` conversion operators | `await(future)` or `await(action.finished())` per section 8 |
-| **C. Thread-blocking atomic waits** `waitOnAtomic`, `waitUntilAtomic` | `Editor.Core/EditorEngine.cpp` (12), `Engine.Core.Game/GameEngine.cpp` (11), `Engine.Pedantic.Resource/ExclusiveResource.hpp:83`, `Engine.Resource/Manage/UniqueResource.hpp:47`, `Engine.Storage.Action/Access/ExclusiveIoResource.hpp`, `Engine.Scheduler.Test/test.cpp` | Engine lifecycle counters (`setupCounter`, `moduleCount`, `next`): each phase knows its child count before starting any child (`getCoreModuleCount()`, 1 for the sub-module task) and the counters are reset between phases, so each phase gets a fresh `JoinCounter(n)` or `Event`; no `add()` and no reset API. Awaited from the main thread (thread path). The three `ExclusiveResource`-style acquire loops: `FiberMutex` replaces the `atomic_flag` + `waitOnAtomic` pair. `waitOnAtomic` / `waitUntilAtomic` are then deleted |
-| **D. Blocking future waits** `concurrent::future::get/join` | `Engine.Async.Test/Promise.cpp` (4), no production site | `future_state` on `Event` (section 8); tests keep calling `get()` and gain a fiber-side test |
-| **E. Promise bodies as tasks** `make_task(promise)` | `Engine.Scheduler/Async.hpp`, `Engine.Scheduler.Test/test.cpp:98`, platform and importer promises | unchanged; completion calls `Event::set()` through `future_state::complete()` |
+| **C. Thread-blocking atomic waits** `waitOnAtomic`, `waitUntilAtomic` | `Editor.Core/EditorEngine.cpp` (12), `Engine.Core.Game/GameEngine.cpp` (11), `Engine.Pedantic.Resource/ExclusiveResource.hpp:83`, `Engine.Resource/Manage/UniqueResource.hpp:47`, `Engine.Storage.Action/Access/ExclusiveIoResource.hpp`, `Engine.Scheduler.Test/test.cpp` | Engine lifecycle counters (`setupCounter`, `moduleCount`, `next`): each phase knows its child count before starting any child (`getCoreModuleCount()`, 1 for the sub-module task) and the counters are reset between phases, so each phase gets a fresh `JoinCounter(n)` or `Signal`; no `add()` and no reset API. Awaited from the main thread (thread path). The three `ExclusiveResource`-style acquire loops: `FiberMutex` replaces the `atomic_flag` + `waitOnAtomic` pair. `waitOnAtomic` / `waitUntilAtomic` are then deleted |
+| **D. Blocking future waits** `concurrent::future::get/join` | `Engine.Async.Test/Promise.cpp` (4), no production site | `future_state` on `Signal` (section 8); tests keep calling `get()` and gain a fiber-side test |
+| **E. Promise bodies as tasks** `make_task(promise)` | `Engine.Scheduler/Async.hpp`, `Engine.Scheduler.Test/test.cpp:98`, platform and importer promises | unchanged; completion calls `Signal::set()` through `future_state::complete()` |
 | **F. OS mutexes reachable from tasks** | `UnfairSpinLock` in `Engine.GFX/Command/{CommandPool,CommandBuffer}`, `Engine.Driver.Vulkan/VkCmdMgr.cpp`; `SpinMutex` shortcut in `Engine.Accel.Lang/Ir/Variant.hpp` | `FiberMutex` for the command pool and buffer, `FiberSharedMutex` for the variant caches (closes the `shortcut:` from PR #156). `FifoWorkSet` keeps `UnfairSpinLock` (no suspension inside) |
 | **G. Worker loop** | `Engine.Scheduler/Worker/Worker.cpp:150-200` | handshake step 2 replaces "reschedule suspended task"; the `awaiter.ready()` poll is gone; the idle branch stays as is (idle strategy is W02.5) |
 
@@ -255,14 +257,26 @@ Not in the list: `thread::self::yield()` in `WinPlatform.cpp:323` and `CompSched
 In `Engine.Scheduler.Test`:
 
 - Handshake race: a test hook in `Worker` (debug-only callback after `SwitchToFiber` returns) lets the test call `set()` between the fiber's push and the worker's step 2, and separately after step 2; both orders must resume the task exactly once.
-- Worker availability: with 2 workers, park 1,000 tasks on one `Event`, then run an unrelated task and assert it completes before the event is set; set the event and assert all 1,000 complete.
+- Worker availability: with 2 workers, park 1,000 tasks on one `Signal`, then run an unrelated task and assert it completes before the signal is set; set the signal and assert all 1,000 complete.
 - `JoinCounter`: N children plus creator guard; a child finishing before `add()` of the next one never completes the counter early.
-- Thread path: the main test thread awaits an `Event` set from a task; `FiberMutex` locked from a thread and a fiber alternately.
+- Thread path: the main test thread awaits a `Signal` set from a task; `FiberMutex` locked from a thread and a fiber alternately.
 - `FiberMutex`: 8 fibers increment a counter under the lock 10,000 times each with yields inside the critical section (forces migration while holding); result exact; no `UnfairSpinLock`-style throw.
 - `FiberSharedMutex`: steady readers (never empty) plus one writer; the writer acquires within one reader batch; readers arriving after the writer parked are admitted only after it.
 - Stale barrier tests behind `#if FALSE` are not ported here (they are W02.4's stage API).
 
 In `Engine.Async.Test`: `Promise.cpp` unchanged and passing; a new case awaits a future from inside a task.
+
+## 10a. As built (W02.2, 2026-11-09)
+
+Contracts that implementation added or sharpened, binding from here on:
+
+- **`Signal::reset()`** re-arms the one-shot. Valid only while no waiter is queued and never concurrently with `set()` or `wait()` (debug assert). Re-arming after `wait()` returned is allowed: `set()`'s state store is its last access, so the sole waiter returning means the setter is done. `CompositePipeline::stop()` and the editor action dispatcher rely on both.
+- **Destruction**: a `Signal` (and so a `JoinCounter`) may be destroyed as soon as `isSet()` returned true or `wait()` returned, even while the last `set()`/`done()` caller is still unwinding.
+- **Action signal ownership**: `ActionDispatcher` re-arms `finished()` before `execute`, a scope guard sets it when the executed body exits (normally or by exception), and the dispatcher awaits it; action bodies never set it. `isFinished()` therefore means "dispatch completed", not "body ran".
+- **Resource locks** (`ExclusiveResource`, `UniqueResource`, `ExclusiveIoResource`) guard with `FiberMutex`; their acquire/release helpers are excluded from clang's thread-safety analysis because RAII accessors release in another function.
+- **Thread-safety annotations**: `Engine.Common/ThreadSafety.hpp` wraps clang's capability attributes (`HG_CAPABILITY`, `HG_ACQUIRE`, `HG_RELEASE`, `HG_TRY_ACQUIRE`, shared variants, `HG_NO_THREAD_SAFETY_ANALYSIS`), no-ops on MSVC. `FiberMutex` and `FiberSharedMutex` carry them; the clang build uses `-Wthread-safety-analysis` (the umbrella flag adds negative-capability noise).
+- **Fiber control block** also carries `ptr<Schedule> schedule` (set on attach, used by `unpark`) and the `CancellationToken`.
+- **Layering debt**, accepted for now: header-only `Engine.Async` reaches the scheduler through `Engine::getEngine()` (as `Engine.Scheduler` itself already does); `Engine.Accel.Lang` links `Engine.Async` for `FiberSharedMutex`. The seam fix (a scheduler handle on the state) belongs to W02.4.
 
 ## 11. Risks and open items
 
