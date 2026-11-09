@@ -65,7 +65,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Animation](animation.md) | S36 | W36.0 to W36.5 | W36.0 | Q36.1 to Q36.3 |
 | [Navigation](navigation.md) | S37 | W37.0 to W37.4 | W37.0 | Q37.1, Q37.2 |
 | [Audio](audio.md) | S38 | W38.0 to W38.7 | W38.0 | Q38.1 to Q38.4 |
-| [Input](input.md) | S39 | W39.1 to W39.4 | W39.1 | Q39.1, Q39.2 |
+| [Input](input.md) | S39 | W39.0 to W39.4 | W39.1 (W39.0 done) | Q39.1, Q39.2 (decided) |
 | [Vector canvas and uikit](vector-ui-uikit.md) | S42, S43 | W42.0 to W42.5, W43.0 to W43.4 | W42.0, W43.0 | Q42.1, Q42.2, Q43.1 |
 | [Editor workflows](editor-workflows.md) | S44, S45, S46, S54 | W44.0 to W44.4, W45.1 to W45.3, W46.1, W46.2, W54.1, W54.2 | W44.0, W44.1 | Q44.1 to Q44.3, Q45.1, Q46.1, Q54.1 |
 | [Visual scripting and hot reload](visual-scripting-hmr.md) | S47, S48 | W47.0 to W47.4, W48.0 to W48.3 | W47.0 | Q47.1, Q47.2, Q48.1, Q48.2 |

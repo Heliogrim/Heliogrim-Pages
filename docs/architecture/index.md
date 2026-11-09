@@ -21,6 +21,7 @@ Overview documents for the engine and editor systems. Exploration notes are not 
 | [Audio and DSP](audio-dsp.md) | <span class="hg-status exploration">exploration</span> | Middleware, DAW ingestion, live and baked processing |
 | [Bounding volumes](bounding-volumes.md) | <span class="hg-status exploration">exploration</span> | Spatial queries |
 | [Fiber scheduler iteration](fiber-scheduler-exploration.md) | <span class="hg-status exploration">exploration</span> | Waiting, wake lists, task dependencies |
+| [Input backends](input-exploration.md) | <span class="hg-status closed">closed</span> 2026-11-09 | Result: SDL3 base, native capability side channels, ADR [placeholder](../adr/placeholder-input-backend-sdl3-base.md) |
 | [Observability and profiling](observability-exploration.md) | <span class="hg-status exploration">exploration</span> | Fiber-aware spans, ring buffers, tiered builds |
 | [Code documentation](code-documentation.md) | <span class="hg-status exploration">exploration</span> | Symbol-level reference without annotations in the engine |
 | [Pointer sets](pointer-sets-exploration.md) | <span class="hg-status closed">closed</span> 2026-11-04 | Result: keep ankerl, ADR [placeholder](../adr/placeholder-pointer-sets.md) |

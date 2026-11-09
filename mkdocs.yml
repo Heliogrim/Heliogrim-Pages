@@ -98,6 +98,7 @@ nav:
           - Audio and DSP: architecture/audio-dsp.md
           - Bounding volumes: architecture/bounding-volumes.md
           - Fiber scheduler iteration: architecture/fiber-scheduler-exploration.md
+          - Input backends: architecture/input-exploration.md
           - Observability and profiling: architecture/observability-exploration.md
           - Pointer sets: architecture/pointer-sets-exploration.md
           - Scripting by native codegen: architecture/scripting-native-codegen-exploration.md
@@ -207,6 +208,7 @@ nav:
       - "Placeholder: explicit allocators": adr/placeholder-explicit-allocators.md
       - "Placeholder: queue ownership": adr/placeholder-queue-ownership.md
       - "Placeholder: in-house crash handler": adr/placeholder-in-house-crash-handler.md
+      - "Placeholder: input backends": adr/placeholder-input-backend-sdl3-base.md
       - Template: adr/template.md
   - Guides:
       - guides/index.md

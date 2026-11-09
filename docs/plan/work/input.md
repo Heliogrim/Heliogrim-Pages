@@ -9,6 +9,7 @@
 |---|---|---|
 | `Engine.Input`, `Support.Input.Win32`, `Editor.UI.Service::InputService` | Event classes, drag and drop, a schedule stage, editor binding lists | Direct include of the Win32 backend is a layer violation; `InputService` becomes a context |
 | Audio brainstorm memory | SDL3 likely dropped later for native drivers | Native Win32 input behind `Engine.Platform` (Q39.1) |
+| [Input backends exploration](../../architecture/input-exploration.md) (W39.0) | SDL3 base plus native capability side channels (accepted); Windows numbers; per-platform gaps | SDL 3.4 upgrade; Apple main-thread pump; hardware end-to-end latency run |
 | [Concurrency work](concurrency-fibers.md) | Platform pump as an affine thread | Events drained at the Input stage |
 | [Editor workflows work](editor-workflows.md) S44, S54 | Gizmo capture contexts; recording for replay | Contexts and the recorder are defined here |
 | [Vector UI work](vector-ui-uikit.md) S43 | Focus and hover layer | Pushes the UI context |
@@ -39,10 +40,10 @@ Placement: `Engine.Input/{RawEvent,InputAction,Modifier,Trigger,InputContext,Arb
 
 ## Work chunks
 
-### W39.1 Input v2 design · design · after W39.0
+### W39.1 Input v2 design · design · ready
 
 - **Goal**: layers, actions, contexts, arbitration, assets, recording, the backend registration through `Engine.Platform`, migration of `InputService` and existing bindings.
-- **Inputs**: `Engine.Input`, `Editor.UI.Service`, Enhanced Input and SDL3 models (verified landing pages).
+- **Inputs**: `Engine.Input`, `Editor.UI.Service`, Enhanced Input and SDL3 models (verified landing pages), [input exploration](../../architecture/input-exploration.md) section 7 (capability sources, source timestamps and sample batches, own key enums, thread-safe intake, Apple main thread). The SDL 3.4.x upgrade is a prerequisite task in the W39.1 plan.
 - **Output**: `architecture/input-v2-design.md`; plan.
 - **Questions**: Q39.1, Q39.2.
 
@@ -58,16 +59,17 @@ Placement: `Engine.Input/{RawEvent,InputAction,Modifier,Trigger,InputContext,Arb
 
 - **Done when**: a recorded editor session replays to the same action stream in a test.
 
-### W39.0 Native backend spike · explore · ready
+### W39.0 Native backend spike · explore · done 2026-11-09
 
 - **Goal**: compare SDL3 against native input backends per platform (Win32 raw input, macOS and iOS through the system frameworks, Wayland, optionally X11) on latency, device coverage (gamepad, pen, touch), event fidelity and maintenance cost; decide the backend strategy for full platform coverage (Q39.1).
-- **Output**: `architecture/input-exploration.md` with numbers and the per-platform recommendation; W39.1 designs the backend interface against it.
+- **Output**: [Input backends exploration](../../architecture/input-exploration.md) with numbers and the per-platform recommendation; W39.1 designs the backend interface against it.
+- **Result (accepted 2026-11-09, ADR [placeholder](../../adr/placeholder-input-backend-sdl3-base.md))**: SDL3 stays the base backend everywhere (window, pump, keyboard, gamepads, lifecycle), upgraded to 3.4.x first; native code enters as capability side channels where evidence shows a gain (Windows: raw mouse deltas in absolute mode, pen history, `WM_POINTER` touch and pinch; iPadOS: coalesced and predicted touches, Pencil squeeze; Wayland: tablet pads and gestures). Keyboard and relative mouse showed no SDL overhead on Windows (0.3 ms and 0.08 ms p50, injected input); full native backends would cost 15–30k lines per platform.
 
 ## Decisions (2026-11-09)
 
 | ID | Decision |
 |---|---|
-| Q39.1 | Not simply SDL3. Spike the difference (W39.0) with the goal of native integration for Win32, iOS, macOS, Wayland and maybe X11, so the engine reaches full platform coverage without a middle layer where it does not pay off. |
+| Q39.1 | Not simply SDL3. Spike the difference (W39.0) with the goal of native integration for Win32, iOS, macOS, Wayland and maybe X11, so the engine reaches full platform coverage without a middle layer where it does not pay off. **Resolved by W39.0 (2026-11-09)**: SDL3 (3.4.x) stays the base backend on every platform; native code only as capability side channels with evidence (Windows raw mouse in absolute mode, pen history, `WM_POINTER` touch now; iPadOS and Wayland with their ports; none on X11). See the [exploration](../../architecture/input-exploration.md) section 6 and the ADR [placeholder](../../adr/placeholder-input-backend-sdl3-base.md). |
 | Q39.2 | Prioritised set of contexts. Known downsides accepted: priorities form a shared namespace that must be named constants, not magic numbers (Q18.3 rule); a modal context must say explicitly that it consumes everything; debugging needs an inspector that lists the active contexts by priority. |
 
 ## Questions for the owner
