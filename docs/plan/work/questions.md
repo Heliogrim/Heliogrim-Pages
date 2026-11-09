@@ -96,6 +96,8 @@
 
 ## Batch 4: World
 
+In progress 2026-11-09 (decisions on the work pages): 21 of 25 decided, among them Q39.1 (spike W39.0), Q37.2 (spike W56.0), Q31.2 (spike W31.4), Q31.1 (own fluids bundle), Q40.1 and Q40.2 (quadtree over fixed leaves, 2D columns with height layers). Open: Q38.3 and Q38.4 (explanations requested); the Q33.1 state-not-generator rule awaits confirmation.
+
 | ID | Question | Default | Blocks |
 |---|---|---|---|
 | Q40.1 | Cell size: fixed 256 m or hierarchical from the start? | Fixed 256 m | W40.1 |

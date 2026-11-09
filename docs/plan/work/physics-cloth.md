@@ -46,7 +46,7 @@ Placement: `Engine.Physics.Jolt/{FiberJobSystem,PhysicsWorld,ShapeFactory}`, `En
 
 ### W34.1 Physics v2 design · design · after W34.0, W07.1, W40.1
 
-- **Goal**: wrapper layer, worlds per cell group, components, shape factory, query service, deterministic profile, server scope.
+- **Goal**: wrapper layer, worlds per cell group, components, shape factory, query service, deterministic profile, server scope with the adaptive body tiers (Q34.2).
 - **Output**: `architecture/physics-v2-design.md`; plan (shapes and queries first, then characters, vehicles, ragdolls).
 - **Questions**: Q34.2, Q34.3.
 
@@ -71,7 +71,16 @@ Placement: `Engine.Physics.Jolt/{FiberJobSystem,PhysicsWorld,ShapeFactory}`, `En
 
 - **Done when**: a cape collides with its character at 60 Hz; 100 instances within budget.
 
-### W35.3 GPU XPBD cloth · execute · after W35.2, W24.2, only if Q35.1 asks for crowd-scale cloth
+### W35.3 GPU XPBD cloth · execute · after W35.2, W24.2 (later; Q35.1 keeps it out of the first release)
+
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q34.1 | Accept `JPH_DOUBLE_PRECISION` if the measured cost is at or below 10%. The owner notes that if Jolt becomes a problem later, it may be changed or replaced; the wrapper layer in W34.1 is the seam for that. |
+| Q34.3 | Split builds per role: the Jolt debug renderer is compiled only into roles with a GPU. |
+| Q34.2 | Design for level 3 (adaptive body tier per actor: full body near players or during game events such as a siege, kinematic proxy or frozen far away; the wrapper switches tiers without gameplay code noticing) and implement level 2 first (proxies by default, full bodies opt-in for vehicles, debris and physics puzzles). W34.1 designs and spikes the tier switch. |
+| Q35.1 | Not a first-release target. Jolt soft bodies with LOD first (W35.2); GPU XPBD cloth stays the later chunk W35.3. |
 
 ## Questions for the owner
 

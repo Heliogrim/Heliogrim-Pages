@@ -39,7 +39,7 @@ The design page holds the code design. Additions that the battle plan requires, 
 
 ### W38.0 Close the design: builder check, open questions, approval · design · ready
 
-- **Goal**: run (or re-run) the builder check on the design page; answer section 14 with the battle-plan resolutions above; mark proposals as owner-approved or changed; add the page to the nav; write the ADR placeholders for the two decisions already made (block recording, domain-tagged signal model).
+- **Goal**: run (or re-run) the builder check on the design page; answer section 14 with the battle-plan resolutions above; mark proposals as owner-approved or changed; state the bank-compiled versus live-mixing split (Q38.1); add the page to the nav; write the ADR placeholders for the two decisions already made (block recording, domain-tagged signal model).
 - **Output**: approved `audio-runtime-design.md`; untracked plan for design milestones 1 and 2.
 - **Questions**: Q38.1, Q38.2, Q38.3.
 
@@ -68,6 +68,13 @@ The design page holds the code design. Additions that the battle plan requires, 
 - **Done when**: a cave layer applies its reverb; a weather state changes wind and rain beds; banks stream through residency.
 
 ### W38.7 Editor audio UI design and implementation · design then execute · after W42.3, W43.2
+
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q38.2 | Constant-parameter nodes only are reorderable in the first version; optimiser passes that handle smoothed gains can be added later. |
+| Q38.1 | Approved: one listener in milestone 1; the device thread outside the fiber scheduler (an affine thread with lock-free queues, as planned in Batch 1); graph data compiled per bank, with the caveat that live mixing and reaction must stay possible, so W38.0 states the split between what is compiled into a bank and what stays live; `AudioSceneSystem` as the third system in the game scene is explicitly encouraged. Multi-listener means several hearing points (split-screen, editor preview), not speaker layout, and stays a hook. The graph description is an asset; W38.0 settles only its granularity (own asset type, compiled into banks at cook). |
 
 ## Questions for the owner
 

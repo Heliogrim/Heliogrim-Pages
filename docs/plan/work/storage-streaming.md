@@ -19,7 +19,7 @@
 
 - **Bundles**: `Engine.Storage.*` keeps registries, actions, packages. New `Engine.Storage.Backend` (`IoBackend` interface, Windows IOCP implementation, generic thread-pool fallback) running on an `AffineThread` (S02). New `Engine.Resource.Residency` (budgets, priorities, eviction). New `Engine.Memory` (tracked allocators, arenas). New `Engine.GFX.Texture.Virtual` (page tables, feedback, transcode). New `Engine.World.Partition` replacing `Engine.Level` as the actor container.
 - **Layer**: storage, residency and memory in L2; virtual textures in L3 rendering; partition in L3 world.
-- **Provides**: `IoRequest` submission with priorities and cancellation; residency budgets and eviction events; tagged allocation reports; virtual texture page service; cell grid, cell lifecycle, cell persistence.
+- **Provides**: `IoRequest` submission with priorities and cancellation; residency budgets and eviction events; tagged allocation reports; virtual texture page service; cell grid (2D quadtree over fixed leaf cells, optional height layers per leaf; Q40.1, Q40.2), cell lifecycle, cell persistence.
 - **Consumes**: `AffineThread` and `Waitable` (S02), `Diagnostic` (S05), spans and counters (S04), record headers and checksums (S01), `DoubleVec3` world positions (S07), feedback buffer from the material resolve pass (S15).
 
 ```hg-diagram
@@ -63,10 +63,11 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 - **Done when**: a query resolves its stack once per scheme; a mutation invalidates after commit; #24 closed with a test.
 
-### W03.3 Async request path and IOCP backend · design · after W02.3
+### W03.3 Async request path and IOCP backend · design · ready (W02.3 done)
 
 - **Goal**: `IoRequest`, `IoQueue`, `IoBackend`, the IOCP implementation, the removal of `todo_panic` in `queryAsync` and `mutateAsync`. The interface is shaped so a DirectStorage backend drops in later (decision Q03.2): file range to host or GPU destination, batch submit, queue-level completion, a compression-format field per request.
 - **Inputs**: `docs/packages.pdf` in the engine checkout (package layout; older than the code, the source is the reference where they differ).
+- **Inputs from W02.3**: [affine threads design](../../architecture/affine-thread-design.md) section 12 (the fiber callback stays on the fiber, the IO thread moves byte ranges; header, index, archive batches; windowed fallback for large cell archives; in-flight budgets, coalescing and cancellation as the pressure levers) and the `IoThread` skeleton with its completion port.
 - **Output**: `architecture/storage-design.md` main section; plan.
 - **Questions**: Q03.2.
 
@@ -120,6 +121,10 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 | Q03.4 | A package layout PDF exists at `docs/packages.pdf` in the engine checkout; the code is probably more complete, so the source is the reference. |
 | Q08.1 | Explicit allocators plus a debug-only global hook. |
 | Q03.1 | Not a flat key. Cache per resolver stage so a hit always yields a valid result and a request that resolves archive → package → file reuses an already cached package stage and only adds the missing resolver on top, never rebuilding from the ground up. See the `ResolvedStage` row in the code design. |
+| Q40.3 | `Level` survives as a named cell set in the public API. |
+| Q40.2 (input) | World scope stated by the owner for the partition design: massive terrains; multi-layered terrain-scale tunnel systems; gigantic caves holding whole kingdoms; giant forests with villages inside trees; wide grasslands, swamps, volcanoes, mountain ranges and borders; wide oceans. The 2D versus 3D cell question (and the cell-size question Q40.1) is decided against this scope; pros and cons are in the conversation record of 2026-11-09. |
+| Q40.1 | Recommendation accepted as the starting point: fixed leaf cells (256 m to start; forest and cave interiors decide the final size) under a quadtree used for streaming priority and server interest, with persistence and ownership at the leaf only. Empty leaves hold no package. The design must get the split right between extreme actor and asset density and wide open, loosely populated regions; the owner points at a VSBVH as the kind of structure that shines there. |
+| Q40.2 | 2D columns with explicit, authored height layers (surface, cave levels), each with its own height band and packages; terrain and ocean stay on the 2D grid; streaming picks layers by player height and known connections. 3D cubes rejected for now. |
 
 ## Questions for the owner
 

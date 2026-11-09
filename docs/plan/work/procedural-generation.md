@@ -59,6 +59,13 @@ Placement: `Engine.World.Procedural/{Generator,CellSeed,PointSet,GenCache}`, `En
 
 - **Done when**: a scatter graph authored in the editor compiles to C++ and matches the hand-written generator's output.
 
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q33.2 | Wait for the S47 graph compiler before any procedural graph authoring; generators are hand-written until then. |
+| Q33.1 | Default classification. Authoritative: terrain deltas and erosion, roads, rivers, settlements and structures, cave and dungeon layouts, resource nodes and gameplay props, navmesh inputs, biome boundaries, encounter placement. Cosmetic: grass and foliage detail, debris, decals, weather particles, small fauna. Proposed rule for the owner's mixed cases (volcano debris, thrown rocks, ash fields, trampled fauna), to confirm: classify the state, not the generator. The causing event and any state that collides, persists or matters to gameplay is authoritative (a rock that can hit, an ash field as a persisted surface mask); the visual layer that reads that state is cosmetic and may be regenerated locally. |
+
 ## Questions for the owner
 
 | ID | Question | Blocks | Suggested default |

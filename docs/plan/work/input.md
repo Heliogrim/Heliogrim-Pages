@@ -39,7 +39,7 @@ Placement: `Engine.Input/{RawEvent,InputAction,Modifier,Trigger,InputContext,Arb
 
 ## Work chunks
 
-### W39.1 Input v2 design · design · ready
+### W39.1 Input v2 design · design · after W39.0
 
 - **Goal**: layers, actions, contexts, arbitration, assets, recording, the backend registration through `Engine.Platform`, migration of `InputService` and existing bindings.
 - **Inputs**: `Engine.Input`, `Editor.UI.Service`, Enhanced Input and SDL3 models (verified landing pages).
@@ -57,6 +57,18 @@ Placement: `Engine.Input/{RawEvent,InputAction,Modifier,Trigger,InputContext,Arb
 ### W39.4 Implement recorder and injector · execute · after W39.2
 
 - **Done when**: a recorded editor session replays to the same action stream in a test.
+
+### W39.0 Native backend spike · explore · ready
+
+- **Goal**: compare SDL3 against native input backends per platform (Win32 raw input, macOS and iOS through the system frameworks, Wayland, optionally X11) on latency, device coverage (gamepad, pen, touch), event fidelity and maintenance cost; decide the backend strategy for full platform coverage (Q39.1).
+- **Output**: `architecture/input-exploration.md` with numbers and the per-platform recommendation; W39.1 designs the backend interface against it.
+
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q39.1 | Not simply SDL3. Spike the difference (W39.0) with the goal of native integration for Win32, iOS, macOS, Wayland and maybe X11, so the engine reaches full platform coverage without a middle layer where it does not pay off. |
+| Q39.2 | Prioritised set of contexts. Known downsides accepted: priorities form a shared namespace that must be named constants, not magic numbers (Q18.3 rule); a modal context must say explicitly that it consumes everything; debugging needs an inspector that lists the active contexts by priority. |
 
 ## Questions for the owner
 

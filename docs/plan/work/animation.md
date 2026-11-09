@@ -59,7 +59,7 @@ Placement: `Engine.Animation/{Skeleton,AnimationClip,MorphTargetSet,PoseBuffer,N
 
 - **Done when**: two-bone IK on feet, morph-driven face, 1,000-instance crowd within budget, a retargeted clip runs on a second skeleton.
 
-### W36.4 Motion matching node · execute · after W36.3, only if Q36.3 says first release
+### W36.4 Motion matching node · execute · after W36.3 (Q36.3: after the first release)
 
 ### W36.5 Blend graph authoring through the S47 compiler · execute · after W47.3, W36.3
 
@@ -68,6 +68,8 @@ Placement: `Engine.Animation/{Skeleton,AnimationClip,MorphTargetSet,PoseBuffer,N
 | ID | Decision |
 |---|---|
 | Q36.1 | Vendor ACL (Animation Compression Library, MIT, header-only) for clip compression if W36.0 builds it cleanly under clang-cl. |
+| Q36.2 | Dual quaternion skinning as a per-asset option from the start, same skinning pass behind a flag. |
+| Q36.3 | Motion matching after the first version, once clip sampling, blending and inertialisation exist. |
 
 ## Questions for the owner
 

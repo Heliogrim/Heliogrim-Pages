@@ -45,7 +45,7 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 
 ### W37.1 Navigation design · design · after W37.0, W27.1, W40.1
 
-- **Goal**: tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets.
+- **Goal**: tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets, agent state replicable per the W56.0 tiers.
 - **Output**: `architecture/navigation-design.md`; plan.
 - **Questions**: Q37.1, Q37.2.
 
@@ -66,6 +66,7 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 | ID | Decision |
 |---|---|
 | Q37.1 | Start with a vendored navmesh library. W37.0 first produces a comprehensive comparison of the options (Recast and Detour, alternatives, an in-house voxeliser and tile builder) with pros, cons, licence and maintenance state for each, and picks from that table. The pick is wrapped behind engine types. |
+| Q37.2 | Server-only simulation with 100 to 200 ms visible reaction latency is rejected: combat will be snappy and partly fast-paced. A tiered synchronisation strategy is expected (client prediction with soft reconciliation as one part, lock-step action evaluation for all agents and players inside the perceptive effective range as another, cheaper replication by distance). Spike W56.0 on the networking page works it out; W37.1 keeps the agent state shape open for those tiers. |
 
 ## Questions for the owner
 

@@ -59,11 +59,11 @@ Placement: `Engine.World.Ocean/{WaveFunction,OceanParams,BuoyancyService}`, `Eng
 
 ### W31.0 Fluids discussion brief · explore · ready (#111 is "To discuss")
 
-- **Goal**: prepare the owner's conversation: scope (splashes, smoke, local water), technique per scope, cost at the target budget, the CPU proxy contract; recommend bundle placement.
+- **Goal**: prepare the owner's conversation: scope (splashes, smoke, local water), technique per scope, cost at the target budget, the CPU proxy contract. Bundle placement is decided (Q31.1: own bundle).
 - **Output**: `architecture/fluids-exploration.md`.
 - **Questions**: Q31.1, Q31.2.
 
-### W31.1 Fluids design · design · after W31.0 and the owner's decision, W24.2
+### W31.1 Fluids design · design · after W31.0, W31.4, W24.2
 
 ### W31.2 Implement a splash volume and a smoke volume · execute · after W31.1
 
@@ -72,6 +72,24 @@ Placement: `Engine.World.Ocean/{WaveFunction,OceanParams,BuoyancyService}`, `Eng
 ### W31.3 Shallow-water inserts and flow proxy · execute · after W31.2, W30.2
 
 - **Done when**: a river's flow drives a floating object identically on server and client.
+
+### W31.4 Next-generation gas solver spike · explore · after W31.0
+
+- **Goal**: survey state-of-the-art and unified solvers for the gas scope (smoke, fire, dust): the Weta FX unified solver ("everything is forces" in the owner's words), recent Eulerian and hybrid solvers, and what of their quality survives at real-time budgets on the baseline GPU; recommend the solver family W31.1 designs for and what it can grow into.
+- **Output**: `architecture/fluids-solver-exploration.md` with a comparison table and a recommendation; W31.1 reads it.
+
+### W31.5 Local 3D liquid, large-scale liquid, world-scale gas · execute · after W31.3, scope per owner decision
+
+- **Goal**: the later fluid scopes the owner wants on the list (FLIP or PBF basins and waterfalls, carving rivers and floods across cells, volcano plumes and weather fronts as simulation); each becomes its own chunk once W31.3 lands.
+
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q30.1 | Spike (W30.0) decides between Gerstner and spectral components for the authoritative height layer. The owner is open to experiments that find a new method, so the spike may propose one beyond the two candidates if the numbers support it. |
+| Q30.2 | Four cascades at 256² as the measured starting point; W30.1 raises resolution where the spike shows aliasing. |
+| Q31.1 | Own bundle. Fluids are a separate domain and get their own bundle (`Engine.Fluids` after the W10.3 rename) with a hard dependency on the particles bundle for pools, stages and rendering; the project already carries hard dependencies of this kind. |
+| Q31.2 | First version: splashes and spray plus a local gas solver (smoke, fire, dust); shallow-water inserts and the flow proxy follow in W31.3. Scopes 5 to 7 (local 3D liquid, large-scale liquid, world-scale gas) stay on the page as W31.5. A spike (W31.4) surveys next-generation unified solvers for the gas scope, including the Weta FX solver the owner referred to as "everything is forces", so the first solver is chosen for the quality it can grow into. |
 
 ## Questions for the owner
 

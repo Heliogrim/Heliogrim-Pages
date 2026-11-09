@@ -77,6 +77,16 @@ Placement: `Engine.World.Terrain/{TerrainTile,HeightLayerStack,HeightQueryServic
 
 - **Done when**: a cave layer has its own weather and reverb; the entrance blends.
 
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q28.2 | Terrain v2 may ship before navigation consumes height layers. |
+| Q27.1 | 64 m tiles at 1 m height spacing (65x65 samples), 4x4 tiles per 256 m leaf cell; the tile matches the navmesh tile. Finer detail comes from displacement and the voxel overlay, not from the height field. |
+| Q27.2 | 16-bit heights with per-tile min and max, plus a per-tile float32 fallback flag for extreme relief (tall cliffs) so terracing never shows. |
+| Q28.1 | Dual Contouring (Hermite data, sharp carved edges for cave architecture) with Transvoxel-style LOD seams; a fix-up pass for self-intersections is part of the design. |
+| Q29.1 | Authored volumes first; derivation from voxel caves follows once S28 exists. |
+
 ## Questions for the owner
 
 | ID | Question | Blocks | Suggested default |

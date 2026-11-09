@@ -78,7 +78,13 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 
 - **Done when**: authenticated reliable and unreliable channels pass loss and reorder tests; QUIC datagram comparison recorded.
 
-### W56.1 Replication design · design · after W55.1, W09.1, W40.1
+### W56.0 Agent and player synchronisation strategy spike · explore · ready (desk study; loopback prototype after W55.3)
+
+- **Goal**: work out the tiered strategy the owner asked for in Q37.2: client prediction with soft reconciliation, lock-step action evaluation for every agent and player inside the perceptive effective range, interpolation or coarser replication by distance; the perceived reaction latency per tier, the determinism each tier needs (ties to Q59.1), the cost per connected player; compare against pure server-authoritative agents.
+- **Output**: `architecture/agent-sync-exploration.md` with the tier table and a recommendation; W56.1 and W37.1 read it.
+- **Questions**: Q37.2 (decided as a spike), Q56.1.
+
+### W56.1 Replication design · design · after W55.1, W56.0, W09.1, W40.1
 
 - **Output**: `architecture/replication-design.md`; plan (schemas and snapshots first, interest second, prediction third).
 - **Questions**: Q56.1.
