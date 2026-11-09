@@ -119,6 +119,49 @@ This matches the existing engine direction of explicit ownership across threads,
 - Then build the bus graph with one compressor, then add EQ, limiter and ducking.
 - Write the cooker input format for stems (WAV plus JSON metadata) as a short spec.
 
+## 10. Brainstorm Progress (2026-11-03)
+
+**Status**: brainstorm in progress, no design approved. Items marked *vision* describe where the engine is heading, not code that exists today.
+
+### Direction set by the owner
+
+- **Own engine, not middleware.** The owner previously built DSP, mixers, channels, a Butterworth band compressor/EQ and trigonometric distance attenuation; that code is lost and will be rebuilt. FMOD, Wwise, Steam Audio, miniaudio and SoLoud serve as references only.
+- **Native output.** SDL3 is expected to be dropped (*vision*). First backend: Windows Core Audio (WASAPI). 7.1.4 and audio objects on Windows need Windows Sonic (`ISpatialAudioClient`), a later step. macOS Core Audio would be a separate backend.
+- **Users.** Scene sound and editor feedback sounds. First milestone: a spatial scene sound, not an editor ping.
+- **Sample rate configurable.** 44.1/48 kHz are common; 96 kHz is a real target (owner's setup). Internal rate should match the device to avoid WASAPI shared-mode resampling.
+- **Signal representation.** Packets between DSP nodes carry their domain (time domain vs FFT). Nodes declare commutativity so the graph compiler can reorder chains and minimise FFT/IFFT conversions. (Note, unverified as design rule: linear time-invariant nodes commute; nonlinear nodes such as compressor, clipper and limiter are reorder barriers.)
+- **Execution via command buffers and pools.** Decided: record once per graph change, replay per block, with caching and reuse of recorded (sub-)buffers. The current render command path is a naive implementation that will be replaced (*vision*), so audio takes ideas from it, not its structure.
+- **Threading.** No single game thread: the engine runs cooperative fiber tasks; platform event pumping and blocking IO run on dedicated threads. The current fiber task model is a placeholder; a real scheduler with task-graph dependencies (possibly EEVDF-like) is *vision*. The audio design must not depend on today's scheduler internals. Open guess: the device callback needs its own real-time thread outside the fiber scheduler.
+- **Scene integration.** An audio SceneSystem maps pushed components to internal models, following the [actor archetype](actor-archetypes-design.md) pattern. A shared BVH / spatial query service for all systems is *vision* ([bounding volumes](bounding-volumes.md)).
+- **Mixing.** Multiple mixer banks: group sub-mixes feed further mixers up to a master.
+- **First DSP scope, every category once:** multiband compressor, EQ, low-/high-pass, clipper/limiter, spatializer, attenuators, synthesizer (sine). Extend later.
+- **Loaders.** Reuse existing importers, but loader architecture and loader chains will be reworked for the new storage system (*vision*).
+- **Observability.** Processing metrics are required (research: measure worst-case block time, not average). Observability is its own engine-wide topic, brainstormed separately; the current `Profiler`/`Stopwatch` will be dropped without direct replacement. The audio design leaves a hook only.
+- **Game events and controls** need an intentional, designed integration.
+- **Editor composition UI** with graphics and controls, likely after the MSDF/reflow UI rework (*vision*).
+
+### Code check (2026-11-03)
+
+- Importers: WAV, FLAC, Vorbis only. **No Opus importer** and no Opus vendor library. Vendored: `dr_libs`, `ogg`, `vorbis`.
+- Graphics command path to model on: `RenderCommandBufferBase` (virtual record API) → `RenderCommandBuffer` (linked commands in a monotonic arena, released all at once) → `RenderCommandTranslator` (visitor with state, can reuse a native batch) → Vulkan `VkNativeBatch` with pooled `AccelCommandBuffer`s. Only Vulkan secondary buffers exist; no sub-range reuse.
+- Scene systems: `SceneSystem` hooks plus `SceneSystemTypeMappedRegistry` (component → model, model create/update/readback/destroy). Systems are a compile-time list per scene (`GameScene` = physics + render). Audio would be a third entry.
+- Observability: only a JSON trace `Profiler` and `Stopwatch` (scoped macro compiled out). No counters or metrics registry.
+- No BVH or shared spatial query service exists.
+
+### Project split (agreed)
+
+1. Audio runtime: DSP core and node set, command buffers, WASAPI backend, SceneSystem, metrics. Design doc next.
+2. Game event and control integration.
+3. Editor composition UI, after the MSDF/reflow rework.
+
+### Research (2026-11-03)
+
+Three sourced reports, each claim linked and unverified points flagged:
+
+- [Middleware feature inventory](sources/audio-research-middleware.md): FMOD 2.03.15, Wwise 2025.1.12, Steam Audio 4.8.1, cross-product table, top AAA differentiators.
+- [Creative tools and open libraries](sources/audio-research-tools-libs.md): FL Studio, Blender, Cinema 4D, miniaudio, SoLoud. Both libraries lock on or near the audio thread; copy ideas, not design.
+- [Optimisation paths](sources/audio-research-optimisation.md): banks, codecs, baking, dynamic graphs and variants, clustering, threading. Lists the hooks to design in from day one (definition/media split, residency, sound instance vs voice, per-source sends, compiled flat graphs, lock-free queues, coarse job graph, worst-case timing).
+
 ## References
 
 - Design review (Gemini, raw): [sources/audio-dsp-gemini-review.md](sources/audio-dsp-gemini-review.md)
