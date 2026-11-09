@@ -45,7 +45,7 @@ Placement: `Engine.Config/{ProcessRole,Capabilities}`, `Heliogrim.Roles/`, `Engi
 
 - **Goal**: role selection, capability flags, role compositions, null device, server and worker loops, orchestration contract, the `Engine.Core.Game` layer fix, Linux target plan.
 - **Output**: `architecture/process-roles-design.md`; plan.
-- **Questions**: Q58.1, Q58.2.
+- **Questions**: Q58.1, Q58.2 (both decided, see Decisions).
 
 ### W58.2 Implement roles, capabilities, null device and server loop · execute · after W58.1
 
@@ -82,6 +82,8 @@ Placement: `Engine.Config/{ProcessRole,Capabilities}`, `Heliogrim.Roles/`, `Engi
 |---|---|
 | Q53.1 | Game modules static in shipping, DLL in development. Shipping still has to load DLLs: allocators, the C++ runtime and third-party libraries a game developer pulls in (SQLite or any other framework, tool or utility), so the module layout keeps a DLL path for dependencies even when game code links statically. |
 | Q53.2 | Signing is required at some point and is the game developer's authority: obtaining a certificate from a public CA or running an own CA is their job, the engine provides tooling and infrastructure. Default is a local certificate workflow with a pluggable signer, plus a guided user flow that leads a game developer from an unsigned build to artifacts signed with a publicly accepted CA or their own CA. |
+| Q58.1 | Plain Kubernetes probes and StatefulSets for the single shard now; an Agones mapping as an adapter later. The orchestration contract stays an adapter, so Kubernetes is the first target, not a hard dependency. |
+| Q58.2 | A Linux toolchain (clang on Ubuntu) enters CI as soon as W58.2 lands; no earlier date. |
 
 ## Questions for the owner
 

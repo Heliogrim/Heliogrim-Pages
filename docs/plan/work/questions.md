@@ -155,6 +155,8 @@
 
 ## Batch 6: Scale and determinism
 
+**Closed 2026-11-09.** All 10 answered (Q56.2 to Q56.4 added by the W56.0 exploration); decisions on the work pages. Notable: web protocols are for auth and services only, never game-critical transfer; `d` and the T1 cap are floating runtime values; dynamic sharding and node cooperation by player density is expected; dynamic cell splitting and cooperative buffering nodes are measured in W57.0 before load shedding is final. All six batches are closed.
+
 | ID | Question | Default | Blocks |
 |---|---|---|---|
 | Q58.1 | Agones or plain Kubernetes StatefulSets? | Plain probes now, Agones adapter later | W58.1 |

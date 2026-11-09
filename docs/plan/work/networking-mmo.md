@@ -108,6 +108,10 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 
 ### W57.1 Server mesh design · design · after W57.0 and the owner's decision
 
+- **Goal**: authority and handover between nodes, dynamic sharding and node cooperation on cells and hyper-cell regions by player density (Q56.2), load shedding with the W57.0 measurements of dynamic cell splitting and cooperative buffering nodes (Q57.1), persistence journal (Q57.2).
+- **Output**: `architecture/server-mesh-design.md`; plan.
+- **Questions**: Q57.1, Q57.2 (both decided, see Decisions).
+
 ### W57.2 Implement authority, handover, persistence · execute · after W57.1
 
 - **Done when**: two nodes hand over a moving actor with no visible hitch; a node crash recovers the cell from journal plus snapshot.
@@ -117,6 +121,14 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 | ID | Decision |
 |---|---|
 | Q55.1 | A C QUIC library under MIT or BSD is acceptable if it is frequently maintained, has a security reporting process in place, and is openly and widely adopted. The transport chunk checks these three criteria per candidate (for example msquic, ngtcp2, lsquic) before picking. |
+| Q59.1 | (b) same compiler across machines for the simulation bundles, (a) same binary elsewhere. The agent-sync exploration narrows the (b) slice to action evaluation (combat resolution functions and action curves); physics, animation and pathfinding stay at (a). |
+| Q55.2 | Custom UDP protocol first for the real-time channel. QUIC, HTTP/3, HTTP/2 and the web protocols exist for built-in support of OAuth, authentication, web statistics and similar services; they were never meant for game-critical transfer. |
+| Q56.1 | Prediction scope: local actor and its mount (tier T0), for now. |
+| Q56.2 | Scheduled-start delay `d` per cell from the 90th-percentile one-way delay of clients in range, clamped to 40 to 100 ms, as a floating value that adapts at runtime. The owner expects dynamic sharding and dynamic cooperation of server nodes on cells and hyper-cell regions driven by player density and other factors; W56.1 and W57.1 plan for that. Mass battles are the benchmark: reliability, effectiveness and perceived smoothness and sharpness must be measured there (W56.0 prototype, W57.0). |
+| Q56.3 | Players whose link exceeds the cap see late actions; `d` never grows for everyone in range. In dense areas a growing `d` would stress the system and degrade gameplay for the whole group. |
+| Q56.4 | Engaged-tier (T1) cap starts at 32 predicted non-local entities per client, as an adjustable floating value tuned by the prototype and at runtime. |
+| Q57.1 | Tick-rate degradation with admission limits as the baseline. Two further candidates need measurement in W57.0 before W57.1 decides: splitting the overloaded cell dynamically into sub-cells, and cooperative nodes that buffer load for a hot cell. |
+| Q57.2 | Own journal files through the storage system; an external database adapter interface is reserved. |
 
 ## Questions for the owner
 

@@ -98,6 +98,12 @@
 
 ### W64.3 System page per shipped system · execute · continuous
 
+### W64.4 Glossary with hover terms on the Pages site · execute · ready
+
+- **Goal**: a glossary page for engine and plan terms (the owner has asked for several in the question batches: fiber, affine thread, cell, froxel, cascade, tier, `d`, metered run, and the gap-analysis list); terms in page text link to it and show a short definition on hover, marked with a subtle coloured dotted underline rather than a loud highlight. Material for MkDocs ships this through the `abbr` extension plus an auto-appended abbreviations snippet, so the chunk checks that path first before any custom JavaScript.
+- **Output**: `docs/glossary.md`, the abbreviation snippet, the underline style in `stylesheets/heliogrim.css`, nav entry.
+- **Done when**: every term the owner asked about in batches 1 to 6 resolves on hover from at least one plan page.
+
 - **Rule**: every execute chunk that ships a system ends with a system page from the template, verified against the commit.
 
 ### W10.1 Header diet and PCH · execute · ready (#75 is the spec)
