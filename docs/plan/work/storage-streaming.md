@@ -52,18 +52,24 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 ## Work chunks
 
-### W03.1 Resolved-stack reuse · design+plan · ready
+### W03.1 Resolved-stack reuse · design+plan · done 2026-11-09
+
+- **Result**: [storage design](../../architecture/storage-design.md) section 1; plan in the engine checkout `docs/superpowers/plans/2026-11-09-resolved-stack-reuse.md` (5 tasks). Finding: type-level chains were already cached; what is rebuilt per call is the runtime stage state, and overlapping queries on one package hit an assert. Stage key = (storage instance, resource type); query stages only; per-primary shared lock; one invalidation rule (the whole chain over the mutated primary); 512-entry bound as a stopgap; #24 reduces to routing `read_shader_file` through storage.
 
 - **Goal**: cache resolved stacks per stage with prefix reuse and guard-safe lifetime (Q03.1); close #24 on the way. The design names, for each existing resolver, what its stage key is and which commits invalidate it.
 - **Inputs**: `Engine.Storage.Action` (`StageResolutionFactory`, `ActionTypeResolutionCache`, `ResourceObjectStore`), exploration section 3.
 - **Output**: short design section in `architecture/storage-design.md`; plan.
 - **Questions**: Q03.1.
 
-### W03.2 Implement stack cache · execute · after W03.1
+### W03.2 Implement stack cache · execute · ready (W03.1 done), held until the current master changes land
+
+- **Plan**: engine checkout `docs/superpowers/plans/2026-11-09-resolved-stack-reuse.md` (5 tasks). Branch from `master` once the pending master changes are in; execution method not chosen yet (suggested: subagent-driven, since tasks 3 and 4 change locking and lifetimes across five bundles).
 
 - **Done when**: a query resolves its stack once per scheme; a mutation invalidates after commit; #24 closed with a test.
 
-### W03.3 Async request path and IOCP backend · design · ready (W02.3 done)
+### W03.3 Async request path and IOCP backend · design · done 2026-11-09
+
+- **Result**: [storage design](../../architecture/storage-design.md) section 2; plan in the engine checkout `docs/superpowers/plans/2026-11-09-async-storage-iocp.md` (5 tasks, runs after W03.2). Proposals open to the owner: priority per queue instead of per request (DirectStorage model, needed for FIFO per queue); buffered overlapped I/O first, unbuffered behind a flag after W03.5; `IoFileBlob` makes every `Blob::read` one park, so the parsers stay unchanged and sync `query` parks too; `WindowedBlob` with 8 MiB windows, per guard, keeps archive walks in memory; `kMaxInFlight = 64`; `StorageModule` owns the `IoSystem`, stopped next to `_platform->tidy()`; `GameEngine` never sets up storage today and stays on `LfsSyncBlob`.
 
 - **Goal**: `IoRequest`, `IoQueue`, `IoBackend`, the IOCP implementation, the removal of `todo_panic` in `queryAsync` and `mutateAsync`. The interface is shaped so a DirectStorage backend drops in later (decision Q03.2): file range to host or GPU destination, batch submit, queue-level completion, a compression-format field per request.
 - **Inputs**: `docs/packages.pdf` in the engine checkout (package layout; older than the code, the source is the reference where they differ).
@@ -71,7 +77,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 - **Output**: `architecture/storage-design.md` main section; plan.
 - **Questions**: Q03.2.
 
-### W03.4 Implement async storage · execute · after W03.3, W02.2
+### W03.4 Implement async storage · execute · ready after W03.2 (W03.3 and W02.2 done)
 
 - **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` in storage.
 
@@ -116,12 +122,14 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 | ID | Decision |
 |---|---|
-| Q03.2 | IOCP first. The design and layout keep a DirectStorage backend in view, since it is part of the target architecture. |
+| Q03.2 | Applied in the [storage design](../../architecture/storage-design.md) section 2. IOCP first. The design and layout keep a DirectStorage backend in view, since it is part of the target architecture. |
 | Q03.3 | Benchmark decides. Candidates must be legally clear and must include a codec DirectStorage can decompress on the GPU (GDeflate). |
 | Q03.4 | A package layout PDF exists at `docs/packages.pdf` in the engine checkout; the code is probably more complete, so the source is the reference. |
 | Q08.1 | Explicit allocators plus a debug-only global hook. |
-| Q03.1 | Not a flat key. Cache per resolver stage so a hit always yields a valid result and a request that resolves archive → package → file reuses an already cached package stage and only adds the missing resolver on top, never rebuilding from the ground up. See the `ResolvedStage` row in the code design. |
+| Q03.1 | Applied in the [storage design](../../architecture/storage-design.md) section 1.2: key = (storage instance, resource type). Not a flat key. Cache per resolver stage so a hit always yields a valid result and a request that resolves archive → package → file reuses an already cached package stage and only adds the missing resolver on top, never rebuilding from the ground up. See the `ResolvedStage` row in the code design. |
 | Q40.3 | `Level` survives as a named cell set in the public API. |
+| Q03.5 (2026-11-09) | In-flight cap 64 as the starting value, a constructor argument tuned by the W03.4 benchmark sweep (8 to 128). A slot reservation for high and realtime priority is added only if the priority test or the trace shows inversion. [Storage design](../../architecture/storage-design.md) 2.3. |
+| Q03.6 (2026-11-09) | A dropped batch future never cancels. `IoRequest` carries an optional `Arci<void> keepAlive` that the batch holds until the request completes, so a dropped future with an owned buffer is safe. `IoFileBlob` leaves it empty. [Storage design](../../architecture/storage-design.md) 2.4. |
 | Q40.2 (input) | World scope stated by the owner for the partition design: massive terrains; multi-layered terrain-scale tunnel systems; gigantic caves holding whole kingdoms; giant forests with villages inside trees; wide grasslands, swamps, volcanoes, mountain ranges and borders; wide oceans. The 2D versus 3D cell question (and the cell-size question Q40.1) is decided against this scope; pros and cons are in the conversation record of 2026-11-09. |
 | Q40.1 | Recommendation accepted as the starting point: fixed leaf cells (256 m to start; forest and cave interiors decide the final size) under a quadtree used for streaming priority and server interest, with persistence and ownership at the leaf only. Empty leaves hold no package. The design must get the split right between extreme actor and asset density and wide open, loosely populated regions; the owner points at a VSBVH as the kind of structure that shines there. |
 | Q40.2 | 2D columns with explicit, authored height layers (surface, cave levels), each with its own height band and packages; terrain and ocean stay on the 2D grid; streaming picks layers by player height and known connections. 3D cubes rejected for now. |

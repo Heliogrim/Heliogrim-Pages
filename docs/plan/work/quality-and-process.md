@@ -98,7 +98,9 @@
 
 ### W64.3 System page per shipped system · execute · continuous
 
-### W64.4 Glossary with hover terms on the Pages site · execute · ready
+### W64.4 Glossary with hover terms on the Pages site · execute · page seeded 2026-11-09, hover terms open
+
+- **Status**: `docs/glossary.md` exists with about 80 entries recovered from the question batches and is in the nav; the hover definitions, the dotted underline and the term links are still to do.
 
 - **Goal**: a glossary page for engine and plan terms (the owner has asked for several in the question batches: fiber, affine thread, cell, froxel, cascade, tier, `d`, metered run, and the gap-analysis list); terms in page text link to it and show a short definition on hover, marked with a subtle coloured dotted underline rather than a loud highlight. Material for MkDocs ships this through the `abbr` extension plus an auto-appended abbreviations snippet, so the chunk checks that path first before any custom JavaScript.
 - **Output**: `docs/glossary.md`, the abbreviation snippet, the underline style in `stylesheets/heliogrim.css`, nav entry.

@@ -26,19 +26,19 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 ## Ready now
 
-33 chunks have no open dependency. Suggested order inside M1, by how much they unblock:
+32 chunks have no open dependency. Suggested order inside M1, by how much they unblock:
 
 | Order | Chunk | Kind | Why first |
 |---|---|---|---|
-| 1 | [W02.0](concurrency-fibers.md), [W02.2](concurrency-fibers.md) | explore, execute | The scheduler shapes storage, audio, observability, physics and replay |
+| 1 | [W02.0](concurrency-fibers.md), [W02.4](concurrency-fibers.md) | explore, design | The scheduler shapes storage, audio, observability, physics and replay |
 | 2 | [W01.1](serialization-and-reflection.md) | design | Serialisation versioning gates partition, actions, packages, hot reload |
 | 3 | [W05.1](diagnostics-and-crash.md) | design | Every later system returns `Diagnostic` |
-| 4 | [W03.1](storage-streaming.md), [W03.5](storage-streaming.md) | design, explore | Cheap, closes #24, decides the codec |
+| 4 | [W03.2](storage-streaming.md), [W03.5](storage-streaming.md) | execute, explore | Stack cache closes #24 (W03.1 design done), W03.5 decides the codec |
 | 5 | [W63.1](quality-and-process.md), [W62.1](quality-and-process.md), [W26.1](quality-and-process.md), [W61.1](quality-and-process.md), [W10.1](quality-and-process.md), [W64.1](quality-and-process.md) | mixed | Gates that make every other chunk safer |
 | 6 | [W11.0](accel-lang.md), [W11.1](accel-lang.md) | execute | Milestone 2 is done but unmerged; the borrows plan exists |
 | 7 | [W09.1](serialization-and-reflection.md), [W07.1](render-graph-gpu-driven.md), [W14.0](render-graph-gpu-driven.md), [W15.0](render-graph-gpu-driven.md), [W58.1](build-and-deploy.md), [W39.1](input.md) | design, explore | M2 designs with no M1 dependency |
 | 8 | [W38.0](audio.md) | design | The audio design is one builder check from approval |
-| 9 | [W06.1](diagnostics-and-crash.md), [W36.0](animation.md), [W37.0](navigation.md), [W52.0](localization.md), [W44.0](editor-workflows.md) | explore | Vendor fit and benchmark spikes; each is a day or two |
+| 9 | [W06.1](diagnostics-and-crash.md), [W36.0](animation.md), [W37.0](navigation.md) (done 2026-11-09), [W52.0](localization.md), [W44.0](editor-workflows.md) | explore | Vendor fit and benchmark spikes; each is a day or two |
 | 10 | [W42.0](vector-ui-uikit.md), [W43.0](vector-ui-uikit.md), [W44.1](editor-workflows.md), [W47.0](visual-scripting-hmr.md), [W59.0](networking-mmo.md) | explore | Close paused brainstorms and record decisions |
 | 11 | [W20.0](shadows-gi.md), [W31.0](ocean-fluids.md) | explore | Briefs for the two "To discuss" issues (#100, #111) |
 
@@ -46,9 +46,9 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 | Work page | Systems | Chunks | Ready | Open questions |
 |---|---|---|---|---|
-| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.7 | W02.0, W02.2, W02.3 (W02.1 done) | Q02.1 to Q02.6 |
+| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.7 | W02.0, W02.4 (W02.1 to W02.3 done) | Q02.1 to Q02.6 |
 | [Diagnostics, observability, crash](diagnostics-and-crash.md) | S04, S05, S06 | W04.1 to W04.3, W05.1 to W05.3, W06.1 to W06.3 | W05.1, W06.1 | Q04.1 to Q04.4, Q05.1, Q05.2, Q06.1, Q06.2 |
-| [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.1, W03.5 | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
+| [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.2, W03.5; W03.4 after W03.2 (W03.1, W03.3 done) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
 | [Serialisation, reflection, packages](serialization-and-reflection.md) | S01, S09, S41 | W01.1 to W01.5, W09.1, W09.2, W41.1, W41.2 | W01.1, W09.1 | Q01.1 to Q01.3, Q09.1, Q09.2, Q41.1, Q41.2 |
 | [Quality and process](quality-and-process.md) | S10, S26, S61 to S64 | W10.1, W10.2, W26.1 to W26.3, W61.1 to W61.3, W62.1 to W62.3, W63.1, W63.2, W64.1 to W64.3 | W63.1, W62.1, W26.1, W61.1, W64.1, W10.1 | Q10.1, Q26.1, Q62.1 to Q62.3, Q63.1, Q63.2, Q64.1 |
 | [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.4, W12.1 to W12.3, W13.1, W13.2, W60.1 | W11.0, W11.1 | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
@@ -63,7 +63,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Procedural generation](procedural-generation.md) | S33 | W33.1 to W33.5 | none | Q33.1, Q33.2 |
 | [Physics and cloth](physics-cloth.md) | S34, S35 | W34.0 to W34.4, W35.1 to W35.3 | none | Q34.1 to Q34.3, Q35.1 |
 | [Animation](animation.md) | S36 | W36.0 to W36.5 | W36.0 | Q36.1 to Q36.3 |
-| [Navigation](navigation.md) | S37 | W37.0 to W37.4 | W37.0 | Q37.1, Q37.2 |
+| [Navigation](navigation.md) | S37 | W37.0 to W37.4 | none (W37.0 done) | Q37.1, Q37.2 |
 | [Audio](audio.md) | S38 | W38.0 to W38.7 | W38.0 | Q38.1 to Q38.4 |
 | [Input](input.md) | S39 | W39.0 to W39.4 | W39.1 (W39.0 done) | Q39.1, Q39.2 (decided) |
 | [Vector canvas and uikit](vector-ui-uikit.md) | S42, S43 | W42.0 to W42.5, W43.0 to W43.4 | W42.0, W43.0 | Q42.1, Q42.2, Q43.1 |
@@ -72,9 +72,9 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [DCC, plugins, VCS](dcc-plugins-vcs.md) | S49, S50, S51 | W49.1 to W49.4, W50.1 to W50.3, W51.1, W51.2 | none | Q49.1, Q50.1, Q51.1 |
 | [Localisation](localization.md) | S52 | W52.0 to W52.3 | W52.0 | Q52.1, Q52.2 |
 | [Build and headless roles](build-and-deploy.md) | S53, S58 | W53.1 to W53.5, W58.1 to W58.4 | W58.1 | Q53.1, Q53.2, Q58.1, Q58.2 |
-| [Networking, replication, mesh, replay](networking-mmo.md) | S55 to S57, S59 | W55.0 to W55.3, W56.1 to W56.3, W57.0 to W57.2, W59.0 to W59.2 | W59.0 | Q55.1, Q55.2, Q56.1, Q57.1, Q57.2, Q59.1 |
+| [Networking, replication, mesh, replay](networking-mmo.md) | S55 to S57, S59 | W55.0 to W55.3, W56.1 to W56.3, W57.0 to W57.2, W59.0 to W59.2 | W59.0 (W56.0 desk study done) | Q55.1, Q55.2, Q56.1 to Q56.4, Q57.1, Q57.2, Q59.1 |
 
-Totals: 232 chunks (about 50 explore, 70 design, 110 execute), 33 ready, 125 owner questions. The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
+Totals: 232 chunks (about 50 explore, 70 design, 110 execute), 32 ready, 128 owner questions (three added by W56.0). The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
 
 ## Cross-cutting findings from the cross-reference
 

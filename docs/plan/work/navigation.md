@@ -7,6 +7,7 @@
 
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
+| [Navmesh library fit](../../architecture/navigation-exploration.md) (W37.0) | Pick accepted (Q37.1); recastnavigation builds clean as C++23 with clang-cl 22; build, query, crowd and TileCache numbers on a 5900X; detail-mesh patch halves builds with identical output; layers partitioning | TileCache 255-cell layer limit versus 64 m tiles; float origin per region; further build optimisations in W37.2 |
 | [Terrain work](terrain.md) | Tile grid, height layers, dirty-tile protocol | Navmesh tile equals terrain tile; one layer per height layer |
 | [Storage work](storage-streaming.md) S40 | Cells and packages | Navmesh tiles stored in the cell package |
 | [Ocean work](ocean-fluids.md) | Surface height | Dynamic ceiling or floor for volumes |
@@ -38,20 +39,23 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 
 ## Work chunks
 
-### W37.0 Recast and Detour build fit · explore · ready
+### W37.0 Recast and Detour build fit · explore · done 2026-11-09
+
+- **Result**: [navmesh library fit](../../architecture/navigation-exploration.md). Vendor `recastnavigation` at a pinned `main` commit with `DT_POLYREF64`; write the hierarchy, flow fields, voxel octree and build scheduling in-house. Accepted 2026-11-09 (Q37.1 resolved). The performance pass is in the exploration, section 10.
 
 - **Goal**: comparison table of navmesh library options and the in-house path (Q37.1), then build the pick with clang-cl 22 under the vendor rules; confirm sliced queries and TileCache behaviour on a sample; record licence.
 - **Output**: `architecture/navigation-exploration.md`.
 
-### W37.1 Navigation design · design · after W37.0, W27.1, W40.1
+### W37.1 Navigation design · design · after W27.1, W40.1
 
-- **Goal**: tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets, agent state replicable per the W56.0 tiers: agents replicate intent (current path segment, target, speed) beside the pose so engaged-tier clients can continue movement, and AI decisions leave as server-scheduled `ActionEvent`s ([agent-sync exploration](../../architecture/agent-sync-exploration.md) section 7).
+- **Goal**: design against the constraints in the [exploration](../../architecture/navigation-exploration.md) section 7. Cover the tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets, agent state replicable per the W56.0 tiers: agents replicate intent (current path segment, target, speed) beside the pose so engaged-tier clients can continue movement, and AI decisions leave as server-scheduled `ActionEvent`s ([agent-sync exploration](../../architecture/agent-sync-exploration.md) section 7).
 - **Output**: `architecture/navigation-design.md`; plan.
 - **Questions**: Q37.1, Q37.2.
 
 ### W37.2 Implement tiles, builds, queries and crowd · execute · after W37.1, W27.2, W40.2
 
 - **Done when**: a 10 km² world streams navmesh tiles with its cells; 1,000 server agents path and steer within budget.
+- **Carries**: `vendor/recastnavigation/` integrated the way the other vendors are, with patches auto-applied on fetch: a CMake patch that lifts the C++98 and exception overrides, and the detail-mesh cache patch with a tile-hash test against unpatched upstream. After that come measurement tasks for incremental Delaunay, terrain via `rcAddSpan` and threaded crowd avoidance, each gated by output or path-length equality ([exploration](../../architecture/navigation-exploration.md) section 10.7). The patch and the spike source are untracked in the engine checkout under `docs/superpowers/patches/`.
 
 ### W37.3 Terrain edit rebuilds and layer links · execute · after W37.2, W28.2
 
@@ -65,7 +69,7 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 
 | ID | Decision |
 |---|---|
-| Q37.1 | Start with a vendored navmesh library. W37.0 first produces a comprehensive comparison of the options (Recast and Detour, alternatives, an in-house voxeliser and tile builder) with pros, cons, licence and maintenance state for each, and picks from that table. The pick is wrapped behind engine types. |
+| Q37.1 | Start with a vendored navmesh library. W37.0 first produces a comprehensive comparison of the options (Recast and Detour, alternatives, an in-house voxeliser and tile builder) with pros, cons, licence and maintenance state for each, and picks from that table. The pick is wrapped behind engine types. **Resolved by W37.0 (2026-11-09)**: vendor `recastnavigation` (zlib) pinned to a `main` commit, with an in-house hierarchy, flow fields and voxel octree ([exploration](../../architecture/navigation-exploration.md) section 6, ADR [placeholder](../../adr/placeholder-navmesh-recastnavigation.md)). The owner asked for a performance pass before W37.2: faster alternatives, or optimisations that keep quality. |
 | Q37.2 | Server-only simulation with 100 to 200 ms visible reaction latency is rejected: combat will be snappy and partly fast-paced. A tiered synchronisation strategy is expected (client prediction with soft reconciliation as one part, lock-step action evaluation for all agents and players inside the perceptive effective range as another, cheaper replication by distance). Spike W56.0 on the networking page works it out; W37.1 keeps the agent state shape open for those tiers. Desk study done 2026-11-09 ([agent-sync exploration](../../architecture/agent-sync-exploration.md)): agents replicate pose plus intent, decisions go out as scheduled action events, AI think time absorbs the scheduling delay. |
 
 ## Questions for the owner

@@ -96,7 +96,7 @@
 
 ## Batch 4: World
 
-**Closed 2026-11-09.** All 25 answered; decisions on the work pages. Three questions became spikes: Q39.1 (W39.0, SDL3 versus native input), Q37.2 (W56.0, tiered agent and player synchronisation), Q31.2 (W31.4, next-generation gas solvers). Q31.1 made fluids their own bundle; Q40.1 and Q40.2 set a 2D quadtree over fixed leaf cells with authored height layers.
+**Closed 2026-11-09 with three stragglers.** 25 of 28 answered; Q17.1, Q32.1 and Q32.2 were not presented to the owner and stay open with their defaults applying until answered. Decisions on the work pages. Three questions became spikes: Q39.1 (W39.0, SDL3 versus native input), Q37.2 (W56.0, tiered agent and player synchronisation), Q31.2 (W31.4, next-generation gas solvers). Q31.1 made fluids their own bundle; Q40.1 and Q40.2 set a 2D quadtree over fixed leaf cells with authored height layers.
 
 | ID | Question | Default | Blocks |
 |---|---|---|---|
@@ -169,6 +169,17 @@
 | Q56.4 | Engaged-tier cap: how many predicted non-local entities per client? | 32, adjusted by the W56.0 prototype | W56.1 |
 | Q57.1 | Load shedding: time dilation, tick-rate degradation, or admission limits? | Tick-rate degradation with admission limits | W57.1 |
 | Q57.2 | Persistence: own journal through storage, or external database adapter from the start? | Own journal, adapter reserved | W57.1 |
+
+## Follow-ups from chunk work
+
+Questions raised after the six batches closed, by design chunks. Each one has a default that the plan uses unless the owner says otherwise.
+
+**Q03.5 and Q03.6 answered 2026-11-09**: both defaults accepted; decisions on the [storage work page](storage-streaming.md).
+
+| ID | Question | Default | Blocks |
+|---|---|---|---|
+| Q03.5 | In-flight cap for the IO thread: 64 tuned by benchmark, with a slot reservation for high priority if inversion shows? ([storage design](../../architecture/storage-design.md) 2.3) | 64 to start, reservation only on evidence | W03.4 |
+| Q03.6 | Dropped batch future: "keep buffer alive until resolved" contract, or an optional buffer owner in `IoRequest`? ([storage design](../../architecture/storage-design.md) 2.4) | Optional owner | W03.4 |
 
 ## How to answer
 
