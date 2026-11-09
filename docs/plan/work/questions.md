@@ -131,7 +131,7 @@
 
 ## Batch 5: Editor and tooling
 
-In progress 2026-11-09 (decisions on the work pages): Q39.1 and Q39.2 (with Batch 4), Q53.1, Q53.2, Q52.1, Q42.2, Q43.1, Q44.2, Q44.3, Q54.1, Q50.1 (source plugins built locally, store flow later), Q45.1. Open: Q48.2 (clarification of "first-party" requested), Q47.1, Q47.2, Q51.1, Q44.1.
+In progress 2026-11-09 (decisions on the work pages): Q39.1 and Q39.2 (with Batch 4), Q53.1, Q53.2, Q52.1, Q42.2, Q43.1, Q44.2, Q44.3, Q54.1, Q50.1 (source plugins built locally, store flow later), Q45.1. Q48.2 (first-party only). Open: Q47.1, Q47.2, Q51.1, Q44.1.
 
 | ID | Question | Default | Blocks |
 |---|---|---|---|

@@ -72,7 +72,7 @@ Placement: `Engine.Graph.Ir/`, `Engine.Graph.Emit.Cpp/`, `Engine.Graph.Emit.Asl/
 ### W48.1 Hot reload design · design · after W48.0, W09.1, W01.1, W08.1
 
 - **Output**: `architecture/hot-reload-design.md`; plan (module boundary first, patch tier second, swap tier third).
-- **Questions**: Q48.2.
+- **Questions**: Q48.2 (decided: first-party modules only).
 
 ### W48.2 Implement module boundary and patch tier · execute · after W48.1, W53.2, W09.2
 
@@ -87,6 +87,7 @@ Placement: `Engine.Graph.Ir/`, `Engine.Graph.Emit.Cpp/`, `Engine.Graph.Emit.Asl/
 | ID | Decision |
 |---|---|
 | Q48.1 | No licensed or paid software. In-house patcher only; Live++ is out, including the trial. W48.0 measures the in-house patch step alone. |
+| Q48.2 | First-party only: a shipped game loads only modules the game developer built and signed (including store plugins compiled into the game). Player-authored native modules are out of scope; if player content ever comes, it is data mods plus a sandboxed addon layer, decided later. |
 
 ## Questions for the owner
 
