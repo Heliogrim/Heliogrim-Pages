@@ -12,6 +12,7 @@
 | [Storage work](storage-streaming.md) S40 | Cells, spatial index | Interest management and authority units |
 | [Serialisation work](serialization-and-reflection.md) S01, S09 | Versioned records, replication attributes | Migration payload and schema source |
 | [Physics work](physics-cloth.md) | Deterministic profile, worlds per cell group | Rollback tests and handover |
+| [Agent-sync exploration](../../architecture/agent-sync-exploration.md) (W56.0) | Five sync tiers; "lock-step action evaluation" as server-scheduled action events; only action evaluation deterministic; no per-client server resimulation | Q56.2 to Q56.4; loopback prototype after W55.3 |
 | [Build work](build-and-deploy.md) S58 | Server and cluster roles, orchestration contract | Nodes are cluster roles |
 | [Procedural](procedural-generation.md), [ocean](ocean-fluids.md) | Deterministic math set | Owned by S59 |
 | `Engine.Network` (48 lines), `Engine.Crypto` (CRC32) | Nothing to keep | New bundles |
@@ -31,8 +32,9 @@
 | `RealtimeChannel` | Connect tokens, AEAD (ChaCha20-Poly1305 or AES-GCM), replay protection, reliable-ordered and unreliable sub-channels, fragmentation, MTU discovery around 1,200 bytes; no unauthenticated packet is processed. QUIC datagrams (RFC 9221) as a measured alternative. |
 | `ReplicationSystem : SceneSystem` | Mirrors components with replication attributes into a network model; `Schema` per type with quantisation ranges and priority per field, derived from reflection. |
 | `SnapshotEncoder` | Acked-baseline deltas, per-entity priority accumulators under a bandwidth budget, smallest-three quaternions, bit packing then an arithmetic coder measured; shared by server and client. |
-| `InterestPolicy` | Interface; grid default over the S40 spatial index; aura and priority later. |
-| `Prediction` | Input buffering and reconciliation for the local actor; interpolation for others; server lag compensation. |
+| `InterestPolicy` | Interface; grid default over the S40 spatial index; aura and priority later. Output per connection and entity: a `SyncTier` (T0 self, T1 engaged, T2 perceptive, T3 distant, T4 outside interest) per the [agent-sync exploration](../../architecture/agent-sync-exploration.md). T1 is chosen by interaction first (aggro, target, projectile) then distance, with hysteresis and a per-client cap (Q56.4). |
+| `ActionEvent` | `{ actor, action id, start tick, parameters, seed }`; a replicated message class beside snapshots. The server schedules each combat action at `t + d` (Q56.2, Q56.3) so clients in range start it on the same tick; late remote-player actions start offset into the wind-up. Action evaluation (timeline, hit windows) is the only deterministic slice. |
+| `Prediction` | T0: input buffering and reconciliation for the local actor and its mount, corrections smoothed over 100 to 250 ms. T1: short-horizon movement prediction (last input for players, replicated intent for agents) with bubble resimulation of entities near a correction. T2 and T3: interpolation and extrapolation. Tier switches smoothed. Server: capped lag compensation with a victim veto, hitbox history only, no per-client resimulation. |
 | `Authority` | Data on the entity `{ ownerNode, lease }`; transfer is a transaction. |
 | `CellHandover` | Overlap-zone ghosts read-only on neighbours; migration of serialised entity state (S01); duplicate-actor window measured. |
 | `CellPersistence` | Journal plus periodic snapshot per cell through storage. |
@@ -47,7 +49,7 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 
 ### W59.0 Determinism scope decision · explore · ready
 
-- **Goal**: write the ADR draft for scope (a), (b) or (c) with the costs each implies on the toolchain and the simulation bundles; list the bundles that must be deterministic.
+- **Goal**: write the ADR draft for scope (a), (b) or (c) with the costs each implies on the toolchain and the simulation bundles; list the bundles that must be deterministic. List combat action evaluation as its own deterministic slice: the W56.0 strategy needs scope (b) for it only, not for physics, animation or pathfinding.
 - **Output**: ADR placeholder; section in `architecture/determinism-exploration.md`.
 - **Questions**: Q59.1.
 
@@ -78,7 +80,9 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 
 - **Done when**: authenticated reliable and unreliable channels pass loss and reorder tests; QUIC datagram comparison recorded.
 
-### W56.0 Agent and player synchronisation strategy spike · explore · ready (desk study; loopback prototype after W55.3)
+### W56.0 Agent and player synchronisation strategy spike · explore · desk study done 2026-11-09; loopback prototype after W55.3
+
+- **Result**: [agent-sync exploration](../../architecture/agent-sync-exploration.md). Recommends tiers T0 self (predicted), T1 engaged (capped, predicted, bubble resimulation), T2 perceptive (interpolated), T3 distant (reduced rate), T4 outside interest. "Lock-step action evaluation" becomes server-scheduled `ActionEvent`s on a shared tick timeline; only action evaluation must be deterministic (scope (b) for that slice). Three owner points open on that page (scheduled delay `d`, high-RTT players, T1 cap).
 
 - **Goal**: work out the tiered strategy the owner asked for in Q37.2: client prediction with soft reconciliation, lock-step action evaluation for every agent and player inside the perceptive effective range, interpolation or coarser replication by distance; the perceived reaction latency per tier, the determinism each tier needs (ties to Q59.1), the cost per connected player; compare against pure server-authoritative agents.
 - **Output**: `architecture/agent-sync-exploration.md` with the tier table and a recommendation; W56.1 and W37.1 read it.
@@ -86,8 +90,9 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 
 ### W56.1 Replication design · design · after W55.1, W56.0, W09.1, W40.1
 
-- **Output**: `architecture/replication-design.md`; plan (schemas and snapshots first, interest second, prediction third).
-- **Questions**: Q56.1.
+- **Output**: `architecture/replication-design.md`; plan (schemas and snapshots first, interest and sync tiers second, action events and prediction third).
+- **Input**: the tier table and recommendation in the [agent-sync exploration](../../architecture/agent-sync-exploration.md).
+- **Questions**: Q56.1 to Q56.4.
 
 ### W56.2 Implement schemas, snapshots and interest · execute · after W56.1, W55.3, W40.2
 
@@ -121,5 +126,8 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 | Q55.1 | QUIC library: is a C library under MIT or BSD (msquic, ngtcp2) acceptable as a platform-integration vendor? | W55.1 | Yes; W55.0 picks |
 | Q55.2 | Real-time channel: build the custom UDP protocol first, or QUIC datagrams first with custom as the fallback? | W55.1 | Custom UDP first |
 | Q56.1 | Prediction scope: local player actor only, or also vehicles and mounts? | W56.1 | Local actor and its mount |
+| Q56.2 | Scheduled-start delay `d` for action events: one value per cell, or per client group? | W56.1 | Per cell, from the 90th-percentile one-way delay of clients in range, clamped to 40 to 100 ms |
+| Q56.3 | Clients whose delay exceeds `d`: they see late actions, or `d` grows for everyone in range? | W56.1 | They see late actions; `d` never exceeds the cap |
+| Q56.4 | Engaged-tier cap: how many predicted non-local entities per client? | W56.1 | 32, adjusted by the W56.0 prototype |
 | Q57.1 | Load shedding policy: time dilation per cell, tick-rate degradation, or admission limits? | W57.1 | Tick-rate degradation with admission limits |
 | Q57.2 | Persistence store: own journal files through storage, or an external database adapter from the start? | W57.1 | Own journal through storage; adapter interface reserved |

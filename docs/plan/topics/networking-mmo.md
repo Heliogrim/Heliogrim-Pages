@@ -38,7 +38,7 @@
 - Replication is a scene system mirroring components marked for replication (reflection attributes, S09) into a network model; schemas define quantisation ranges and priority per field.
 - Snapshots: acked-baseline deltas with per-entity priority accumulators under a bandwidth budget; a schema-driven encoder shared by server and client; an arithmetic coder after bit packing is measured.
 - Interest management: a policy interface (grid default; aura or priority later) fed by the same spatial index as streaming residency (S40), so streaming and replication share one query.
-- Client prediction with input buffering and server reconciliation for the local actor; interpolation for others; lag compensation on the server.
+- Synchronisation in tiers ([agent-sync exploration](../../architecture/agent-sync-exploration.md), W56.0): the local actor and its mount predicted with input buffering and smoothed reconciliation; engaged entities (target, attackers, projectiles) predicted under a per-client cap; the rest of the perceptive range interpolated; distant entities at reduced rate. Combat actions are server-scheduled action events with a start tick, so clients in range start them on the same tick; only their evaluation is deterministic. Lag compensation on the server is capped with a victim veto; the server never resimulates per client.
 - Authority is data on the entity (owner node, lease); transfer is a transaction between nodes (S57).
 
 ### S57 MMO server mesh
@@ -67,3 +67,4 @@
 - Custom UDP versus QUIC datagrams after measurement.
 - Determinism scope (a), (b) or (c).
 - Orchestration (Agones versus StatefulSets).
+- Action-event scheduling delay, high-RTT policy and engaged-tier cap (Q56.2 to Q56.4).

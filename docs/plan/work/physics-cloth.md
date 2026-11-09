@@ -14,6 +14,7 @@
 | [Bounding volumes exploration](../../architecture/bounding-volumes.md) | Spatial query options | Jolt queries become the scene query service; picking (S44) uses it |
 | [Animation work](animation.md) | Skeleton drives ragdolls and cloth colliders | Order: evaluate, then ragdoll and cloth |
 | [Networking work](networking-mmo.md) S57 | Cell authority and handover | One `PhysicsSystem` per cell group on the server |
+| [Agent-sync exploration](../../architecture/agent-sync-exploration.md) (W56.0) | The tiered sync strategy needs no physics determinism; client corrections come from reconciliation | Adaptive body tiers (Q34.2) stay independent of the sync tiers |
 
 ## Architecture
 

@@ -1,6 +1,6 @@
 # Questions for the Owner
 
-**Status**: <span class="hg-status summary">plan</span>. All 125 questions from the [work pages](index.md), grouped into batches that one conversation can clear. Each row names the chunk it blocks and the default a session uses if the question stays open. Answers go back into the work page and, where they decide architecture, into an ADR placeholder.
+**Status**: <span class="hg-status summary">plan</span>. All 128 questions (125 original, Q56.2 to Q56.4 added 2026-11-09 by W56.0) from the [work pages](index.md), grouped into batches that one conversation can clear. Each row names the chunk it blocks and the default a session uses if the question stays open. Answers go back into the work page and, where they decide architecture, into an ADR placeholder.
 
 ## Batch 1: Foundations (unblocks M1 design chunks)
 
@@ -123,7 +123,7 @@
 | Q35.1 | Crowd-scale cloth in the first release? | No | W35.1 |
 | Q36.2 | Dual quaternion skinning as a per-asset option in v1? | Yes | W36.1 |
 | Q36.3 | Motion matching in the first release? | After | W36.1 |
-| Q37.2 | Clients predict NPC movement, or server only? | Server only | W37.1 |
+| Q37.2 | Clients predict NPC movement, or server only? | ~~Server only~~ rejected; tiered strategy, see W56.0 | W37.1 |
 | Q38.1 | Approve the audio design proposals as written? | Approve | W38.0 |
 | Q38.2 | Reorder nodes with smoothed gains, or constant-parameter nodes only? | Constant only | W38.0 |
 | Q38.3 | Delay compensation across banks in milestone 4 or later? | Later | W38.0 |
@@ -160,6 +160,9 @@
 | Q59.1 | Determinism scope: (a) same binary, or (b) same compiler across machines? | (b) for simulation bundles | W59.1 |
 | Q55.2 | Custom UDP first, or QUIC datagrams first? | Custom UDP first | W55.1 |
 | Q56.1 | Prediction scope: local actor only, or also vehicles and mounts? | Local actor and its mount | W56.1 |
+| Q56.2 | Scheduled-start delay `d` for action events: one value per cell, or per client group? | Per cell, from the 90th-percentile one-way delay of clients in range, clamped to 40 to 100 ms | W56.1 |
+| Q56.3 | Clients whose delay exceeds `d`: they see late actions, or `d` grows for everyone in range? | They see late actions; `d` never exceeds the cap | W56.1 |
+| Q56.4 | Engaged-tier cap: how many predicted non-local entities per client? | 32, adjusted by the W56.0 prototype | W56.1 |
 | Q57.1 | Load shedding: time dilation, tick-rate degradation, or admission limits? | Tick-rate degradation with admission limits | W57.1 |
 | Q57.2 | Persistence: own journal through storage, or external database adapter from the start? | Own journal, adapter reserved | W57.1 |
 

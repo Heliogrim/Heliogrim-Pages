@@ -13,7 +13,7 @@
 | [Reflection work](serialization-and-reflection.md) S09 | Attributes and functions | Blend graph parameters are reflected properties |
 | [Visual scripting work](visual-scripting-hmr.md) S47 | Graph compiler | Blend graph compiles to a flat node program through it later |
 | [Physics work](physics-cloth.md) | Ragdolls and cloth after evaluation | Order inside the frame task graph |
-| [Networking work](networking-mmo.md) S56 | Server-authoritative movement | Root motion reconciled through the character controller |
+| [Networking work](networking-mmo.md) S56 | Server-authoritative movement; [agent-sync exploration](../../architecture/agent-sync-exploration.md) | Root motion reconciled through the character controller; combat actions start on a server-scheduled tick, so clips need start-offset playback (begin mid-wind-up for late remote actions) and per-action hit-window data |
 
 ## Architecture
 
@@ -47,7 +47,7 @@ Placement: `Engine.Animation/{Skeleton,AnimationClip,MorphTargetSet,PoseBuffer,N
 
 ### W36.1 Animation system design · design · after W36.0, W09.1, W15.1
 
-- **Goal**: assets, pose buffers, node program, evaluation scheduling, LOD, skinning pass, root motion, retargeting, DCC import contract.
+- **Goal**: assets, pose buffers, node program, evaluation scheduling, LOD, skinning pass, root motion, retargeting, DCC import contract, start-offset playback and hit-window tracks for scheduled combat actions (W56.0).
 - **Output**: `architecture/animation-design.md`; plan.
 - **Questions**: Q36.2, Q36.3.
 

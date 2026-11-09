@@ -11,7 +11,7 @@
 | [Storage work](storage-streaming.md) S40 | Cells and packages | Navmesh tiles stored in the cell package |
 | [Ocean work](ocean-fluids.md) | Surface height | Dynamic ceiling or floor for volumes |
 | [Physics work](physics-cloth.md) | Query service | Dynamic obstacles from physics bodies |
-| [Networking work](networking-mmo.md) | Server authority | Agents simulate on the server (Q37.2) |
+| [Networking work](networking-mmo.md) | Server authority | Agents replicate intent and scheduled actions per the [W56.0 tiers](../../architecture/agent-sync-exploration.md) (Q37.2) |
 | Vendor policy (vision page) | Selected algorithm libraries allowed | Recast and Detour qualify (Q37.1) |
 
 ## Architecture
@@ -45,7 +45,7 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 
 ### W37.1 Navigation design · design · after W37.0, W27.1, W40.1
 
-- **Goal**: tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets, agent state replicable per the W56.0 tiers.
+- **Goal**: tile contract, layers and links, hierarchy, crowd and flow fields, volumes, dynamic obstacles, server budgets, agent state replicable per the W56.0 tiers: agents replicate intent (current path segment, target, speed) beside the pose so engaged-tier clients can continue movement, and AI decisions leave as server-scheduled `ActionEvent`s ([agent-sync exploration](../../architecture/agent-sync-exploration.md) section 7).
 - **Output**: `architecture/navigation-design.md`; plan.
 - **Questions**: Q37.1, Q37.2.
 
@@ -66,11 +66,10 @@ Placement: `Engine.Navigation/{NavTile,AgentClass,LayerLink,PathQuery,Crowd,Flow
 | ID | Decision |
 |---|---|
 | Q37.1 | Start with a vendored navmesh library. W37.0 first produces a comprehensive comparison of the options (Recast and Detour, alternatives, an in-house voxeliser and tile builder) with pros, cons, licence and maintenance state for each, and picks from that table. The pick is wrapped behind engine types. |
-| Q37.2 | Server-only simulation with 100 to 200 ms visible reaction latency is rejected: combat will be snappy and partly fast-paced. A tiered synchronisation strategy is expected (client prediction with soft reconciliation as one part, lock-step action evaluation for all agents and players inside the perceptive effective range as another, cheaper replication by distance). Spike W56.0 on the networking page works it out; W37.1 keeps the agent state shape open for those tiers. |
+| Q37.2 | Server-only simulation with 100 to 200 ms visible reaction latency is rejected: combat will be snappy and partly fast-paced. A tiered synchronisation strategy is expected (client prediction with soft reconciliation as one part, lock-step action evaluation for all agents and players inside the perceptive effective range as another, cheaper replication by distance). Spike W56.0 on the networking page works it out; W37.1 keeps the agent state shape open for those tiers. Desk study done 2026-11-09 ([agent-sync exploration](../../architecture/agent-sync-exploration.md)): agents replicate pose plus intent, decisions go out as scheduled action events, AI think time absorbs the scheduling delay. |
 
 ## Questions for the owner
 
 | ID | Question | Blocks | Suggested default |
 |---|---|---|---|
 | Q37.1 | Vendor Recast and Detour (zlib) or write the voxeliser in-house? | W37.1 | Vendor, wrapped behind engine types |
-| Q37.2 | Do clients predict NPC movement, or do agents simulate on the server only with replicated poses? | W37.1 | Server only; clients interpolate |
