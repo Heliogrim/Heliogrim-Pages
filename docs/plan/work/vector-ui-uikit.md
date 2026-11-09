@@ -49,7 +49,7 @@ Placement: `Engine.Canvas/{CanvasCommand,CanvasBackend,AnimatedValue}`, `Engine.
 
 ### W42.1 Canvas design · design · after W42.0, W12.2
 
-- **Goal**: command interface, two backends, text service, glyph caches, animation values, Reflow integration and the `GFX` dependency move.
+- **Goal**: command interface, primitive set checked against issues #12 to #17 (Q42.2), two backends, text service, glyph caches, animation values, Reflow integration and the `GFX` dependency move.
 - **Output**: `architecture/canvas-design.md`; plan (quad backend first, text service second, tiled backend third).
 
 ### W42.2 Implement canvas with the quad backend and migrate Reflow · execute · after W42.1
@@ -92,6 +92,8 @@ Placement: `Engine.Canvas/{CanvasCommand,CanvasBackend,AnimatedValue}`, `Engine.
 | ID | Decision |
 |---|---|
 | Q42.1 | HarfBuzz, FreeType and ICU are acceptable text vendors, ICU with trimmed data. The design chunk records each licence (HarfBuzz old-MIT, FreeType FTL with its attribution clause or GPLv2, ICU Unicode licence) and each limitation (binary size, data trimming, platform builds) before adoption. |
+| Q42.2 | Full primitive list for day one, paths last; W42.1 first checks GitHub issues #12 to #17 for what each primitive is actually needed for and trims nothing without that check. |
+| Q43.1 | Semantic tree first, the Windows UI Automation provider planned as a later chunk; the design plans for it, but it is not a priority right now. |
 
 ## Questions for the owner
 

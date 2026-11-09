@@ -61,7 +61,7 @@ Placement: `Engine.Config/{ProcessRole,Capabilities}`, `Heliogrim.Roles/`, `Engi
 
 ### W53.1 Build system design · design · after W41.1, W58.1
 
-- **Goal**: descriptor, SDK export, cook, package, sign, module layout (static or DLL), CLI shape, editor UI later; the unified runtime representation per asset type and use case that the cook emits, agreed with W49.1 (format libraries stay editor-only, Q49.1).
+- **Goal**: descriptor, SDK export, cook, package, sign (pluggable signer and the guided CA workflow, Q53.2), module layout (static game code, DLL path for runtimes and third-party dependencies, Q53.1), CLI shape, editor UI later; the unified runtime representation per asset type and use case that the cook emits, agreed with W49.1 (format libraries stay editor-only, Q49.1).
 - **Output**: `architecture/game-build-design.md`; plan.
 - **Questions**: Q53.1, Q53.2.
 
@@ -76,6 +76,12 @@ Placement: `Engine.Config/{ProcessRole,Capabilities}`, `Heliogrim.Roles/`, `Engi
 ### W53.4 Signing, symbol upload, patch packages · execute · after W53.3, W06.3
 
 ### W53.5 Editor build UI · execute · after W53.3, W43.3
+## Decisions (2026-11-09)
+
+| ID | Decision |
+|---|---|
+| Q53.1 | Game modules static in shipping, DLL in development. Shipping still has to load DLLs: allocators, the C++ runtime and third-party libraries a game developer pulls in (SQLite or any other framework, tool or utility), so the module layout keeps a DLL path for dependencies even when game code links statically. |
+| Q53.2 | Signing is required at some point and is the game developer's authority: obtaining a certificate from a public CA or running an own CA is their job, the engine provides tooling and infrastructure. Default is a local certificate workflow with a pluggable signer, plus a guided user flow that leads a game developer from an unsigned build to artifacts signed with a publicly accepted CA or their own CA. |
 
 ## Questions for the owner
 

@@ -58,6 +58,7 @@ Placement: `Engine.Localization/{Text,MessageFormatter,StringTable,LocaleData,Ps
 | ID | Decision |
 |---|---|
 | Q52.2 | ICU with trimmed data. |
+| Q52.1 | In-house Fluent-like message syntax subset now, kept MessageFormat 2 compatible; no wait for ICU MF2. |
 
 ## Questions for the owner
 

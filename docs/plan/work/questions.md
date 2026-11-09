@@ -131,6 +131,8 @@
 
 ## Batch 5: Editor and tooling
 
+In progress 2026-11-09 (decisions on the work pages): Q39.1 and Q39.2 (with Batch 4), Q53.1, Q53.2, Q52.1, Q42.2, Q43.1, Q44.2, Q44.3, Q54.1. Explanations requested for Q48.2, Q50.1, Q45.1; Q47.1, Q47.2, Q51.1, Q44.1 not yet answered.
+
 | ID | Question | Default | Blocks |
 |---|---|---|---|
 | Q39.1 | SDL3 now with native Win32 later, or native in this system? | SDL3 now | W39.1 |
