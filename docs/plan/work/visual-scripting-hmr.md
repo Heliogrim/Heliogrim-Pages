@@ -44,7 +44,7 @@ Placement: `Engine.Graph.Ir/`, `Engine.Graph.Emit.Cpp/`, `Engine.Graph.Emit.Asl/
 
 - **Goal**: record the decision proposals from both explorations: no managed runtime for now (vision non-goal), native codegen as the path, interpreter for iteration, reflection through S09 not language reflection; answer the exploration's open questions or route them to the owner.
 - **Output**: decision section appended to both explorations; ADR placeholder "visual scripts compile to C++".
-- **Questions**: Q47.1, Q47.2.
+- **Questions**: Q47.1, Q47.2 (both decided, see Decisions).
 
 ### W47.1 Graph IR design · design · after W47.0, W09.1, W05.1
 
@@ -87,6 +87,8 @@ Placement: `Engine.Graph.Ir/`, `Engine.Graph.Emit.Cpp/`, `Engine.Graph.Emit.Asl/
 | ID | Decision |
 |---|---|
 | Q48.1 | No licensed or paid software. In-house patcher only; Live++ is out, including the trial. W48.0 measures the in-house patch step alone. |
+| Q47.1 | Confirmed for now: no C# or other managed runtime in the plan horizon; visual scripts compile to C++ (W47.0 writes the ADR placeholder). |
+| Q47.2 | Interpreter is editor-only for now; emitted C++ is mandatory for a shipped build. |
 | Q48.2 | First-party only: a shipped game loads only modules the game developer built and signed (including store plugins compiled into the game). Player-authored native modules are out of scope; if player content ever comes, it is data mods plus a sandboxed addon layer, decided later. |
 
 ## Questions for the owner

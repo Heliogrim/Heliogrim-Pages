@@ -70,7 +70,7 @@ Placement: `Editor.Import/{Translator,ImportPipeline,AssetFactory,ReimportPolicy
 ### W51.1 VCS integration design · design · after W41.1
 
 - **Output**: `architecture/vcs-integration-design.md`; plan.
-- **Questions**: Q51.1.
+- **Questions**: Q51.1 (decided: not now).
 
 ### W51.2 Implement Git and LFS provider, status, lock, diff · execute · after W51.1, W41.2, W43.3 (asset browser)
 
@@ -82,6 +82,7 @@ Placement: `Editor.Import/{Translator,ImportPipeline,AssetFactory,ReimportPolicy
 |---|---|
 | Q49.1 | FBX through `ufbx` only; no Autodesk SDK. glTF stays the primary interchange format. The vendored assimp has its own FBX reader under BSD-3, so licensing is not the problem; its FBX coverage (animation, newer binary versions) and speed are. W49.1 states whether assimp stays for any format once the own glTF translator and `ufbx` cover the importer's use, or is dropped. |
 | Q49.1 (addendum) | Format libraries (assimp, `ufbx`, image and audio decoders) are editor-only dependencies; the runtime never links them. W49.1 audits which of assimp's formats the project needs and which can go. Distribution builds cook every source asset into one unified runtime representation per asset type and use case (the `CookStep` of [build and deploy](build-and-deploy.md), content-addressed through S41); W49.1 and W53.1 state the runtime format per asset type together so import and cook agree. |
+| Q51.1 | Perforce is not mandatory right away; the provider API leaves room for a Perforce provider later. |
 | Q50.1 | Same-toolchain plugins only; no binary C-ABI table is built, the layering merely leaves room for one. The owner's model: plugins reach the user through a store or shop inside the editor as source packages (code plus assets) that are compiled locally against the installed engine, and the user is free to edit the pulled code. W50.1 designs the package shape and local build; the store flow is a later editor chunk. |
 
 ## Questions for the owner

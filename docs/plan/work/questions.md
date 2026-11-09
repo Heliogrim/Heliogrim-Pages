@@ -49,7 +49,7 @@
 | Q06.2 | Crash upload path now or local database only? | Local only, upload seam reserved | W06.1 |
 | Q18.1 | meshoptimizer vendored or in-house builder? | Vendor | W18.1 |
 | Q36.1 | ACL vendored or in-house compression? | Vendor if W36.0 builds cleanly | W36.1 |
-| Q37.1 | Recast and Detour vendored or in-house voxeliser? | Vendor, wrapped | W37.1 |
+| Q37.1 | Recast and Detour vendored or in-house voxeliser? | Vendor, wrapped | W37.1 (**resolved 2026-11-09**: recastnavigation, ADR [placeholder](../../adr/placeholder-navmesh-recastnavigation.md)) |
 | Q46.1 | SQLite FTS5 vendored or in-house inverted index? | SQLite FTS5 | W46.1 |
 | Q42.1 | HarfBuzz, FreeType, ICU acceptable as text vendors? | Yes, ICU trimmed | W42.1 |
 | Q52.2 | ICU full or trimmed data? | Trimmed | W52.1 |
@@ -131,7 +131,7 @@
 
 ## Batch 5: Editor and tooling
 
-In progress 2026-11-09 (decisions on the work pages): Q39.1 and Q39.2 (with Batch 4), Q53.1, Q53.2, Q52.1, Q42.2, Q43.1, Q44.2, Q44.3, Q54.1, Q50.1 (source plugins built locally, store flow later), Q45.1. Q48.2 (first-party only). Open: Q47.1, Q47.2, Q51.1, Q44.1.
+In progress 2026-11-09 (decisions on the work pages): Q39.1 and Q39.2 (with Batch 4), Q53.1, Q53.2, Q52.1, Q42.2, Q43.1, Q44.2, Q44.3, Q54.1, Q50.1 (source plugins built locally, store flow later), Q45.1. Q48.2 (first-party only), Q47.1, Q47.2, Q51.1. Open: Q44.1 (gizmo option set requested).
 
 | ID | Question | Default | Blocks |
 |---|---|---|---|
