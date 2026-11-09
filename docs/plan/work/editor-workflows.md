@@ -70,7 +70,7 @@ Placement: `Engine.Scene.Query/BoundsQueryService`, `Editor.Viewport.Picking/`, 
 
 ### W45.1 Actions v2 design · design · after W01.1, W09.1
 
-- **Goal**: transactions, deltas by stable ID, coalescing, asset sessions, log serialisation and replay, migration of existing actions and the uncommitted `SaveUniverse` action, fix of the `reapply` bugs.
+- **Goal**: transactions, deltas by stable ID, coalescing, asset sessions (one stream per document, compound cross-document transactions; Q45.1), log serialisation and replay, migration of existing actions and the uncommitted `SaveUniverse` action, fix of the `reapply` bugs.
 - **Output**: `architecture/editor-actions-design.md`; plan.
 - **Questions**: Q45.1.
 
@@ -108,6 +108,7 @@ Placement: `Engine.Scene.Query/BoundsQueryService`, `Editor.Viewport.Picking/`, 
 | Q44.2 | Day-one picking: geometry, light icons and gizmo handles; audio and physics proxies through the richness toggles. |
 | Q44.3 | Richness gizmos editor-only first; the overlay fragment is written so a game debug overlay can reuse it. |
 | Q54.1 | First acceptance scenario for the test driver: import a glTF, place it, move it with a gizmo, save, reload, compare the hash. |
+| Q45.1 | Per-asset undo sessions: one linear undo and redo stream per open document plus the scene's own; cross-document operations (for example renaming an asset the scene references) are a compound transaction recorded in both streams or are not undoable, and the design names that case. |
 
 ## Questions for the owner
 
