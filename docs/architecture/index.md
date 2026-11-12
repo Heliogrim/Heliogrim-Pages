@@ -13,6 +13,7 @@ Overview documents for the engine and editor systems. Exploration notes are not 
 | [Scheduler waitables](scheduler-waitable-design.md) | <span class="hg-status design">design</span> draft 2026-11-08 | Parking, events, join counter, fiber mutexes; follows the fiber scheduler exploration |
 | [Promise and future](promise-future-design.md) | <span class="hg-status design">design</span> draft 2026-11-08 | Move-only promise and future over the scheduler event, task-scheduled chaining, Send constraint |
 | [Affine threads](affine-thread-design.md) | <span class="hg-status design">design</span> draft 2026-11-09 | One owned-thread seam for the platform pump and IO: inbox, OS waker, `post` returning a future, modal-safe drain |
+| [Task graph](task-graph-design.md) | <span class="hg-status design">design</span> draft 2026-11-11, reviewed 2026-11-12 | Declared stages `{ name, reads, writes, lane, after, before }`, a checked builder (cycles, conflicts), a counting runner with a TLA+ model, lanes stamped on the task; every frame stage with its sets |
 | [Storage](storage-design.md) | <span class="hg-status design">design</span> draft 2026-11-09 | Resolved-stack reuse (per-stage cache, invalidation after commit) and the async path: IOCP `IoSystem` with DirectStorage-shaped batches, fibers park per read, windowed archive residency |
 
 ## Explorations

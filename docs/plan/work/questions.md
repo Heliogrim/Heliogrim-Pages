@@ -178,6 +178,8 @@ Questions raised after the six batches closed, by design chunks. Each one has a 
 
 | ID | Question | Default | Blocks |
 |---|---|---|---|
+| Q02.7 | Lift the `workers_ = 1` override in `CompScheduler::setup`? ([task graph design](../../architecture/task-graph-design.md) 6.3) | Yes; auto worker count, `USE_WORKER_COUNT` to force, editor run as the check | W02.5 Task 6 |
+| Q02.8 | Ageing: `Schedule::tick()` once per frame and the `eLower` set never promoted? On one worker this starves `exec`'d work for about two frames and `eLower` entirely ([task graph design](../../architecture/task-graph-design.md) 6.4) | No for the W02.4 plan; revisit in W02.5 lanes with a second worker and a measurement | W02.5 lanes |
 | Q03.5 | In-flight cap for the IO thread: 64 tuned by benchmark, with a slot reservation for high priority if inversion shows? ([storage design](../../architecture/storage-design.md) 2.3) | 64 to start, reservation only on evidence | W03.4 |
 | Q03.6 | Dropped batch future: "keep buffer alive until resolved" contract, or an optional buffer owner in `IoRequest`? ([storage design](../../architecture/storage-design.md) 2.4) | Optional owner | W03.4 |
 

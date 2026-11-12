@@ -94,6 +94,7 @@ nav:
           - Scheduler waitables: architecture/scheduler-waitable-design.md
           - Promise and future: architecture/promise-future-design.md
           - Affine threads: architecture/affine-thread-design.md
+          - Task graph: architecture/task-graph-design.md
           - Storage: architecture/storage-design.md
       - Explorations:
           - Actor system: architecture/actor-system.md

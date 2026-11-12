@@ -30,7 +30,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 | Order | Chunk | Kind | Why first |
 |---|---|---|---|
-| 1 | [W02.0](concurrency-fibers.md), [W02.4](concurrency-fibers.md) | explore, design | The scheduler shapes storage, audio, observability, physics and replay |
+| 1 | [W02.0](concurrency-fibers.md), [W02.5](concurrency-fibers.md) | explore, execute | The scheduler shapes storage, audio, observability, physics and replay; W02.4 is done (2026-11-11), its plan is ready to run |
 | 2 | [W01.1](serialization-and-reflection.md) | design | Serialisation versioning gates partition, actions, packages, hot reload |
 | 3 | [W05.1](diagnostics-and-crash.md) | design | Every later system returns `Diagnostic` |
 | 4 | [W03.2](storage-streaming.md), [W03.5](storage-streaming.md) | execute, explore | Stack cache closes #24 (W03.1 design done), W03.5 decides the codec |
@@ -46,7 +46,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 | Work page | Systems | Chunks | Ready | Open questions |
 |---|---|---|---|---|
-| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.7 | W02.0, W02.4 (W02.1 to W02.3 done) | Q02.1 to Q02.6 |
+| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.7 | W02.0, W02.5 (W02.1 to W02.4 done) | Q02.1 to Q02.8 |
 | [Diagnostics, observability, crash](diagnostics-and-crash.md) | S04, S05, S06 | W04.1 to W04.3, W05.1 to W05.3, W06.1 to W06.3 | W05.1, W06.1 | Q04.1 to Q04.4, Q05.1, Q05.2, Q06.1, Q06.2 |
 | [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.2, W03.5; W03.4 after W03.2 (W03.1, W03.3 done) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
 | [Serialisation, reflection, packages](serialization-and-reflection.md) | S01, S09, S41 | W01.1 to W01.5, W09.1, W09.2, W41.1, W41.2 | W01.1, W09.1 | Q01.1 to Q01.3, Q09.1, Q09.2, Q41.1, Q41.2 |
@@ -74,7 +74,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Build and headless roles](build-and-deploy.md) | S53, S58 | W53.1 to W53.5, W58.1 to W58.4 | W58.1 | Q53.1, Q53.2, Q58.1, Q58.2 |
 | [Networking, replication, mesh, replay](networking-mmo.md) | S55 to S57, S59 | W55.0 to W55.3, W56.1 to W56.3, W57.0 to W57.2, W59.0 to W59.2 | W59.0 (W56.0 desk study done) | Q55.1, Q55.2, Q56.1 to Q56.4, Q57.1, Q57.2, Q59.1 |
 
-Totals: 232 chunks (about 50 explore, 70 design, 110 execute), 32 ready, 128 owner questions (three added by W56.0). The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
+Totals: 232 chunks (about 50 explore, 70 design, 110 execute), 32 ready, 130 owner questions (three added by W56.0, Q02.7 and Q02.8 by W02.4). The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
 
 ## Cross-cutting findings from the cross-reference
 
