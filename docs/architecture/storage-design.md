@@ -70,7 +70,7 @@ Every cached blob stage of a local file holds an open file handle. The editor au
 
 ### 1.6 Issue #24
 
-The hard-coded path in #24 is gone: `read_shader_file` (`Engine.GFX.Render.Subpass/Impl/__tmp_helper.hpp`) now looks up `shader/<name>` under the project and editor asset paths from the config. What is left is that shaders bypass storage: the helper opens a `std::ifstream` itself. **Proposal**: `read_shader_file` queries `file+project://shader/<name>`, then `file+editor://shader/<name>`, through `StorageSystem::requestStorage` and `query`, and returns the blob's bytes. Shaders then hit the stack cache like any asset, the same reader works for packaged builds once shaders move into archives, and a test pins it. The `R:\...` paths in `Engine.GFX.RenderGraph/test.cpp` belong to a test that is not built; they stay out of scope.
+The hard-coded path in #24 is gone: `read_shader_file` (`Engine.Graphics.Render.Subpass/Impl/__tmp_helper.hpp`) now looks up `shader/<name>` under the project and editor asset paths from the config. What is left is that shaders bypass storage: the helper opens a `std::ifstream` itself. **Proposal**: `read_shader_file` queries `file+project://shader/<name>`, then `file+editor://shader/<name>`, through `StorageSystem::requestStorage` and `query`, and returns the blob's bytes. Shaders then hit the stack cache like any asset, the same reader works for packaged builds once shaders move into archives, and a test pins it. The `R:\...` paths in `Engine.Graphics.RenderGraph/test.cpp` belong to a test that is not built; they stay out of scope.
 
 ### 1.7 Tests (`Engine.Storage.Test`)
 
@@ -91,6 +91,22 @@ The hard-coded path in #24 is gone: `read_shader_file` (`Engine.GFX.Render.Subpa
 - Budgets by resource class instead of a count bound (residency manager).
 - Caching mutation stages.
 - Mutation compaction rules (exploration open question); unchanged by this section.
+
+### 1.9 As built (W03.2, 2026-11-10)
+
+Engine branch `feat/storage-stack-cache` (13 commits; reworked 2026-11-11 after the owner review and a branch review; merged into `feat/wip` by PR #169 on 2026-11-13). Where the build departs from 1.2 to 1.7:
+
+- **Shared lock per call, not per guard.** `execQuery` holds the per-primary `FiberSharedMutex` shared for the duration of one call; a `fetchQuery` guard itself holds no lock. A storage call nested inside another storage call's callback on the same primary takes the lock again on the same fiber and deadlocks once a writer waits (a mutation nested in a query deadlocks at once). Marked `shortcut:` at `execQuery` and `execMutation`; no production caller nests today. Tracked as a bug in engine issue #166.
+- **Locks are never freed.** `_locks` keeps one `FiberSharedMutex` per storage ever locked, because `lockOf` hands out a reference that a fiber locks after the map's spin lock is released. Shared-owned mutex handles would lift this if storages churn.
+- **Removal completes before it returns.** `removeStorage` takes the primary's exclusive lock first, so running actions drain; then it re-checks that the URL still names the same storage (a concurrent removal yields `None`), unregisters, marks the storage retired (`IStorage::retire`, guarded by that lock) and invalidates its chains. A query or mutation that holds the storage's `Arci` from before and locks afterwards sees the retired flag and fails with `AccessError` without caching anything. When the call returns, nothing of that storage is cached and nothing can be cached again.
+- **Mutations invalidate on every exit.** The invalidation runs from a scope guard declared after the exclusive lock, so a failed acquire or a throwing commit still drops the chain before the lock opens. Mutations on a primary only ever run under that primary's exclusive lock, so no stale entry can be cached between commit and invalidation. A query's release runs from a scope guard too, so its chain is dropped before the shared lock opens.
+- **Cursor resources are not shared.** An archive keeps a per-reader read cursor, so a cached archive stage shared by concurrent queries moved each other's position (found by the bad-path tests: wrong bytes under concurrent reads). Stages of a cursor resource (statically: `seek`/`tell`; dynamically: the resource type is an `Archive`), and every stage above one, are built per query and never inserted. Blob and package stages stay shared; building an archive view over a cached package is cheap.
+- **Keys use the exact accessor type** on the static path (`Rc<IoResourceAccessor<T>>`, so `T` and `const T` differ), and static and dynamic chains no longer share nodes. The dynamic path type-checks what it reuses; a `T` / `const T` collision there fails the query with `IllegalTypeError` instead of reinterpreting the node.
+- **Cached local files stay open.** A cached `LfsSyncBlob` keeps its `fstream` open until eviction or invalidation: without `FILE_SHARE_DELETE`, an external atomic save of that file fails while the engine runs, and changes made outside the engine are not detected. Section 2's `IoFileBlob` on Win32 handles replaces it; file watching is out of scope. The blob clears its stream state on every call, so one short read does not poison the shared blob.
+- **#24 uses absolute paths.** The registry does not resolve relative `file+editor` / `file+project` URLs: `EditorReadOnlyRepository` ignores its base path, and `ProjectFileSystemRepository` prefixes the project root (not the asset path) and only in the editor environment. `readTextViaStorage(system, scheme, absolutePath)` therefore takes an absolute path; `read_shader_file` builds the two candidates from `eLocalAssetPath` as before. Relative resolution is a separate repository change.
+- **`LfsSyncBlob`** falls back to a read-only open when the file is not writable, so read-only shader and asset files still load; `write` and `trim` assert on such a blob.
+- **Tests** count `StackCache` insert attempts instead of `acqFn` calls: a repeated query and a sibling archive both make 0 (blob and package hit, the archive is per query). The storage suite has 97 tests, writes files only under a per-process scratch root that is swept at start and exit, and covers the bad paths first: retired-storage rejection, removal waiting for in-flight queries, exactly one winner when two removals race, failed builds, mutation isolation between primaries, concurrent readers and readers against a writer, and missing, relative, directory, unknown-scheme and read-only files. `readTextViaStorage` rejects relative paths, directories and schemes without a repository, and shader `#include` names cannot leave the asset roots.
+- Found on the way: `#pragma push` / `pop` in `Engine.Resource.Package/Linker/Indexed.hpp` leaked `pack(1)` into later headers, so struct layouts differed between translation units. Fixed in its own commit.
 
 ## 2. Async request path and IOCP backend
 
@@ -206,3 +222,28 @@ Measurement (in the PR, not in a test): IOCP versus `BlockingBackend` throughput
 - Codecs, GPU destinations, DirectStorage, io_uring, the remote cache tier.
 - Per-client in-flight budgets beyond the per-system `kMaxInFlight`; the residency manager owns those.
 - Byte caching across queries (residency manager).
+
+### 2.10 Revalidated against the merged stack cache (2026-11-13)
+
+Checked on `feat/wip` at `027985d2`, after PR #169. Still true as written in sections 2.1 to 2.7: the `IoThread` skeleton (asserts on any key but `wake_key`, harvests 64), the unused `Dispatcher` stub, the six `todo_panic` async overloads, `StorageModule` without an IO member, the stop order in both engines (`_platform->tidy()`, then `_resources->destroy()` and `_scheduler->destroy()`), `GameEngine` never calling `_storage.setup`, `hg::async` in `Engine.Async/Future/Async.hpp`, and `StorageReadonlyArchive` reading through a `cref<Blob>`. Changes this section makes to 2.5 and the plan:
+
+- **Branch base is `feat/wip`**, where the stack cache landed; the PR targets `feat/wip`, as the W02 and W03.2 PRs did.
+- **Archive stages are already built per query** (1.9, "Cursor resources are not shared"). The archive accessor owns its `WindowedBlob` next to its `StorageReadonlyArchive` (archive base offset 0, size = linked size); the window source is the cached package's blob. There is no cached archive stage left to strip down to "offset, size, type".
+- **No `IoFile` on `LocalFileStorage`.** The cached blob stage owns its `IoFileBlob` and with it the `IoFile`, so one handle per cached file stays under the 512-entry bound, and invalidation or eviction closes it.
+- **Open flags** (**Proposal**): `FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE`, so a cached handle no longer blocks an external atomic save that uses POSIX rename semantics (`FileRenameInfoEx` with `FILE_RENAME_FLAG_POSIX_SEMANTICS`). A legacy `MoveFileExW(MOVEFILE_REPLACE_EXISTING)` over the cached file still fails with `ERROR_ACCESS_DENIED` while the handle is open (found in W03.4; the cached handle stays, since dropping it defeats the stack cache) (1.9, "Cached local files stay open"); `eRead` opens with `OPEN_EXISTING`, so a query never creates a missing file on the IO path (one of the W03.2 issue drafts); `eReadWrite` opens with `OPEN_ALWAYS`.
+- **Blobs derive `InheritMeta<X, Blob>`** like `LfsSyncBlob`.
+- **The stages reach the `IoSystem` through `Context`** (which now also holds the `StackCache`) as `ptr<io::IoSystem> io`, null without the IO thread; `Engine.Storage.Action` links `Engine.IO.Dispatcher`.
+- **#166 applies to the async overloads too**: awaiting `queryAsync` inside another storage callback on the same primary deadlocks like a nested sync call. This chunk adds no such caller.
+
+### 2.11 As built (W03.4, 2026-11-13)
+
+Engine branch `feat/async-storage` (8 commits, [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180)). Where the build departs from 2.2 to 2.10:
+
+- **`keepAlive` is `Arci<IoKeepAlive>`**, not `Arci<void>`, because an intrusive `Arci<void>` cannot exist. Callers derive from `IoKeepAlive`. The batch releases it when the batch resolves, not when each request completes.
+- **Aborted reads**: an `ERROR_OPERATION_ABORTED` that moved bytes reports `eShort` with the byte count. `eCancelled` always means zero bytes were written.
+- **The local-file stages are typed `Blob`**, not `LfsSyncBlob`. Each call picks `IoFileBlob` when the IO system runs and `LfsSyncBlob` otherwise. One `eNormal` queue per cached `IoFileBlob`.
+- **`stopIo()`** stops the IO thread, then clears the stack cache. A query that starts after the stop resolves sync stages. One already past the `running()` check can still cache an IO-backed stage after the clear, because `StackCache::clear` does not wait on the per-primary locks; its reads come back empty. This is accepted for now (ruling R29, a `shortcut:` in the code). `Context::io` is never nulled, because the IO system outlives the storage system and `running()` gates the choice.
+- **IOCP slots** are registered in the slot map before `ReadFile`/`WriteFile` is called and erased again on a synchronous failure. A failed insert can therefore never free an `OVERLAPPED` that the kernel owns.
+- **Archive ranges from the package linker** are checked for overflow and against the package size; a bad range fails the query with `AccessError`.
+- **The async overloads return `Future<R, E>`**, because `hg::async` flattens the `Result`.
+- **Tests run without a live drive measurement.** The Debug, page-cached sweep flattens at 16 in flight, but that is dispatch overhead. The cap stays 64 until W03.5 measures unbuffered reads.

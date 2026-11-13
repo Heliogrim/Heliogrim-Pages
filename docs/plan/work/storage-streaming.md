@@ -17,7 +17,7 @@
 
 ## Architecture
 
-- **Bundles**: `Engine.Storage.*` keeps registries, actions, packages. New `Engine.Storage.Backend` (`IoBackend` interface, Windows IOCP implementation, generic thread-pool fallback) running on an `AffineThread` (S02). New `Engine.Resource.Residency` (budgets, priorities, eviction). New `Engine.Memory` (tracked allocators, arenas). New `Engine.GFX.Texture.Virtual` (page tables, feedback, transcode). New `Engine.World.Partition` replacing `Engine.Level` as the actor container.
+- **Bundles**: `Engine.Storage.*` keeps registries, actions, packages. New `Engine.Storage.Backend` (`IoBackend` interface, Windows IOCP implementation, generic thread-pool fallback) running on an `AffineThread` (S02). New `Engine.Resource.Residency` (budgets, priorities, eviction). New `Engine.Memory` (tracked allocators, arenas). New `Engine.Graphics.Texture.Virtual` (page tables, feedback, transcode). New `Engine.World.Partition` replacing `Engine.Level` as the actor container.
 - **Layer**: storage, residency and memory in L2; virtual textures in L3 rendering; partition in L3 world.
 - **Provides**: `IoRequest` submission with priorities and cancellation; residency budgets and eviction events; tagged allocation reports; virtual texture page service; cell grid (2D quadtree over fixed leaf cells, optional height layers per leaf; Q40.1, Q40.2), cell lifecycle, cell persistence.
 - **Consumes**: `AffineThread` and `Waitable` (S02), `Diagnostic` (S05), spans and counters (S04), record headers and checksums (S01), `DoubleVec3` world positions (S07), feedback buffer from the material resolve pass (S15).
@@ -48,7 +48,7 @@ flowchart LR
 | `Partition` | Cell grid, interest sources (viewers, server interest), priority by distance, budget through `ResidencyManager`; `Level` becomes a named `CellSet`. |
 | `CellPackage` | One package per cell (S41), edits written as deltas through #73's merge stream. |
 
-Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`, `Engine.Storage.Action/StackCache.{hpp,cpp}`, `Engine.Resource.Residency/`, `Engine.Memory/`, `Engine.GFX.Texture.Virtual/`, `Engine.World.Partition/{CellCoord,Cell,Partition,CellPackage}`. Tests per bundle; the 1,000-request test and the cancellation test live in `Engine.Storage.Backend.Test`; the fly-over test is a scene fixture (S61).
+Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`, `Engine.Storage.Action/StackCache.{hpp,cpp}`, `Engine.Resource.Residency/`, `Engine.Memory/`, `Engine.Graphics.Texture.Virtual/`, `Engine.World.Partition/{CellCoord,Cell,Partition,CellPackage}`. Tests per bundle; the 1,000-request test and the cancellation test live in `Engine.Storage.Backend.Test`; the fly-over test is a scene fixture (S61).
 
 ## Work chunks
 
@@ -61,9 +61,10 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 - **Output**: short design section in `architecture/storage-design.md`; plan.
 - **Questions**: Q03.1.
 
-### W03.2 Implement stack cache · execute · ready (W03.1 done), held until the current master changes land
+### W03.2 Implement stack cache · execute · done 2026-11-13 (merged into `feat/wip` by PR #169); editor check and #24 open
 
-- **Plan**: engine checkout `docs/superpowers/plans/2026-11-09-resolved-stack-reuse.md` (5 tasks). Branch from `master` once the pending master changes are in; execution method not chosen yet (suggested: subagent-driven, since tasks 3 and 4 change locking and lifetimes across five bundles).
+- **Result**: engine PR [#169](https://github.com/Heliogrim/Heliogrim-Engine/pull/169), branch `feat/storage-stack-cache` (13 signed commits, stacked on #165 `refactor/lock-types`), merged into `feat/wip` on 2026-11-13 (head `027985d2`, not yet on `master`). The 13th commit keeps every storage test file under a swept per-process scratch root; the storage suite holds 97 tests. Executed subagent-driven from `docs/superpowers/plans/2026-11-09-resolved-stack-reuse.md`, then reworked after the owner review and a six-lens branch review: removal completes before it returns, mutations invalidate on every exit, archive stages are built per query (a shared archive cursor gave wrong reads under concurrency), and storage tests went from 50 to 97 with bad paths first. Every commit builds and passes on its own. Deviations and shortcuts: [storage design](../../architecture/storage-design.md) 1.9. Open: the editor shader-load check (the editor does not build on the base branch, `EditorInit.cpp` `initDefaultUi`), so #24 stays open until the owner confirms; nested calls on one primary can deadlock (#166); relative `file+editor` URL resolution, the `pack(1)` header fix, "mutation callback `false` still commits" and "a query creates a missing file" are issue drafts for the owner.
+- **Plan**: engine checkout `docs/superpowers/plans/2026-11-09-resolved-stack-reuse.md` (5 tasks).
 
 - **Done when**: a query resolves its stack once per scheme; a mutation invalidates after commit; #24 closed with a test.
 
@@ -77,9 +78,16 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 - **Output**: `architecture/storage-design.md` main section; plan.
 - **Questions**: Q03.2.
 
-### W03.4 Implement async storage · execute · ready after W03.2 (W03.3 and W02.2 done)
+### W03.4 Implement async storage · execute · code done 2026-11-13 (`feat/async-storage`, 8 signed commits, [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) into `feat/wip`); editor run open
 
-- **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` in storage.
+- **Result**: engine branch `feat/async-storage` (from `feat/wip` at `027985d2`): `IoSystem` with IOCP and blocking backends, four priority levels per queue, FIFO batch futures, tag cancellation through `CancelIoEx`, a draining `stop()`, `IoFileBlob` and `WindowedBlob` (8 MiB), local-file stages on the IO thread with a sync fallback, `StorageModule` ownership, `queryAsync`/`mutateAsync`. Tests: IO.Dispatcher 17, Storage 110, Storage.Package 7. A whole-branch review (six lenses) found two blockers from untrusted package ranges, both fixed (archive ranges are validated against the package size). Throughput (Debug, page-cached, 5900X): 64 KiB IOCP 3,855 vs blocking 4,299 MiB/s; 1 MiB 5,695 vs 5,158 MiB/s. This measures dispatch overhead, not the drive, so Q03.5 (in-flight cap) stays at 64 and moves to W03.5. As-built deviations: [storage design](../../architecture/storage-design.md) 2.10.
+- **Result (head)**: `384baadc`. The final review's shutdown-ordering regression is fixed: `StorageModule::stopIo` now stops the IO thread first and then clears the stack cache, so queries that start after the stop resolve sync stages. A query already past the IO check can still cache an IO-backed stage after the clear (its reads come back empty); this is noted as a `shortcut:` in the code. The IOCP backend now registers each slot before it issues the read.
+- **Open**: the editor was never run, and it does not build on `feat/wip` (`EditorInit.cpp:40`).
+- **Scope (owner, 2026-11-13)**: `StorageRegistry::removeProvider`/`removeRepository` keep their `todo_panic` for now; they are registry removal, not the request path, and nothing calls them. The "no `todo_panic` in storage" clause below covers the query and mutation path only.
+
+- **Plan**: engine checkout `docs/superpowers/plans/2026-11-09-async-storage-iocp.md` (5 tasks), revised 2026-11-13 against the merged stack cache ([storage design](../../architecture/storage-design.md) 2.10: branch base `feat/wip`, archive stages already per query, no `IoFile` on `LocalFileStorage`, `FILE_SHARE_DELETE` and `OPEN_EXISTING` for reads, `InheritMeta` blobs, `Context::io`). Executed subagent-driven in the worktree `Heliogrim-CLion-wt/async-storage`; the editor start stays with the owner, next to the W03.2 editor check.
+
+- **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` on the storage query and mutation path (registry removal excluded, see Scope).
 
 ### W03.5 Codec and chunking benchmark · explore · ready
 
