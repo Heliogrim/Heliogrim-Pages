@@ -8,7 +8,7 @@
 | Existing page | What it already settles | Still open or in tension |
 |---|---|---|
 | [Observability exploration](../../architecture/observability-exploration.md) | Goals (spans, histograms, memory, GPU timestamps, OTel), design points (fiber-local context, per-lane SPSC rings, inactive gate, rdtsc, macro-free API), the compile problems in the source sketches, three build tiers | Context location; buffer overflow policy; metered-run mode; capture format; which metrics go to OTLP |
-| [ADR placeholder: drop trace profiler](../../adr/placeholder-trace-profiler.md) | Old profiler, stopwatch and macros are gone; no direct replacement | None; S04 is the replacement |
+| [ADR placeholder: drop trace profiler](../../adr/placeholder-trace-profiler.md) | Drop the old profiler, stopwatch and macros; no direct replacement | Not yet removed: `Engine.Common/Profiling` and its macro still have 15 users (checked 2026-11-10); S04 is the replacement and W04.1 removes them |
 | [Fiber scheduler exploration](../../architecture/fiber-scheduler-exploration.md) | `FiberContext` in the control block is the likely home of the current span | Owned by S02 W02.1; S04 consumes it |
 | [Audio runtime design](../../architecture/audio-runtime-design.md) | Keeps only a profiling hook | The hook must be the S04 span API |
 | `Engine.Accel.Lang/Ir/Diagnostic.hpp` | A working diagnostic with spans for ASL | Becomes the first migration to the engine-wide type, not a second type |
