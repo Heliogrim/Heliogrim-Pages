@@ -7,13 +7,13 @@
 
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
-| Accel IR milestones 1 and 2 (engine branches `feat/accel-ir`, `feat/accel-ir-coverage`, session notes 2026-11-07) | All engine shaders in `.asl`; all graphics stages plus compute in the IR; glslang-gated GLSL emitter; immutable-by-default references; SIMT loop rules; `IrSpirvGateTest.AllAssetsAreAsl` | Milestone 2 branch not pushed or merged; GPU render never verified; editor build on master broken by two unrelated functions |
-| Region borrows spec and plan (#82, untracked `docs/superpowers/{specs,plans}/2026-11-07-ir-region-borrows*.md` in the coverage worktree) | Five-task plan ready; helpers specialised per root in the IR (backend neutral); `let` borrows share the overlap rule | Not started; GLSL vs SPIR-V lowering of borrows left open on purpose |
+| Accel IR milestones 1 and 2 (engine branches `feat/accel-ir`, `feat/accel-ir-coverage`, session notes 2026-11-07) | All engine shaders in `.asl`; all graphics stages plus compute in the IR; glslang-gated GLSL emitter; immutable-by-default references; SIMT loop rules; `IrSpirvGateTest.AllAssetsAreAsl` | Milestone 2 on `master` (checked 2026-11-13: `588f84a7` to `0a443b8a`); tests that read shader assets were replaced by inline sources (`b8ecfc8f`), so `AllAssetsAreAsl` is gone; GPU render never verified |
+| Region borrows spec and plan (#82, untracked `docs/superpowers/{specs,plans}/2026-11-07-ir-region-borrows*.md`) | Done: PR [#156](https://github.com/Heliogrim/Heliogrim-Engine/pull/156) merged into `feat/wip` 2026-11-08, on `master`; #82 closed | GLSL vs SPIR-V lowering of borrows left open on purpose; the spec still lives only in the engine checkout (W11.0 design page) |
 | Issue #148 | Three ASL-to-GLSL name-collision gaps (`_hg_ref` hoisting, reserved names) | Bug on the GLSL path; irrelevant once SPIR-V is primary, must still be fixed while GLSL is the oracle |
 | Accel IR brainstorm (memory, 2026-10) | Goals: compute and mesh stages, sparse and bindless resources, indirect dispatch for virtualised geometry | Matches S12 and S15 prerequisites |
 | [Render graph v2 work](render-graph-gpu-driven.md) | Pass declarations read inputs and outputs from the ASL interface | The interface export format is owned here (W11.3) |
 
-No exploration page exists for ASL on this site. The engine-side specs are untracked; W11.0 records the state on the site so the plan survives the worktree.
+The engine-side specs are untracked; W11.0 recorded them on the site as the [Accel Lang design](../../architecture/accel-lang-design.md) (2026-11-13).
 
 ## Architecture
 
@@ -40,20 +40,22 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 
 ## Work chunks
 
-### W11.0 Land milestone 2 and record ASL state on the site · execute · ready
+### W11.0 Land milestone 2 and record ASL state on the site · execute · code done 2026-11-13 (#148 fix on engine branch `fix/asl-reserved-names`, unpushed; design page written)
 
 - **Goal**: milestone 2 has landed (Q11.1); fix #148 on the GLSL path, write `architecture/accel-lang-design.md` from the engine-side specs so the IR shape, rules and the region-borrow spec live on the site.
-- **Done when**: branch merged; #148 closed; the design page exists with the IR part list and the borrow rules.
+- **Done when**: branch merged (done: on `feat/wip` and `master`); #148 closed (fix `cf89c70b` on `fix/asl-reserved-names`, reviewed and squashed, off `feat/wip`: the parser rejects GLSL reserved words, `gl_`, `_hg_` and the region suffixes at module scope; 469 Lang and 45 Compile tests pass; closes on merge); the design page exists with the IR part list and the borrow rules (done: [Accel Lang design](../../architecture/accel-lang-design.md)).
+- **Left**: push and PR into `feat/wip` (owner). The remaining name collisions (GLSL builtin functions, `<binding>_block`, a local `f__r<k>`, extension type names; design page section 6) are left to W11.2 on purpose, not patched on the GLSL path.
 - **Questions**: Q11.1.
 
-### W11.1 Region borrows (#82) · execute · ready (plan exists)
+### W11.1 Region borrows (#82) · execute · done 2026-11-08 (PR #156, on `master`; #82 closed)
 
 - **Goal**: run the existing five-task plan by subagent-driven development on `feat/accel-ir-regions`.
+- **Result**: commits `1a047450` (range borrows and region parameters) to `b6473e3e` (region helpers specialised per root), merged as PR [#156](https://github.com/Heliogrim/Heliogrim-Engine/pull/156) into `feat/wip`, now on `master`.
 - **Done when**: the micropolygon scratchpad layout compiles and the borrow tests pass; GLSL oracle unchanged for shaders without borrows.
 
 ### W11.2 Direct SPIR-V backend design · design · after W11.0
 
-- **Goal**: emitter structure, capability analysis, `spirv-val` and `spirv-opt` in tests, debug info, the oracle protocol (GLSL path becomes test-only after parity), the Slang question.
+- **Goal**: emitter structure, capability analysis, `spirv-val` and `spirv-opt` in tests, debug info, the oracle protocol (GLSL path becomes test-only after parity), the Slang question. The emitter must make name conflicts unrepresentable: identity by result id, user names only as debug info, no generated name in a user-visible namespace (closes the collisions in [design page section 6](../../architecture/accel-lang-design.md#6-open)).
 - **Inputs**: IR parts list, SPIRV-Tools, Slang user guide (module and link-time specialisation chapters).
 - **Output**: section in `accel-lang-design.md`; plan.
 - **Questions**: Q11.2, Q11.3.
