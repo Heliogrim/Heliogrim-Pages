@@ -10,13 +10,13 @@
 | [Code documentation exploration](../../architecture/code-documentation.md) | `clang-doc` spike proposed; no annotations in the engine | Spike not run (W64.1) |
 | [Systems template](../../systems/template.md) | Shape of a system page with a verified commit | Each shipped system adds one (W64.3) |
 | GPU harness design (approved October 2026, session notes; not on this site) | One device per test, validation layer as leak check | Needs a page before implementation (W26.1 writes it from the notes) |
-| Test notes 2026-10 (engine checkout, untracked) | 25 logged production bugs, several unfixed | W61.1 converts them to issues |
+| Test notes 2026-10 (engine checkout, untracked) | 25 logged production bugs; 12 fixed, 2 not bugs (ledger in W61.1, 2026-11-13) | 11 still open or partly open, none filed as issues yet (W61.1) |
 | C++ modules analysis (session note 2026-11-07, not on this site) | Per-bundle modules estimated at 4 to 8 person-months; a 49-bundle header SCC blocks per-bundle modules; PCH untried | W10.1 starts with header diet and PCH, not modules; W10.2 records the analysis on this site |
 | Compile-time trace 2026-11-07 (#75) | Parsing 94%; `vkinc.hpp`, `Path.hpp`, `<chrono>` top | Baseline for W10.1 |
 
 ## Architecture
 
-- Not a runtime system. Artefacts: `STANDARD.md`, `.clang-tidy`, PR template, CI workflows, `Engine.GFX.Test.Harness` (new test-support bundle), test scope tags, docs reference generation.
+- Not a runtime system. Artefacts: `STANDARD.md`, `.clang-tidy`, PR template, CI workflows, `Engine.Graphics.Test.Harness` (new test-support bundle), test scope tags, docs reference generation.
 - **Provides**: gates every other work chunk relies on; the GPU harness is the acceptance tool for track B.
 - **Consumes**: S58 null device and Linux target for TSan (later); S59 state hash for scene fixtures; S45 and S39 for workflow fixtures.
 
@@ -73,10 +73,56 @@
 
 - **Done when**: the five tests pass in CI with lavapipe goldens.
 
-### W61.1 Logged bugs to issues and fixes · execute · ready
+### W61.1 Logged bugs to issues and fixes · execute · in progress (12 of 25 fixed, 2 not bugs; no issues filed yet, checked 2026-11-13)
 
-- **Goal**: convert the 25 logged bugs in the test notes into issues; fix the cheap ones (Flex grow asymmetry, `TypedMetaClass::inherits` transitivity, `SpinLock` ownership, `Arci` shared-slot race where #77 does not cover it) as atomic commits with tests.
-- **Done when**: every logged bug has an issue; fixed ones are closed by commits with tests.
+- **Goal**: convert the 25 logged bugs in the test notes into issues; fix the cheap ones as atomic commits with tests.
+- **Done when**: every logged bug that is still open has an issue; fixed ones are closed by commits with tests.
+- **Ledger** (checked against `master` `f0c0c6b1` on 2026-11-13; numbers are the test-note numbers; "unverified" means read, not compiled):
+
+| # | Bug | State | Evidence |
+|---|---|---|---|
+| L1 | Murmur3 `x86_32` read blocks out of bounds | fixed | `3b0f8270`, `Murmur3.x86_32CanonicalVectors` enabled |
+| L2 | `Engine.Common/{Collection/,}RingBuffer.hpp` do not compile, included nowhere | open | delete both; the live ring buffer is `Engine.Async/Collection/RingBuffer.hpp` |
+| L3 | `Integral128.hpp` specialises `std::is_integral` and `std::is_unsigned` (clang error), unused | open | delete or drop the `std` specialisations |
+| L4 | `Subject<T&>::peek()` returns a reference to the stored pointer | open | `Editor.UI.Rx/Subject.hpp:49` |
+| L5 | `SpinLock::unlock` keeps `_owns` set | fixed | `b163b9af` |
+| L6 | `Pool::destroy` dangling instance; `Pool` members that do not compile when instantiated | destroy fixed (`ffe914a6`), compile part unverified | `Storage.hpp` now includes `<algorithm>` |
+| L7 | `Rci` copy-assign does not compile | open | `RefCountedIntrusive.hpp:139` assigns an `mpt`, whose copy-assign is deleted |
+| L8 | `Modules::removeSubModule` always false; cycle check only direct | removal fixed (`bf729813`); transitive cycle open | `DISABLED_TransitiveOrderCycleIsRejected` |
+| L9 | Flex `padding.z`, single-child space-between, X grow uses `max` where Y uses `min` | padding and space-between fixed (`81561084`); grow asymmetry open | `Engine.Reflow/Algorithm/Flex.hpp:224` vs `:238` |
+| L10 | `AssetRegistry::getAssetByGuid` crashes on an unknown guid | not a bug | by contract; `findAssetByGuid` is the safe call |
+| L11 | `Representation` copy asserts `mainEntry == nullptr`, deep copy TODO | symbol names fixed (`3f2a97e8`); deep copy open | `Engine.Accel.Lang/Representation.cpp:15-27` |
+| L12 | `ActionLog::reapply` can never yield | fixed | 2026-10-27 batch |
+| L13 | `ActionManager::reapply` inverted null check | fixed | 2026-10-27 batch |
+| L14 | `setRelativeLocationAndRotator` drops location for children | fixed | contract documented (universe-space pose) |
+| L15 | `Guid` ordering dereferences bytes as a pointer | fixed | `41e5a432` |
+| L16 | `Bounding::intersectsAaBb(point)` unsatisfiable | fixed | 2026-10-27 batch |
+| L17 | Bounding sphere tests use `r1²+r2²` | fixed | 2026-10-27 batch |
+| L18 | `Bounding(center, extent)` leaves `extentLength` 0 | fixed | 2026-10-27 batch |
+| L19 | `Rotator` roll, `inversed()`, quaternion round trip | fixed | 2026-10-27 batch |
+| L20 | `InlineAutoArray::erase` does not compile, corrupts data | fixed | 2026-10-27 batch |
+| L21 | `CompositePipeline::registerStage` appends before duplicate check | not a bug | dedup lives elsewhere |
+| L22 | `TypedMetaClass::inherits` misses grand-bases | open | `DISABLED_ThreeLevelTransitiveInherit` |
+| L23 | `StructSlot::hasRecordSlot("")` true on an empty struct | open | `DISABLED_EmptyStructRejectsEmptyIdentifier` |
+| L24 | `InputVec<T>::prepare()` does not compile; `uikit::Text` crashes without a font | Text fixed (`59f7cfe1`); `InputVec` open | `make_sptr<InputFloat>()` has no default constructor (`InputVec.hpp:70`) |
+| L25 | `Arci` concurrent copy and move-assign on one slot | fixed | split-count protocol `5ea82a6d` on `master`; #77 still open, can close |
+
+- **Open bug issues in the tracker** (synced 2026-11-13; none of them came from the test notes), each owned by the work page of its system:
+
+| Issue | Bug | System, page |
+|---|---|---|
+| [#24](https://github.com/Heliogrim/Heliogrim-Engine/issues/24) | Shader read fails on a local URL | S03, [storage](storage-streaming.md); fixed in PR #169 (`929c763b`), closes when it lands |
+| [#44](https://github.com/Heliogrim/Heliogrim-Engine/issues/44) | Missing style or re-render with a hover layer over the viewport | S42, [vector UI](vector-ui-uikit.md) |
+| [#148](https://github.com/Heliogrim/Heliogrim-Engine/issues/148) | GLSL emission: user names collide with keywords and generated identifiers | S11, [accel](accel-lang.md) W11.0 |
+| [#154](https://github.com/Heliogrim/Heliogrim-Engine/issues/154) | `Resource<T>` never releases its owned value (body empty) | S03, [storage](storage-streaming.md) |
+| [#158](https://github.com/Heliogrim/Heliogrim-Engine/issues/158), [#160](https://github.com/Heliogrim/Heliogrim-Engine/issues/160), [#161](https://github.com/Heliogrim/Heliogrim-Engine/issues/161), [#162](https://github.com/Heliogrim/Heliogrim-Engine/issues/162) | Editor stop ordering: universes torn down while the pipeline ticks; Input destroyed before the platform thread stops; stop waits silently on a file dialog; stop during drag start hangs | S02, [concurrency](concurrency-fibers.md) (stop sequence proposal #150) |
+| [#163](https://github.com/Heliogrim/Heliogrim-Engine/issues/163) | Editor exit hits a debug breakpoint after 36 shader modules are destroyed late | S12, [accel](accel-lang.md) |
+| [#166](https://github.com/Heliogrim/Heliogrim-Engine/issues/166) | Nested storage call on the same primary can deadlock | S03, [storage](storage-streaming.md) |
+| [#170](https://github.com/Heliogrim/Heliogrim-Engine/issues/170) | `CompileMap`/`CompileHashMap::find` reports missing keys as found above 56 entries | S09, [serialisation and reflection](serialization-and-reflection.md) |
+| [#171](https://github.com/Heliogrim/Heliogrim-Engine/issues/171) | `Path::name()` truncates wide characters, can produce separators | S03, [storage](storage-streaming.md) |
+| [#174](https://github.com/Heliogrim/Heliogrim-Engine/issues/174) | `Signal` destroy rule lets a waiter free it while another is inside `wait()` | S02, [concurrency](concurrency-fibers.md) |
+
+- **Next**: file issues for the open L rows (L2 and L3 can be one "delete dead headers" issue), then fix the cheap ones: L2, L3, L9 grow, L22, L23, L8 cycle.
 
 ### W61.2 Scope tags and scene fixtures · design+plan · after W59 hash, W58 null device (design can start now)
 
@@ -108,20 +154,36 @@
 
 - **Rule**: every execute chunk that ships a system ends with a system page from the template, verified against the commit.
 
-### W10.1 Header diet and PCH · execute · ready (#75 is the spec)
+### W10.1 Header diet and PCH · execute · code done 2026-11-10 (PR [#168](https://github.com/Heliogrim/Heliogrim-Engine/pull/168), merged into `feat/wip` 2026-11-11), build-time number open
 
 - **Goal**: `vkinc.hpp`, `Path.hpp`, `Asset.hpp` diet; precompiled headers per bundle group; record clean editor build time against the 2026-11-07 trace.
 - **Done when**: clean editor build time drops and the number is in the system page; no behaviour change.
+- **Scope change**: PCH is out, by owner decision 2026-11-08 (cross-bundle include web). `Path.hpp` keeps `<filesystem>` and `Timing.hpp` keeps `<chrono>`. The vkFwd firewall rounds 1 and 2 were already in history.
+- **Result**: 12 signed commits on branch `refactor/header-diet` (PR #168), stacked on W10.3 (#167):
+    - `Engine.Common/Algo` gains small constexpr function objects (`FindIf`, `CountOf`, `LowerBound`, `CopyTo`, `TransformTo`, `Merge`) in place of `<algorithm>`/`<ranges>` in widely included headers. Each is a plain loop over `begin()`/`end()` with no standard header beyond `<cstddef>`.
+    - The compile-time reflect containers (`Sort.hpp`, `Map.hpp`, `HashMap.hpp`) and `Path.hpp` use them, `Math/Convertion.hpp` uses the existing `math::clamp`, and none of them include `<algorithm>`/`<ranges>`. This takes `<algorithm>` off the `TypedMetaClass` chain.
+    - `Asserts.hpp` no longer includes `<stdexcept>`.
+    - The ACS and level guid generators are defined in their header's own TU (`ACS/Traits.cpp`, `Level/LevelGuid.cpp`), so `<chrono>` and `<atomic>` leave `ACS/Traits.hpp` and `LevelGuid.hpp`.
+    - `panic_stacktrace` is non-template and defined out of line, so `<stacktrace>` leaves `Panic.hpp`, which reaches about 635 TUs.
+    - `FontAsset.hpp` no longer includes the resource loader.
+    - `get_memory_type` moves from `vkinc.hpp` to its own `Memory/MemoryType.{hpp,cpp}`.
+    - The Jolt profiler is off in Debug.
+    - Logger formats through one `vformat` call.
+    - `Widget.hpp` forward-declares `ReflowCommandBuffer`.
+
+    Each commit fixes the files that had relied on the include it removed. Editor and all tests build, and 29 of 29 suites pass.
+- **Open**: the clean build time is not measured yet. sccache makes a rebuild time meaningless. A replay of each own TU without the cache (12 in parallel) was stopped because the machine ran out of memory, so the number for the system page still has to be measured.
 
 ### W10.2 C++ modules decision · explore · after W10.1
 
 - **Goal**: with the header SCC reduced by W10.1, re-estimate per-bundle modules; decide go or close.
 - **Questions**: Q10.1.
 
-### W10.3 Rename `Engine.PFX` to `Engine.Physics` and `Engine.GFX` to `Engine.Graphics` · execute · ready
+### W10.3 Rename `Engine.PFX` to `Engine.Physics` and `Engine.GFX` to `Engine.Graphics` · execute · done 2026-11-10 (PR [#167](https://github.com/Heliogrim/Heliogrim-Engine/pull/167), merged into `feat/wip` 2026-11-11)
 
 - **Goal**: owner decision (Q24.2, 2026-11-09): spelled-out bundle names. Rename the directories, CMake targets, include paths and namespaces in one mechanical pass; new bundles follow the convention (`Engine.Particles`, `Engine.Foliage`, `Engine.Graphics.Render.Foliage`).
 - **Done when**: the build and all tests pass with no `Engine.GFX` or `Engine.PFX` left in `src/`; `ARCHITECTURE.md` and the module map on this site use the new names. Until then the work pages keep the current names.
+- **Result**: six signed commits on branch `refactor/spelled-out-bundle-names` (PR #167), stacked on `refactor/lock-types` (#165): `Engine.PFX` → `Engine.Physics`, `Engine.GFX*` → `Engine.Graphics*` (17 bundles), `Editor.GFX*` → `Editor.Graphics*` (4 bundles), namespaces `hg::engine::gfx` / `hg::editor::gfx` → `::graphics`, and `Engine.SFX` → `Engine.Audio` with `hg::engine::sfx` → `::audio` and `SfxMaterial` → `AudioMaterial`. Another commit spells out the remaining short forms: `GfxMaterial*` → `GraphicsMaterial*`, `PfxMaterial` → `PhysicsMaterial` (types, files, asset type ids), the `"::Gfx::RenderScenePipeline"` stage id, and parameter names. The owner chose this over keeping the stored ids (2026-11-10), while renaming still needs no migration path; any material already stored under an old type id does not load until it is re-saved. Editor and all tests build, and 29 of 29 suites pass with the same counts as the base. The [module map](../../architecture/modules.md) is regenerated at `b6887c17`; `ARCHITECTURE.md` is updated in the worktree, because it is still untracked in the engine. The render graph `ctid` ids change, but they are runtime-only. The other work pages and `ARCHITECTURE.md` switched to the new names on 2026-11-11, after the merge.
 
 ## Decisions (2026-11-08)
 

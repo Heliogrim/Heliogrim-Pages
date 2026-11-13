@@ -17,7 +17,7 @@
 ## Current state (checked 2026-11-07)
 
 - `STYLE.md`, `.clang-format` and `.resharper-format.xml` define formatting and layout rules. No clang-tidy configuration and no CI (#38 open).
-- 28 test executables with roughly 600 tests (test notes 2026-10). Twenty-five production bugs logged in those notes, several unfixed (Flex grow asymmetry, `TypedMetaClass::inherits` transitivity, `Arci` race on a shared slot, `SpinLock` ownership).
+- 28 test executables with roughly 600 tests (test notes 2026-10). Twenty-five production bugs logged in those notes, 11 still open or partly open on 2026-11-13 (Flex grow asymmetry, `TypedMetaClass::inherits` transitivity, dead headers, among others; `Arci` and `SpinLock` are fixed). The ledger is W61.1 on the [work page](../work/quality-and-process.md).
 - A GPU render test harness design was approved in October 2026 (one device per test, validation layer as leak check) but not built.
 - `Performance.Test` holds a transform benchmark behind `DISABLED_` prefixes; no regression band.
 - Build speed is traced (#75): parsing is 94% of a clean editor build; `vkinc.hpp`, `Path.hpp` and `Asset.hpp` are the top headers.
