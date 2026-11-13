@@ -30,6 +30,9 @@ Authoritative
 Bounded effect volume
 :   An authored box or convex region with a priority that tells weather, audio reverb, GI and physics "inside here, different rules". The `LayerVolume` type (Q29.1).
 
+BRDF
+:   Bidirectional Reflectance Distribution Function: the shader function that says how much light leaving a surface in the view direction came from each incoming direction. Heliogrim's `lighting.brdf.asl` implements the Disney principled parameterisation (Burley 2012), and the IBL lookup tables (`brdfLut`) precompute its integrals.
+
 Cancellation token
 :   A shared flag a task polls to learn that its result is no longer wanted; the fiber scheduler's cancellation model (Q02.1).
 
@@ -45,6 +48,9 @@ Cell
 Comb filtering
 :   The hollow, metallic sound of a signal summed with a delayed copy of itself; the symptom *delay compensation* prevents.
 
+Coroutines
+:   C++20 stackless suspension: a function that `co_await`s is split by the compiler into a state machine and resumes where it left off. Planned as a second way to suspend beside *fibers*, awaiting the same waitables; not yet used in the engine.
+
 Cosmetic
 :   State a client may generate or vary locally without anyone caring about the difference (grass detail, pebbles, decals). May read *authoritative* state as input (Q33.1).
 
@@ -52,6 +58,9 @@ Crash handler
 :   The in-house component that catches a crash, writes a minidump plus log tail and, in a later iteration, attaches it to a bug report. "Crashpad" was only a phrase for it (Q06.1).
 
 ## D to G
+
+DAG
+:   Directed acyclic graph: nodes with one-way edges and no cycles. The task pipeline, the render graph and the actor tick stages are all DAGs, so every pass declares its dependencies and the scheduler derives a valid order.
 
 Delay compensation
 :   Inserting matching delays on the shorter of two parallel audio paths when the longer one goes through a latency-adding effect (convolution reverb, lookahead limiter, linear-phase EQ), so the signals re-align at the bus. Within a bank in milestone 4, across banks later (Q38.3).
@@ -106,6 +115,9 @@ Height layer
 Horizon (volumetrics)
 :   The distance to which fog and clouds are modelled, 32 km; beyond the *froxel* far plane it uses analytic, not voxelised, scattering (Q21.1).
 
+IR / IL
+:   Intermediate representation or intermediate language: the compiler's in-between form between source and target code, built so passes can analyse and rewrite it. See *IR (accel)* for the shader compiler's own IR; *SPIR-V* is the IL it emits.
+
 IOCP
 :   Windows I/O completion ports; the first asynchronous storage backend (Q03.2).
 
@@ -143,6 +155,9 @@ Motion matching
 
 Navmesh
 :   A navigation mesh: walkable polygons agents path over, built per tile from the terrain and colliders. Library choice per the comparison in W37.0 (Q37.1).
+
+OIT
+:   Order-independent transparency: blending transparent surfaces correctly without sorting them back to front. Candidates are weighted blended (McGuire and Bavoil 2013) and moment-based (Münstermann et al. 2018); system S22, after S15.
 
 Origin rebasing
 :   Shifting the floating-point origin to the active *cell* so large worlds keep precision; a fixed-origin project mode serves small games (Q07.1).
@@ -194,17 +209,29 @@ RTPC
 Scheduled-start delay (`d`)
 :   The time the server adds to an NPC action's start tick so every client in range receives it before it starts and plays the wind-up on the same tick. Floats per *cell* from the 90th-percentile one-way delay, clamped to 40 to 100 ms (Q56.2).
 
+SDF / MSDF
+:   A signed distance field stores, per texel, the distance to the nearest edge, so a shader reconstructs a sharp edge at any resolution; a multi-channel SDF stores three distances so corners survive too. The planned text and *vector UI* canvas; plain 3D SDFs serve zone volumes.
+
 Semantic tree
 :   The accessibility and automation view of the UI: widget roles, names, states and relations, independent of pixels. Shipped before the Windows UI Automation provider (Q43.1).
 
 Slang
 :   A shading language and compiler with generics and modules. Not used; Heliogrim compiles its own *IR* (Q11.2).
 
+Sparse residency
+:   A Vulkan feature where an image or buffer is bound to memory in pages, and only the pages in use are resident. Used for streamed texture mips today and the page pool behind *virtual shadow maps*.
+
+SPIR-V
+:   Khronos' binary shader IL that Vulkan consumes. ASL compiles through its own *IR* to SPIR-V directly; the glslang-gated GLSL path is the fallback (S11).
+
 Stack cache (resolver)
 :   Caching per resolver stage so a request that resolves archive, package, then file reuses the cached package stage and only adds the missing resolver on top (Q03.1).
 
 Surface Nets
 :   A voxel surface extraction that averages edge crossings per cell; simpler and faster than *Dual Contouring* but rounds every edge.
+
+SVDAG
+:   Sparse voxel directed acyclic graph: a sparse voxel octree whose identical subtrees are merged into one shared node, cutting memory by orders of magnitude for static scenes. A candidate structure for the shared spatial scene service beside a BVH.
 
 Switch, state, event (audio)
 :   An event starts, stops or modifies sounds; a state is a named enum, scopable to a game object; a switch (footstep surface) is a state read by the event. Parameters are named floats (Q38.4).
