@@ -7,7 +7,7 @@
 
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
-| `Editor.GFX.Loader` (assimp), `AutoImportAction`, issue #146 (archive kind problem in the import action) | Import exists with a known defect | The translator pipeline replaces the action's internals; #146 is folded into W49.1 |
+| `Editor.Graphics.Loader` (assimp), `AutoImportAction`, issue #146 (archive kind problem in the import action) | Import exists with a known defect | The translator pipeline replaces the action's internals; #146 is folded into W49.1 |
 | [Serialisation work](serialization-and-reflection.md) S41 | Text manifest, LFS pointers, blob store | VCS diff and lock targets |
 | [Reflection work](serialization-and-reflection.md) S09 | Module-init registration | Plugins register through it |
 | [Editor workflows work](editor-workflows.md) S46 | File watcher shared | `Engine.Filesystem.Watcher` owned there, consumed here |

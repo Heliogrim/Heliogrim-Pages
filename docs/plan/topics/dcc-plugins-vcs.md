@@ -11,7 +11,7 @@
 
 ## Current state (checked 2026-11-07)
 
-- Import: assimp through `Editor.GFX.Loader` and `AutoImportAction`; GUIDs exist in the asset system; no watcher, no reimport policy, no glTF-specific path.
+- Import: assimp through `Editor.Graphics.Loader` and `AutoImportAction`; GUIDs exist in the asset system; no watcher, no reimport policy, no glTF-specific path.
 - No plugin system; no VCS integration.
 
 ## Research summary

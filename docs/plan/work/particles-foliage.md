@@ -8,7 +8,7 @@
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
 | [Visual scripting work](visual-scripting-hmr.md) S47 | Graph IR with type check and ASL emitter | Emitter graphs want the same IR; the topic leaves "shared from the start or particle-specific first" open (Q24.1) |
-| `Editor.GFX.Graphs` (82 node definition files, no compiler) | Node vocabulary exists | Emitter modules can reuse node definitions once S47 compiles them |
+| `Editor.Graphics.Graphs` (82 node definition files, no compiler) | Node vocabulary exists | Emitter modules can reuse node definitions once S47 compiles them |
 | [Volumetrics work](volumetrics-weather.md) | Froxel volume and wind field service | Lighting and wind providers for both systems |
 | [GI work](shadows-gi.md) | Global SDF as `TraceScene` | Collision provider for particles |
 | [Micropolygon work](micropolygon.md) | Programmable raster extension for masked and bent vertices is "later" | Near-camera foliage depends on it; impostors and masked raster through S15 do not |
@@ -16,7 +16,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.PFX.Particles` naming conflict: `Engine.PFX` is physics today; use `Engine.VFX` (emitter assets, compiled stages, pools, sort, render) and `Engine.World.Foliage` (instance derivation, impostor baking, LOD policy) plus `Engine.GFX.Render.Foliage` (masked raster integration, impostor draw). Editor authoring in `Editor.GFX.Graphs` through S47.
+- **Bundles**: new `Engine.Physics.Particles` naming conflict: `Engine.Physics` is physics today; use `Engine.VFX` (emitter assets, compiled stages, pools, sort, render) and `Engine.World.Foliage` (instance derivation, impostor baking, LOD policy) plus `Engine.Graphics.Render.Foliage` (masked raster integration, impostor draw). Editor authoring in `Editor.Graphics.Graphs` through S47.
 - **Provides**: GPU particle simulation and rendering; foliage instance sets with impostors, wind and LOD.
 - **Consumes**: compute and indirect (S12), render graph (S14), culling and visibility (S15), froxel and wind (S21, S32), SDF (S20), terrain height tiles (S27), skeletal surfaces (S36), scatter (S33), graph IR (S47).
 
@@ -34,7 +34,7 @@
 | `FoliageLod` | Distance tiers: impostor, masked raster, near micropolygon path; dithered cross-fade under TAA; overdraw measured per density tier. |
 | `WindBending` | Vertex-stage hierarchical bending sampling `WindFieldTexture`. |
 
-Placement: `Engine.VFX/{EmitterAsset,SimStage,ParticlePool,DataInterface,SortStage}`, `Engine.GFX.Render.Particles/`, `Engine.World.Foliage/{FoliageInstanceSet,ImpostorBaker,FoliageLod}`, `Engine.GFX.Render.Foliage/`. Tests: 1M-particle budget scenario; emitter recompile without restart; 100k-tree forest budget and golden video.
+Placement: `Engine.VFX/{EmitterAsset,SimStage,ParticlePool,DataInterface,SortStage}`, `Engine.Graphics.Render.Particles/`, `Engine.World.Foliage/{FoliageInstanceSet,ImpostorBaker,FoliageLod}`, `Engine.Graphics.Render.Foliage/`. Tests: 1M-particle budget scenario; emitter recompile without restart; 100k-tree forest budget and golden video.
 
 ## Work chunks
 
@@ -83,5 +83,5 @@ Placement: `Engine.VFX/{EmitterAsset,SimStage,ParticlePool,DataInterface,SortSta
 | ID | Question | Blocks | Suggested default |
 |---|---|---|---|
 | Q24.1 | Share the S47 graph IR from the start (couples S24 to S47's schedule) or a particle-specific stage compiler first? | W24.1 | Particle-specific `SimStage` compiler over the shared node definitions; migrate to the S47 IR when it exists |
-| Q24.2 | Bundle name: `Engine.VFX` (new) given `Engine.PFX` is physics? | W24.1 | `Engine.VFX` |
+| Q24.2 | Bundle name: `Engine.VFX` (new) given `Engine.Physics` is physics? | W24.1 | `Engine.VFX` |
 | Q25.1 | Aggregate (volumetric) leaf LOD: spike or skip for the first release? | W25.1 | Skip; revisit with overdraw numbers |

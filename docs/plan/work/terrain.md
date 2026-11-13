@@ -17,7 +17,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.World.Terrain` (tiles, height layers, materials, height query service, edit op log) and `Engine.World.Terrain.Voxel` (overlay meshing), `Engine.GFX.Render.Terrain` (LOD selection, patch instances), `Editor.Terrain` (sculpt and paint tools as actions). `Engine.World.Volume` for `LayerVolume` (S29).
+- **Bundles**: new `Engine.World.Terrain` (tiles, height layers, materials, height query service, edit op log) and `Engine.World.Terrain.Voxel` (overlay meshing), `Engine.Graphics.Render.Terrain` (LOD selection, patch instances), `Editor.Terrain` (sculpt and paint tools as actions). `Engine.World.Volume` for `LayerVolume` (S29).
 - **Provides**: `sampleHeight(WorldPosition)` and `activeVolume(WorldPosition)` query services; terrain patches as GPU instances; authoritative tile data for server and physics; the edit op log.
 - **Consumes**: cells (S40), double positions (S07), virtual textures (S17), GPU-driven renderer (S15), Jolt heightfields (S34), navmesh rebuild hook (S37), actions (S45), replication (S56, later).
 
@@ -35,7 +35,7 @@
 | `DirtyTileSet` | Collected per frame; physics heightfield and navmesh rebuilds on Background fibers, swapped at a frame boundary. |
 | `LayerVolume` | Region bound to a terrain layer or an authored volume with priority; `activeVolume(WorldPosition) -> VolumeParams` with blend over a transition distance; consumers: weather, audio reverb, GI probe volumes, physics (gravity, water). |
 
-Placement: `Engine.World.Terrain/{TerrainTile,HeightLayerStack,HeightQueryService,BrushOp,OpLog}`, `Engine.World.Terrain.Voxel/`, `Engine.GFX.Render.Terrain/TileLod`, `Engine.World.Volume/LayerVolume`, `Editor.Terrain/`. Tests: `sampleHeight` versus rendered surface at 10k points; op-log hash agreement; cave fixture walk-through.
+Placement: `Engine.World.Terrain/{TerrainTile,HeightLayerStack,HeightQueryService,BrushOp,OpLog}`, `Engine.World.Terrain.Voxel/`, `Engine.Graphics.Render.Terrain/TileLod`, `Engine.World.Volume/LayerVolume`, `Editor.Terrain/`. Tests: `sampleHeight` versus rendered surface at 10k points; op-log hash agreement; cave fixture walk-through.
 
 ## Work chunks
 

@@ -25,7 +25,7 @@ Distance: **near** a bounded change on existing code · **mid** a new subsystem 
 | All pipeline kinds | `Accel.Pipeline` graphics only; IR supports compute stage | Compute, mesh, ray-tracing and work-graph pipelines through `Accel.Compile` and the driver (#78) | mid |
 | Photoreal materials and lighting | PBR BRDF shaders (`lighting.brdf.asl`, `pbr.asl`), IBL generation (`brdfLut`, `brdfIrrad`, `brdfPref`), G-buffer pass, directional shadow pass, sky pass, material prototypes and parameter storage | Layered materials, emissive feeding GI, GI itself, VSM, volumetrics, HDR output, post stack beyond a tonemap | far |
 | Real-time GPU-driven rendering | Render graph with compile step, command translation to Vulkan, scene mirror with models | Bindless descriptors, GPU instance tables, indirect draws, meshlet culling, visibility buffer, derived barriers, aliasing, async compute | far |
-| Micropolygon geometry | `Engine.GFX.Geometry` (46 lines), static geometry asset structure | Everything: cluster DAG build, pages, streaming, software rasteriser, mesh-shader path, material resolve from visibility buffer | far |
+| Micropolygon geometry | `Engine.Graphics.Geometry` (46 lines), static geometry asset structure | Everything: cluster DAG build, pages, streaming, software rasteriser, mesh-shader path, material resolve from visibility buffer | far |
 | Transparency | blend state in pipelines | OIT, refraction, fog/GI interaction | mid (after S15) |
 | Volumetric weather | sky shader | Atmosphere LUTs, froxel fog, clouds, weather state | far |
 | Volumetric fluids | none | GPU grid or particle fluids, surface extraction, CPU proxy | research |
@@ -47,7 +47,7 @@ Distance: **near** a bounded change on existing code · **mid** a new subsystem 
 | Fluid dynamics | none | see volumetric fluids | research |
 | Procedural generation | none | Graph generators, deterministic seeds, erosion, scatter | far |
 | Physics quality | Jolt vendored (shared build, determinism off), `PhysicsSceneSystem`, box and sphere models, schedule stage | Full shape and constraint surface, characters, vehicles, deterministic build decision, double precision decision, job-system bridge to fibers, server islands | mid |
-| Animation + DCC | assimp import (`Editor.GFX.Loader`), skeletal vertex shader | Runtime animation system, compression, blend, IK, retargeting, morphs, glTF/USD pipeline, live link | far |
+| Animation + DCC | assimp import (`Editor.Graphics.Loader`), skeletal vertex shader | Runtime animation system, compression, blend, IK, retargeting, morphs, glTF/USD pipeline, live link | far |
 | Navigation | none | Recast/Detour-class navmesh with tiles, crowds, volumes | far |
 | Sound engine | importers; [runtime design](../architecture/audio-runtime-design.md) drafted | Runtime, device backend, DSP graph, scene system, game-event integration, editor UI | mid |
 | Dynamic weather | none | State simulation, wind field, precipitation | mid (after volumetrics) |
@@ -61,7 +61,7 @@ Distance: **near** a bounded change on existing code · **mid** a new subsystem 
 | Uikit | Atoms and layouts (4k lines); molecules and organisms declared only | Inputs (#27 to #36), lists, trees, docking, dialogs, accessibility tree | mid |
 | Undo/redo workflows | `ActionManager`, `ActionLog`, delegate and import actions; `reapply` broken | Transactions, coalescing, multi-object, asset edits, replay from the log | mid |
 | Asset search engine | `AssetRegistry` with GUID and type lookups | Index, tags, references, full text, query language, watcher | mid |
-| Visual coding to C++ | `Editor.GFX.Graphs` node definitions (82 files), no compiler; [exploration](../architecture/scripting-native-codegen-exploration.md) | Graph IR, type checker, C++ and ASL emitters, build integration, debugging source maps | far |
+| Visual coding to C++ | `Editor.Graphics.Graphs` node definitions (82 files), no compiler; [exploration](../architecture/scripting-native-codegen-exploration.md) | Graph IR, type checker, C++ and ASL emitters, build integration, debugging source maps | far |
 | HMR for C++ | none; build flags not set for patching | Module boundaries, reflection-driven state migration, build integration | far |
 | DCC live link | assimp import | glTF 2.0 importer, watcher, GUID-preserving reimport, Blender add-on, transform/animation live link | mid |
 | Plugins | none | Descriptor, discovery, load phases, C-ABI boundary | mid |

@@ -7,7 +7,7 @@
 
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
-| `Engine.PFX`, `Engine.Physics.Scene(.Model)`, `Engine.Physics.Schedule` | Jolt init, `SceneSystem` with registry, box and sphere models, a stage | Everything else is new; the `SceneSystem` pattern is kept |
+| `Engine.Physics`, `Engine.Physics.Scene(.Model)`, `Engine.Physics.Schedule` | Jolt init, `SceneSystem` with registry, box and sphere models, a stage | Everything else is new; the `SceneSystem` pattern is kept |
 | Jolt vendored config (shared lib, determinism off, 16 layer bits, debug renderer on) | Build shape | Two build-option decisions become ADRs (W34.0) |
 | [Large-world work](render-graph-gpu-driven.md) Q07.2 | Double build or base offset | Topic page recommends `JPH_DOUBLE_PRECISION` on; W34.0 measures |
 | [Concurrency work](concurrency-fibers.md) | Critical-lane fan-out, no callbacks from foreign threads | Jolt `JobSystem` bridge |
@@ -18,7 +18,7 @@
 
 ## Architecture
 
-- **Bundles**: `Engine.PFX` becomes the Jolt wrapper layer (`Engine.Physics.Jolt`: job bridge, shape factory, double positions); `Engine.Physics.Scene` extended (shapes, constraints, characters, vehicles, ragdolls, queries); new `Engine.Physics.Cloth` (Jolt soft bodies first, GPU XPBD later); `Engine.Physics.Schedule` keeps the stage.
+- **Bundles**: `Engine.Physics` becomes the Jolt wrapper layer (`Engine.Physics.Jolt`: job bridge, shape factory, double positions); `Engine.Physics.Scene` extended (shapes, constraints, characters, vehicles, ragdolls, queries); new `Engine.Physics.Cloth` (Jolt soft bodies first, GPU XPBD later); `Engine.Physics.Schedule` keeps the stage.
 - **Provides**: full rigid-body surface as components, character controller, vehicles, scene query service (ray, shape cast, overlap), per-cell-group physics systems, deterministic profile, cloth.
 - **Consumes**: fiber scheduler (S02), `WorldPosition` (S07), terrain heightfields (S27), cells (S40), skeleton poses (S36), state-hash harness (S59), replication (S56, later).
 

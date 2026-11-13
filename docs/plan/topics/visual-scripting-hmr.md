@@ -10,7 +10,7 @@
 
 ## Current state (checked 2026-11-07)
 
-- `Editor.GFX.Graphs` (82 files): node containers and many node definitions (math, conversion) without a compiler.
+- `Editor.Graphics.Graphs` (82 files): node containers and many node definitions (math, conversion) without a compiler.
 - No module boundary for game code; `Heliogrim-Project-Template` exists beside the engine; the build is CMake globbed bundles; unity build is off; the flags Live++ needs are not set.
 - `Engine.Reflect` has address-based type identity (S09 fixes it).
 

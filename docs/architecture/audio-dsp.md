@@ -6,8 +6,8 @@ This note collects the design direction for the sound system: asset ingestion fr
 
 ## 0. Current State in the Engine
 
-- `Engine.SFX` has a `CoreModule` shell (`Audio`) with `setup`, `start`, `stop` and `destroy`. It registers importers only.
-- Importers exist for WAV, FLAC and Vorbis (`Engine.SFX/Importer/`). Sound assets are defined in `Engine.Assets.Type/Audio/Sound.hpp`.
+- `Engine.Audio` has a `CoreModule` shell (`Audio`) with `setup`, `start`, `stop` and `destroy`. It registers importers only.
+- Importers exist for WAV, FLAC and Vorbis (`Engine.Audio/Importer/`). Sound assets are defined in `Engine.Assets.Type/Audio/Sound.hpp`.
 - There is no voice pool, mixer, bus graph, output device backend or DSP code yet.
 
 Everything below is a target, not a description of existing code.
@@ -27,7 +27,7 @@ Three input classes, each with a clear owner:
 
 | Input | Format | Owner | Notes |
 |-------|--------|-------|-------|
-| Raw files | WAV, FLAC, Vorbis (existing importers) | Importer | Already in `Engine.SFX`. Source of truth for DAW stems. |
+| Raw files | WAV, FLAC, Vorbis (existing importers) | Importer | Already in `Engine.Audio`. Source of truth for DAW stems. |
 | DAW stems | Multi-track WAV plus JSON metadata | Asset cooker | Stems are WAV, so this is a metadata problem, not a format problem. |
 | Middleware banks | Wwise `.bnk`/`.wem`, FMOD `.bank` | Bank parser | Proposed out of scope: licence forbids reverse engineering, no public spec (section 8). |
 
@@ -165,5 +165,5 @@ Three sourced reports, each claim linked and unverified points flagged:
 ## References
 
 - Design review (Gemini, raw): [sources/audio-dsp-gemini-review.md](sources/audio-dsp-gemini-review.md)
-- Existing importers: `src/Engine.SFX/Importer/` in the engine repository
+- Existing importers: `src/Engine.Audio/Importer/` in the engine repository
 - Related: [Actor system (exploration)](actor-system.md)

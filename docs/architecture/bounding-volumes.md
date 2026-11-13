@@ -6,12 +6,12 @@ This note collects design direction for zone-like bounds shared by graphics, phy
 
 ## 0. Current State in Engine
 
-- `Aabb` in `Engine.GFX` (`Aabb.hpp`) and `Sphere` in `Engine.GFX/Geometry/`.
+- `Aabb` in `Engine.Graphics` (`Aabb.hpp`) and `Sphere` in `Engine.Graphics/Geometry/`.
 - `Bounding` in `Engine.Common/Math/Bounding.hpp`, with tests in `Engine.Common.Test/Bounding.cpp`.
-- `FrustumCullingFilter` in `Engine.GFX.Render.Graph.Scene/Filter/` as the only spatial query consumer found in a graph query.
+- `FrustumCullingFilter` in `Engine.Graphics.Render.Graph.Scene/Filter/` as the only spatial query consumer found in a graph query.
 - `SparseTexture` exists, but no MSDF pipeline or distance-field baking was found.
 - No zone volumes, attenuation curves, spatial hash, octree or BVH for gameplay or audio was found.
-- Jolt Physics is vendored and wrapped in `Engine.PFX` (`PhysicsSystem`, `PhysicsLayer`). Jolt brings convex shapes, GJK/EPA, a broadphase and object layers. The physics column in section 7 should use those, not new code.
+- Jolt Physics is vendored and wrapped in `Engine.Physics` (`PhysicsSystem`, `PhysicsLayer`). Jolt brings convex shapes, GJK/EPA, a broadphase and object layers. The physics column in section 7 should use those, not new code.
 
 Everything below is target, not description of existing code.
 
@@ -140,5 +140,5 @@ Tile-based navmeshes (Detour-style tile cache with obstacles) already rebuild on
 ## References
 
 - Design review (Gemini, raw): [sources/bounding-volumes-gemini-review.md](sources/bounding-volumes-gemini-review.md)
-- Existing bounds: `src/Engine.Common/Math/Bounding.hpp`, `src/Engine.GFX/Aabb.hpp`, `src/Engine.GFX/Geometry/Sphere.hpp`
+- Existing bounds: `src/Engine.Common/Math/Bounding.hpp`, `src/Engine.Graphics/Aabb.hpp`, `src/Engine.Graphics/Geometry/Sphere.hpp`
 - Related: [Audio and DSP (exploration)](audio-dsp.md), [Actor system (exploration)](actor-system.md)

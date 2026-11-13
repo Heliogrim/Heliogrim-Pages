@@ -9,9 +9,9 @@ A GPU-driven pipeline: the render scene is GPU-resident (instance, material and 
 
 ## Current state (checked 2026-11-07)
 
-- `Engine.GFX.RenderGraph` (102 files, 6.2k lines) with a compile step; `Engine.GFX.Render.Subpass/Impl`: `DepthPrePass`, `MatTestPass`, `PostProcessPass`, `ShadowDirPass`, `SkyBoxPass`, `TriTestPass`, `VisualizePass`, plus mesh capture interfaces. Passes are hand-wired and record per object.
-- `Engine.GFX.Render.Command`: `RenderCommandBuffer` with intrusive commands in a `pmr` arena, translated by `VkRCmdTranslator` into Vulkan secondary command buffers from per-queue pools (spinlock). No sub-range reuse.
-- `Engine.GFX.Scene` and `Engine.Render.Scene`: CPU-side scene mirror with models per component type.
+- `Engine.Graphics.RenderGraph` (102 files, 6.2k lines) with a compile step; `Engine.Graphics.Render.Subpass/Impl`: `DepthPrePass`, `MatTestPass`, `PostProcessPass`, `ShadowDirPass`, `SkyBoxPass`, `TriTestPass`, `VisualizePass`, plus mesh capture interfaces. Passes are hand-wired and record per object.
+- `Engine.Graphics.Render.Command`: `RenderCommandBuffer` with intrusive commands in a `pmr` arena, translated by `VkRCmdTranslator` into Vulkan secondary command buffers from per-queue pools (spinlock). No sub-range reuse.
+- `Engine.Graphics.Scene` and `Engine.Render.Scene`: CPU-side scene mirror with models per component type.
 - `Engine.Driver.Vulkan` (1.9k lines): single queue family in practice; no bindless descriptor layout; no timeline semaphores noted.
 - Transforms are float; `HierarchyComponent::getUniverseTransform` folds the chain in float.
 

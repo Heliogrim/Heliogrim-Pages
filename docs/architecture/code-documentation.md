@@ -30,7 +30,7 @@ Options A and B cost nothing in the engine. C is the only route to a symbol-leve
 
 1. Keep A running: regenerate the module map in CI from a pinned engine commit (today it is run by hand with `tools/gen_modules.py`).
 2. Write B for the systems readers ask about first, starting with the render graph.
-3. Run a time-boxed spike on C against three modules of different style (for example `Engine.Common`, `Engine.ACS`, `Engine.GFX.RenderGraph`). It passes only if the output names the right types, members and base classes for a fixed sample of symbols, with no change to the engine source. If it fails, the symbol level is dropped and the code stays the reference.
+3. Run a time-boxed spike on C against three modules of different style (for example `Engine.Common`, `Engine.ACS`, `Engine.Graphics.RenderGraph`). It passes only if the output names the right types, members and base classes for a fixed sample of symbols, with no change to the engine source. If it fails, the symbol level is dropped and the code stays the reference.
 
 ## Decisions needed
 

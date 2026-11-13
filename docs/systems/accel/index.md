@@ -32,7 +32,7 @@ What it deliberately does not do yet: emit SPIR-V directly, optimise, build comp
 ```hg-diagram
 flowchart LR
     ASL["assets/shader/**/*.asl"]
-    PASS["Render passes and effects<br/>(Engine.GFX.Render.*)"]
+    PASS["Render passes and effects<br/>(Engine.Graphics.Render.*)"]
     PROF["EffectProfile<br/>(profile modules, toggles)"]
     SPEC["EffectSpecification<br/>(target symbols)"]
     LANG["Engine.Accel.Lang<br/>parse, IR passes, emit GLSL"]

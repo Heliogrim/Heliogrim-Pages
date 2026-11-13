@@ -6,7 +6,7 @@ Markers: **Decided** = agreed by the owner. **Builder's call** = left to the imp
 
 ## 1. Intent
 
-Heliogrim has no sound playback. `Engine.SFX` only registers WAV, FLAC and Vorbis importers. The owner has built DSP, mixers, a Butterworth band compressor/EQ and trigonometric spatial attenuation before; that code is lost. This design rebuilds an engine-owned audio runtime: our own DSP, mixers, voices and spatialization, with a native output backend.
+Heliogrim has no sound playback. `Engine.Audio` only registers WAV, FLAC and Vorbis importers. The owner has built DSP, mixers, a Butterworth band compressor/EQ and trigonometric spatial attenuation before; that code is lost. This design rebuilds an engine-owned audio runtime: our own DSP, mixers, voices and spatialization, with a native output backend.
 
 The first audible goal is a spatial scene sound: an emitter in the scene that pans and fades as the listener moves. The runtime must also make DSP chains and mixer banks easy to rearrange, because exploring spatial sound, environments and DSP pipelines is a goal in itself.
 
@@ -151,7 +151,7 @@ Each node: one header/source pair, parameters described by name, type, range and
 
 - An interface with: enumerate devices, open with requested format (rate, channels, layout), start, stop, report the actual mix format, and device-lost/default-changed events.
 - **Decided**: WASAPI shared mode first, event-driven. A null device renders offline into memory at any rate, for tests and offline bounces.
-- **Proposal**: the WASAPI backend lives in a platform support bundle (`Support.<Name>.Windows` per the project convention). **Builder's call**: bundle names and the split of `Engine.SFX` into runtime and DSP bundles.
+- **Proposal**: the WASAPI backend lives in a platform support bundle (`Support.<Name>.Windows` per the project convention). **Builder's call**: bundle names and the split of `Engine.Audio` into runtime and DSP bundles.
 - Following the user's default-device change and exclusive mode are later work.
 
 ### 10.4 Media
@@ -196,4 +196,4 @@ Kept in the data model now so later work does not need a redesign: definition vs
 - Exploration and brainstorm log: [audio-dsp.md](audio-dsp.md)
 - Research: [middleware](sources/audio-research-middleware.md), [tools and libraries](sources/audio-research-tools-libs.md), [optimisation](sources/audio-research-optimisation.md)
 - Related: [bounding volumes](bounding-volumes.md), [actor archetypes](actor-archetypes-design.md)
-- Code: `src/Engine.SFX/`, `src/Engine.Scene/SceneSystem.hpp`, `src/Engine.Scene.Support/SceneSystemTypeMappedRegistry.hpp`, `src/Engine.Physics.Scene/PhysicsSceneSystem.cpp`, `src/Engine.GFX.Render.Command/`
+- Code: `src/Engine.Audio/`, `src/Engine.Scene/SceneSystem.hpp`, `src/Engine.Scene.Support/SceneSystemTypeMappedRegistry.hpp`, `src/Engine.Physics.Scene/PhysicsSceneSystem.cpp`, `src/Engine.Graphics.Render.Command/`

@@ -44,10 +44,10 @@ Legend: <span class="hg-status accepted">exists</span> usable as is · <span cla
 | `Engine.World.Weather` | none | <span class="hg-status planned">missing</span> | Weather state, wind field, precipitation; feeds sky/clouds (S32) |
 | `Engine.World.Procedural` | none | <span class="hg-status planned">missing</span> | Graph-based generators, seeds, erosion, scatter (S33) |
 | `Engine.Fluids` | none | <span class="hg-status planned">missing</span> | GPU grid/particle fluids and CPU proxies (S31) |
-| `Engine.PFX`, `Engine.Physics.*` (3 bundles) | Jolt init, two shape models, schedule stage | <span class="hg-status design">partial</span> | Full Jolt surface, determinism, double precision, characters, vehicles, islands (S34); cloth (S35) |
+| `Engine.Physics`, `Engine.Physics.*` (3 bundles) | Jolt init, two shape models, schedule stage | <span class="hg-status design">partial</span> | Full Jolt surface, determinism, double precision, characters, vehicles, islands (S34); cloth (S35) |
 | `Engine.Animation` | none (skeletal vertex path exists in `defined.skeletal.asl`) | <span class="hg-status planned">missing</span> | Clips, compression, blend graph, inertialisation, motion matching, IK, morphs (S36) |
 | `Engine.Navigation` | none | <span class="hg-status planned">missing</span> | Tiled navmesh, crowds, volumes (S37) |
-| `Engine.SFX` | importers only | <span class="hg-status design">partial</span> | Audio runtime per design (S38) |
+| `Engine.Audio` | importers only | <span class="hg-status design">partial</span> | Audio runtime per design (S38) |
 | `Engine.Input` (+`.Schedule`, `Support.Input.Win32`) | events, drag-drop, Win32 backend | <span class="hg-status design">partial</span> | Contexts, actions, arbitration, recording (S39) |
 
 ## Rendering
@@ -57,15 +57,15 @@ Legend: <span class="hg-status accepted">exists</span> usable as is · <span cla
 | `Engine.Driver.Vulkan` | 1.9k lines | <span class="hg-status design">partial</span> | Bindless descriptors, timeline semaphores, multi-queue, pipeline library, null device (S14, S15, S58) |
 | `Engine.Accel.Lang` | 56 files, 7.3k lines; ASL parser, IR, GLSL emitter (glslang-gated) | <span class="hg-status design">partial</span> | SPIR-V backend, optimiser passes, region borrows (#82) (S11) |
 | `Engine.Accel.Compile`, `.Pipeline`, `.Pass`, `.Command`, `.Storage`, `.Loader`, `.Effect` | graphics pipelines only | <span class="hg-status design">partial</span> | Compute, mesh, ray-tracing, work-graph pipelines (#78) (S12); variant cache (S13) |
-| `Engine.GFX` | 183 files, 18.7k lines | <span class="hg-status design">partial</span> | Trim to device and resource layer; split `vkinc.hpp` cost (#75) |
-| `Engine.GFX.RenderGraph` (+`.Compile`) | 6.2k lines | <span class="hg-status design">partial</span> | Derived barriers, aliasing, async compute (S14) |
-| `Engine.GFX.Render.*` (5 bundles) | hand-wired passes (`DepthPrePass`, `MatTestPass`, `PostProcessPass`, ...) | <span class="hg-status closed">replace</span> | Declarative passes on the GPU-driven scene (S15) |
-| `Engine.GFX.Scene` (+`.Model`), `Engine.Render.Scene*` | CPU-side scene mirror | <span class="hg-status design">partial</span> | GPU-resident instance/material/geometry tables (S15) |
-| `Engine.GFX.Material` | prototypes, effects, parameter storage | <span class="hg-status design">partial</span> | Layered materials, emissive, requirement back-propagation (S16) |
-| `Engine.GFX.Geometry` | 46 lines | <span class="hg-status planned">missing</span> | Cluster DAG, meshlets, pages (S18) |
-| `Engine.GFX.Texture.Virtual` | sparse cube-map code exists (#42) | <span class="hg-status planned">missing</span> | Page tables, feedback, residency (S17) |
-| `Engine.GFX.Shadow`, `.GI`, `.Volumetric`, `.Transparency`, `.Post`, `.Particles`, `.Foliage` | none (shadow and post shaders exist as assets) | <span class="hg-status planned">missing</span> | S19 to S25 |
-| `Engine.GFX.Glow` | 796 lines, purpose unclear | <span class="hg-status design">partial</span> | Audit; fold into post or remove |
+| `Engine.Graphics` | 183 files, 18.7k lines | <span class="hg-status design">partial</span> | Trim to device and resource layer; split `vkinc.hpp` cost (#75) |
+| `Engine.Graphics.RenderGraph` (+`.Compile`) | 6.2k lines | <span class="hg-status design">partial</span> | Derived barriers, aliasing, async compute (S14) |
+| `Engine.Graphics.Render.*` (5 bundles) | hand-wired passes (`DepthPrePass`, `MatTestPass`, `PostProcessPass`, ...) | <span class="hg-status closed">replace</span> | Declarative passes on the GPU-driven scene (S15) |
+| `Engine.Graphics.Scene` (+`.Model`), `Engine.Render.Scene*` | CPU-side scene mirror | <span class="hg-status design">partial</span> | GPU-resident instance/material/geometry tables (S15) |
+| `Engine.Graphics.Material` | prototypes, effects, parameter storage | <span class="hg-status design">partial</span> | Layered materials, emissive, requirement back-propagation (S16) |
+| `Engine.Graphics.Geometry` | 46 lines | <span class="hg-status planned">missing</span> | Cluster DAG, meshlets, pages (S18) |
+| `Engine.Graphics.Texture.Virtual` | sparse cube-map code exists (#42) | <span class="hg-status planned">missing</span> | Page tables, feedback, residency (S17) |
+| `Engine.Graphics.Shadow`, `.GI`, `.Volumetric`, `.Transparency`, `.Post`, `.Particles`, `.Foliage` | none (shadow and post shaders exist as assets) | <span class="hg-status planned">missing</span> | S19 to S25 |
+| `Engine.Graphics.Glow` | 796 lines, purpose unclear | <span class="hg-status design">partial</span> | Audit; fold into post or remove |
 
 ## UI and editor
 
@@ -77,7 +77,7 @@ Legend: <span class="hg-status accepted">exists</span> usable as is · <span cla
 | `Engine.Localization` | none | <span class="hg-status planned">missing</span> | ICU, string tables, pseudo-locale (S52) |
 | `Editor.Action` (+`.Assets.Actions`, `.Scene.Actions`) | 1.4k lines, action log, delegate and import actions | <span class="hg-status design">partial</span> | Transactions, multi-object, asset edits, replay (S45) |
 | `Editor.UI*` (9 bundles) | panels, services, views, theme | <span class="hg-status design">partial</span> | Rebuilt on uikit; picking and gizmos (S44) |
-| `Editor.GFX.Graphs` | 82 files, 2.1k lines of node definitions, no compiler | <span class="hg-status design">partial</span> | Graph IR to ASL / C++ emitters (S47) |
+| `Editor.Graphics.Graphs` | 82 files, 2.1k lines of node definitions, no compiler | <span class="hg-status design">partial</span> | Graph IR to ASL / C++ emitters (S47) |
 | `Editor.Search` | none | <span class="hg-status planned">missing</span> | Asset index and query (S46) |
 | `Editor.Automation` | none | <span class="hg-status planned">missing</span> | Replay driver, fixtures, profile capture (S54) |
 | `Editor.Livelink` | none | <span class="hg-status planned">missing</span> | DCC bridges, watcher-driven reimport (S49) |

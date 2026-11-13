@@ -16,7 +16,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.GFX.Shadow` (CSM, contact shadows, VSM page pool, ray-query tier) and `Engine.GFX.GI` (scene representation for tracing, probe or cascade cache, screen-space gather, SSR). Shaders under `assets/shader/shadow/*` and `gi/*`.
+- **Bundles**: new `Engine.Graphics.Shadow` (CSM, contact shadows, VSM page pool, ray-query tier) and `Engine.Graphics.GI` (scene representation for tracing, probe or cascade cache, screen-space gather, SSR). Shaders under `assets/shader/shadow/*` and `gi/*`.
 - **Provides**: shadow terms for the lighting resolve and the transparent pass; diffuse and specular indirect lighting; per-cell probe payloads.
 - **Consumes**: culling views (S15), compute and ray-query pipelines (S12), emissive list (S16), froxel volume for cloud shadows (S21), cell lifecycle (S40), harness (S26).
 
@@ -33,7 +33,7 @@
 | `CascadeSpike` | Research prototype of sparse split radiance cascades behind the same `IndirectDiffuse` interface; adopted only on in-house measurement. |
 | `ScreenSpaceReflections` | SSR with fallback to probe or cascade radiance; ray-traced reflections as the optional tier. |
 
-Placement: `Engine.GFX.Shadow/{CascadeSet,ContactShadowPass,VirtualShadowMap}`, `Engine.GFX.GI/{TraceScene,ProbeVolume,Ssr}`. Tests: harness goldens for CSM and contact shadows; Cornell-box FLIP against a path-traced reference; probe survival across cell unload and reload.
+Placement: `Engine.Graphics.Shadow/{CascadeSet,ContactShadowPass,VirtualShadowMap}`, `Engine.Graphics.GI/{TraceScene,ProbeVolume,Ssr}`. Tests: harness goldens for CSM and contact shadows; Cornell-box FLIP against a path-traced reference; probe survival across cell unload and reload.
 
 ## Work chunks
 

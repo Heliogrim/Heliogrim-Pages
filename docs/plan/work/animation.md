@@ -8,7 +8,7 @@
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
 | [Animation pipeline system page](../../systems/animation-pipeline.md) | Placeholder | Filled after W36.2 |
-| `assets/shader/template/defined.skeletal.asl`, assimp import in `Editor.GFX.Loader` | A skinned vertex path and skeleton import exist | Skinning moves to a compute pre-skin pass into GPU geometry tables |
+| `assets/shader/template/defined.skeletal.asl`, assimp import in `Editor.Graphics.Loader` | A skinned vertex path and skeleton import exist | Skinning moves to a compute pre-skin pass into GPU geometry tables |
 | [DCC work](dcc-plugins-vcs.md) S49 | glTF 2.0 brings skins, morphs, animations | Asset formats for skeleton and morphs are defined here, consumed by the importer |
 | [Reflection work](serialization-and-reflection.md) S09 | Attributes and functions | Blend graph parameters are reflected properties |
 | [Visual scripting work](visual-scripting-hmr.md) S47 | Graph compiler | Blend graph compiles to a flat node program through it later |
@@ -17,7 +17,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.Animation` (assets, pose buffers, node program, evaluation tasks, LOD), `Engine.Animation.Compression` (ACL wrapper or in-house), `Engine.GFX.Render.Skinning` (compute pre-skin and morph pass), `Editor.Animation` (blend graph authoring, preview, retarget tool).
+- **Bundles**: new `Engine.Animation` (assets, pose buffers, node program, evaluation tasks, LOD), `Engine.Animation.Compression` (ACL wrapper or in-house), `Engine.Graphics.Render.Skinning` (compute pre-skin and morph pass), `Editor.Animation` (blend graph authoring, preview, retarget tool).
 - **Provides**: per-instance poses, skinned geometry in GPU tables, root motion deltas, bone transforms for ragdolls and cloth colliders.
 - **Consumes**: fiber scheduler (S02), reflection (S09), GPU geometry tables (S15), glTF import (S49), physics (S34, S35), graph compiler (S47, later), replication (S56, later).
 
@@ -36,7 +36,7 @@
 | `SkinningPass` | Compute: linear blend or dual quaternion per asset, morph deltas applied, output into the GPU geometry tables so visibility buffer and shadows see one geometry path. |
 | `Retargeter` | Rest-pose mapping between skeletons with bone name map and chain rules. |
 
-Placement: `Engine.Animation/{Skeleton,AnimationClip,MorphTargetSet,PoseBuffer,NodeProgram,AnimationSystem,Inertialiser}`, `Engine.Animation.Compression/`, `Engine.GFX.Render.Skinning/SkinningPass`, `Editor.Animation/`. Tests: locomotion blend with inertialised transitions golden; 1,000-instance crowd budget; Blender and Maya clips identical; retarget test; skinned geometry through the visibility buffer.
+Placement: `Engine.Animation/{Skeleton,AnimationClip,MorphTargetSet,PoseBuffer,NodeProgram,AnimationSystem,Inertialiser}`, `Engine.Animation.Compression/`, `Engine.Graphics.Render.Skinning/SkinningPass`, `Editor.Animation/`. Tests: locomotion blend with inertialised transitions golden; 1,000-instance crowd budget; Blender and Maya clips identical; retarget test; skinned geometry through the visibility buffer.
 
 ## Work chunks
 

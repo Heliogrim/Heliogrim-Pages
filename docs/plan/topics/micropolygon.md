@@ -9,7 +9,7 @@ Cluster-DAG geometry with error-driven LOD, page streaming, software rasterisati
 
 ## Current state (checked 2026-11-07)
 
-- `Engine.GFX.Geometry`: 46 lines. `StaticGeometryStructure` asset exists. No meshlets, no DAG, no pages.
+- `Engine.Graphics.Geometry`: 46 lines. `StaticGeometryStructure` asset exists. No meshlets, no DAG, no pages.
 - #82 describes the micropolygon scratchpad in workgroup shared memory (per-lane index and vertex sub-sections written through shared helpers), which drives the region-borrow feature in ASL.
 - Import goes through assimp into static geometry; no offline processing stage beyond that.
 

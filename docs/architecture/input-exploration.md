@@ -13,7 +13,7 @@ Q39.1 was decided as: not simply SDL3; integrate natively on Win32, iOS, macOS, 
     - window creation (`SDL_CreateWindow` in `WinPlatform::makeNativeWindow`)
     - the message pump (`SDL_PollEvent` on the platform affine thread)
     - event translation (`SDL_AddEventWatch` → `WinPlatform::translateEvent`)
-    - the Vulkan surface (`SDL_Vulkan_CreateSurface` in `Engine.GFX/Surface/Surface.cpp`)
+    - the Vulkan surface (`SDL_Vulkan_CreateSurface` in `Engine.Graphics/Surface/Surface.cpp`)
 - Events translated today: quit, resize, close request, key up/down, mouse motion, buttons and wheel.
 - Not translated:
     - text input and IME

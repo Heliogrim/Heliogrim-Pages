@@ -15,7 +15,7 @@
 
 ## Architecture
 
-- **Bundles**: `Engine.GFX.Geometry` grows into `Engine.GFX.Geometry.Cluster` (meshlet and DAG formats, page layout, runtime selection) and `Editor.GFX.Geometry.Build` (import-time meshlet build, DAG build on Background fibers, runs in the worker role). Rasterisers live in `Engine.GFX.Render.Visibility` (hardware path) and a new `Engine.GFX.Render.SoftwareRaster`.
+- **Bundles**: `Engine.Graphics.Geometry` grows into `Engine.Graphics.Geometry.Cluster` (meshlet and DAG formats, page layout, runtime selection) and `Editor.Graphics.Geometry.Build` (import-time meshlet build, DAG build on Background fibers, runs in the worker role). Rasterisers live in `Engine.Graphics.Render.Visibility` (hardware path) and a new `Engine.Graphics.Render.SoftwareRaster`.
 - **Provides**: cluster geometry asset format, per-frame cluster selection, software rasteriser into the visibility buffer, page requests to residency.
 - **Consumes**: culling and visibility (S15), virtual texture feedback plumbing (S17), residency (S03), ASL region borrows (S11), worker role (S58).
 
@@ -31,7 +31,7 @@
 | `MeshShaderPath` | Optional mid-size path behind the S12 mesh pipeline and the minimum-spec flag. |
 | `PageFeedback` | Page requests emitted by `ClusterSelect` for missing children; served through `ResidencyManager`. |
 
-Placement: `Engine.GFX.Geometry.Cluster/{Meshlet,ClusterDag,GeometryPage,ClusterSelect}`, `Engine.GFX.Render.SoftwareRaster/`, `Editor.GFX.Geometry.Build/`. Tests: harness equality between software and hardware paths; DAG build determinism on fixtures; streaming fly-through as a scene fixture.
+Placement: `Engine.Graphics.Geometry.Cluster/{Meshlet,ClusterDag,GeometryPage,ClusterSelect}`, `Engine.Graphics.Render.SoftwareRaster/`, `Editor.Graphics.Geometry.Build/`. Tests: harness equality between software and hardware paths; DAG build determinism on fixtures; streaming fly-through as a scene fixture.
 
 ## Work chunks
 

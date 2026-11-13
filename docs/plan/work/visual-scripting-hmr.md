@@ -18,7 +18,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.Graph.Ir` (typed graph IR, validation, lowering), `Engine.Graph.Emit.Cpp`, `Engine.Graph.Emit.Asl`, `Engine.Graph.Interp` (editor iteration), `Editor.Graphs` (authoring on `Editor.GFX.Graphs` node definitions, source map navigation). New `Engine.HotReload` (module registry, patch tier integration, swap tier migration) and a `HotReload` build profile in CMake.
+- **Bundles**: new `Engine.Graph.Ir` (typed graph IR, validation, lowering), `Engine.Graph.Emit.Cpp`, `Engine.Graph.Emit.Asl`, `Engine.Graph.Interp` (editor iteration), `Editor.Graphs` (authoring on `Editor.Graphics.Graphs` node definitions, source map navigation). New `Engine.HotReload` (module registry, patch tier integration, swap tier migration) and a `HotReload` build profile in CMake.
 - **Provides**: compile graphs to C++ or ASL with source maps; interpret graphs; reload game modules with state preserved.
 - **Consumes**: reflection (S09), diagnostics (S05), serialisation (S01), memory (S08), SDK and module layout (S53), archetype relocation barrier (#80), crash annotations (S06), replay barrier (S59).
 

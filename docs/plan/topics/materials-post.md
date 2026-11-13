@@ -11,7 +11,7 @@
 
 ## Current state (checked 2026-11-07)
 
-- `Engine.GFX.Material` (16 files): `Material`, `MaterialPrototype`, `MaterialEffect`, `EffectUsagePattern` (ctx, dyn, static bindings; dyn is a stub), `MaterialParameterStorageTable`, `MaterialFactory`. The PBR shaders (`lighting.brdf.asl`, `pbr.asl`, `gbuffer.fs.asl`) implement a single-layer metal-roughness model with IBL.
+- `Engine.Graphics.Material` (16 files): `Material`, `MaterialPrototype`, `MaterialEffect`, `EffectUsagePattern` (ctx, dyn, static bindings; dyn is a stub), `MaterialParameterStorageTable`, `MaterialFactory`. The PBR shaders (`lighting.brdf.asl`, `pbr.asl`, `gbuffer.fs.asl`) implement a single-layer metal-roughness model with IBL.
 - `PostProcessPass` and `tonemap.asl` exist; no grading, bloom, DoF or motion blur; no HDR swapchain; no motion vectors.
 - Blend state exists per pipeline; no OIT.
 
@@ -29,7 +29,7 @@
 - Parameters: typed blocks per update frequency (per material, per instance) mapped to the GPU material table (S15); naming follows glTF and OpenPBR so importers map one to one.
 - Requirement back-propagation: each material effect exports requirements (lights, shadow maps, GI probes, refraction buffer); `MaterialPrototype` aggregates them; the render graph enables passes from the union (no translucent materials, no OIT passes; no emissive, no emissive light list).
 - Emissive feeds GI (S20) through an emissive surface list built by the material classification pass.
-- Material graphs in the editor (`Editor.GFX.Graphs`) compile to ASL through the visual-scripting compiler (S47) once it exists; until then materials are ASL plus parameter sets.
+- Material graphs in the editor (`Editor.Graphics.Graphs`) compile to ASL through the visual-scripting compiler (S47) once it exists; until then materials are ASL plus parameter sets.
 
 ### S22 Transparency
 

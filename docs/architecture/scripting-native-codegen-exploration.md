@@ -13,7 +13,7 @@
 - **No dynamic code loading**: no `LoadLibrary`, `dlopen` or plugin boundary. Game code is linked into the executable. HMR has nothing to build on yet.
 - **Reflection is type identity only**: `Engine.Reflect` offers `TypeId`, `MetaClass`, inheritance queries and a type switch. There is no member, field or function enumeration, no annotations, no invoke. "Reflection and introspection metadata" from the conversation does not exist.
 - **Phases exist as stage ordering only**: `Engine.ACS.Schedule` defines named stages (`ActorTickPrePhysics`, `Physics::Overlap`, `Collision`, `PostPhysics`, `ActorHousekeeping`) on `StagePipeline` with `StageDependency`. Stages order work; they declare no read or write sets, so there is no hazard tracking and no mutation barrier or command buffer for actors. `ActorTickStage` is still a `TODO`.
-- **A node graph and a text emitter already exist, for shaders**: `Editor.GFX.Graphs` has a typed node graph (math, input, output, sub-graph nodes) and `Engine.Accel.Lang` has `Emitter`, `Dialect`, a parser, an IR with `Analysis`, `Contract`, `Lower` and a `GlslEmitter`. That is a working precedent for "graph, then IR, then emitted text", and the shape the C++ emitter would take. It targets GLSL, not C++.
+- **A node graph and a text emitter already exist, for shaders**: `Editor.Graphics.Graphs` has a typed node graph (math, input, output, sub-graph nodes) and `Engine.Accel.Lang` has `Emitter`, `Dialect`, a parser, an IR with `Analysis`, `Contract`, `Lower` and a `GlslEmitter`. That is a working precedent for "graph, then IR, then emitted text", and the shape the C++ emitter would take. It targets GLSL, not C++.
 
 ## 1. Direction (Owner Leaning)
 

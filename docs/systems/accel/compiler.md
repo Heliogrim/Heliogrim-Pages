@@ -20,7 +20,7 @@ How an `.asl` file becomes a Vulkan pipeline: who calls what, which caches are h
 
 ## Step 1: load the shader
 
-A pass builds its effect at setup. Today the loader is a helper, `makeIrIntermediate` (`Engine.GFX.Render.Subpass/Impl/__tmp_helper.hpp`), which reads the file below `assets/shader/`, resolves `#include`s the same way and stores the parsed module:
+A pass builds its effect at setup. Today the loader is a helper, `makeIrIntermediate` (`Engine.Graphics.Render.Subpass/Impl/__tmp_helper.hpp`), which reads the file below `assets/shader/`, resolves `#include`s the same way and stores the parsed module:
 
 ```cpp
 auto vertexStage = make_smr<Stage>(StageFlagBits::eVertex);

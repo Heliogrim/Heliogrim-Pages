@@ -17,7 +17,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.World.Ocean` (authoritative height function, spectrum parameters, buoyancy service) and `Engine.GFX.Render.Ocean` (FFT cascades, foam, shoreline, wakes, surface shading). Fluids: `Engine.VFX.Fluids` as simulation stages of S24, or its own bundle per Q31.1.
+- **Bundles**: new `Engine.World.Ocean` (authoritative height function, spectrum parameters, buoyancy service) and `Engine.Graphics.Render.Ocean` (FFT cascades, foam, shoreline, wakes, surface shading). Fluids: `Engine.VFX.Fluids` as simulation stages of S24, or its own bundle per Q31.1.
 - **Provides**: `sampleWater(WorldPosition, time)` on the CPU; ocean surface rendering; local fluid volumes and 2D shallow-water inserts; CPU proxy fields for gameplay.
 - **Consumes**: weather and wind (S32), terrain height (S27), compute pipelines (S12), froxel (S21), Jolt (S34), particles (S24), deterministic math (S59).
 
@@ -35,7 +35,7 @@
 | `ShallowWaterInsert` | Bounded 2D grid coupled to the ocean height at its border (rivers, near-ship water). |
 | `FlowProxy` | Low-resolution CPU flow and depth field the server evaluates; drives floating objects identically on both sides. |
 
-Placement: `Engine.World.Ocean/{WaveFunction,OceanParams,BuoyancyService}`, `Engine.GFX.Render.Ocean/{FftCascades,ShorelinePass,WakeTarget}`, `Engine.VFX.Fluids/{FluidVolume,ShallowWaterInsert,FlowProxy}`. Tests: 10k-point server and client agreement; ship floats under wind; cascade goldens; FFT cost counter.
+Placement: `Engine.World.Ocean/{WaveFunction,OceanParams,BuoyancyService}`, `Engine.Graphics.Render.Ocean/{FftCascades,ShorelinePass,WakeTarget}`, `Engine.VFX.Fluids/{FluidVolume,ShallowWaterInsert,FlowProxy}`. Tests: 10k-point server and client agreement; ship floats under wind; cascade goldens; FFT cost counter.
 
 ## Work chunks
 

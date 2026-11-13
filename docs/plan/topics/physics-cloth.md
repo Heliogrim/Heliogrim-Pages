@@ -10,7 +10,7 @@
 
 ## Current state (checked 2026-11-07)
 
-- Jolt vendored as a shared library with `CROSS_PLATFORM_DETERMINISTIC` off, `OBJECT_LAYER_BITS` 16, exceptions and RTTI off, Vulkan debug renderer on. `Engine.PFX` initialises it; `Engine.Physics.Scene` is a `SceneSystem` with a registry; `Engine.Physics.Scene.Model` has box and sphere collision models reading `getUniverseTransform`; `Engine.Physics.Schedule` has a stage. No characters, vehicles, constraints, heightfields or queries exposed.
+- Jolt vendored as a shared library with `CROSS_PLATFORM_DETERMINISTIC` off, `OBJECT_LAYER_BITS` 16, exceptions and RTTI off, Vulkan debug renderer on. `Engine.Physics` initialises it; `Engine.Physics.Scene` is a `SceneSystem` with a registry; `Engine.Physics.Scene.Model` has box and sphere collision models reading `getUniverseTransform`; `Engine.Physics.Schedule` has a stage. No characters, vehicles, constraints, heightfields or queries exposed.
 
 ## Research summary
 

@@ -18,7 +18,7 @@
 
 ## Architecture
 
-- **Bundles** (from the design): `Engine.SFX` keeps importers and adds `Engine.SFX.Dsp` (signal model, nodes, compiler, command buffers), `Engine.SFX.Runtime` (instances, voices, buses, device interface, null device), `Support.Audio.Wasapi` (device thread), `Engine.SFX.Scene` (`AudioSceneSystem`), later `Editor.Audio` (graph composition, mixer view).
+- **Bundles** (from the design): `Engine.Audio` (named `Engine.SFX` until W10.3) keeps importers and adds `Engine.Audio.Dsp` (signal model, nodes, compiler, command buffers), `Engine.Audio.Runtime` (instances, voices, buses, device interface, null device), `Support.Audio.Wasapi` (device thread), `Engine.Audio.Scene` (`AudioSceneSystem`), later `Editor.Audio` (graph composition, mixer view).
 - **Provides**: scene sound, mixer banks, DSP graph, device output; audibility queries for gameplay.
 - **Consumes**: `AffineThread` (S02), `WorldPosition` (S07), residency (S03), `LayerVolume` (S29), `WeatherState` (S32), bounds query service (S44), spans hook (S04), canvas (S42) for the editor.
 

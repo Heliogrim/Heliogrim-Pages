@@ -9,7 +9,7 @@ A skeletal animation pipeline: clips with compression, a blend graph with state 
 
 ## Current state (checked 2026-11-07)
 
-- A skeletal vertex path exists in `assets/shader/template/defined.skeletal.asl`; assimp import brings skeletons in through `Editor.GFX.Loader`. No runtime animation system, no clips, no blending.
+- A skeletal vertex path exists in `assets/shader/template/defined.skeletal.asl`; assimp import brings skeletons in through `Editor.Graphics.Loader`. No runtime animation system, no clips, no blending.
 
 ## Research summary
 

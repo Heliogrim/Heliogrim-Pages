@@ -139,11 +139,11 @@ flowchart LR
 | Storage is synchronous; async paths are `todo_panic` ([storage exploration](../architecture/storage-exploration.md)) | Request-based async storage on IOCP or DirectStorage |
 | Serialisation has no schema versions ([serialization exploration](../architecture/serialization-evolution-exploration.md)) | Versioned, skippable, text-form-capable |
 | ASL emits GLSL gated by glslang; graphics pipelines only in `Accel.Pipeline` | ASL emits SPIR-V directly; all pipeline kinds |
-| Render graph exists (`Engine.GFX.RenderGraph`, ~6k lines) but passes are hand-wired (`Render.Subpass/Impl`) | Declarative passes, derived barriers, aliasing, GPU-driven scene |
+| Render graph exists (`Engine.Graphics.RenderGraph`, ~6k lines) but passes are hand-wired (`Render.Subpass/Impl`) | Declarative passes, derived barriers, aliasing, GPU-driven scene |
 | Float world positions | Double world, camera-relative rendering |
 | `Engine.Network`: 48 lines; `Engine.Crypto`: CRC32 only | Transport, replication, TLS/QUIC, hashing |
-| `Engine.PFX` wraps Jolt init; two shape models | Full Jolt integration, deterministic mode, characters, vehicles |
-| `Engine.SFX`: importers only (WAV, FLAC, Vorbis) | Audio runtime per [design](../architecture/audio-runtime-design.md) |
+| `Engine.Physics` wraps Jolt init; two shape models | Full Jolt integration, deterministic mode, characters, vehicles |
+| `Engine.Audio`: importers only (WAV, FLAC, Vorbis) | Audio runtime per [design](../architecture/audio-runtime-design.md) |
 | Reflow draws text from a bitmap atlas as CPU geometry | SDF/MSDF canvas, shaped text |
 | Editor actions: `ActionManager`, `ActionLog`, delegate and import actions; reapply path broken (bug 12 in test notes) | Transactional undo/redo across objects and assets |
 | No crash handler, no diagnostics type, profiler dropped | Crashpad-style dumps, `Diagnostic`, spans |

@@ -8,13 +8,13 @@
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
 | Requirement back-propagation brainstorm (session notes, referenced in the [rundown](../../architecture/exploration-rundown.md)) | Materials export requirements; the graph enables passes from the union | Not written on the site; W16.1 records it |
-| `Engine.GFX.Material` (`EffectUsagePattern` ctx, dyn, static; dyn is a stub) | Binding frequency classes exist in name | The dyn class becomes the per-instance block |
+| `Engine.Graphics.Material` (`EffectUsagePattern` ctx, dyn, static; dyn is a stub) | Binding frequency classes exist in name | The dyn class becomes the per-instance block |
 | [Visual scripting work](visual-scripting-hmr.md) | Material graphs compile to ASL through S47's compiler | Until then materials are ASL plus parameter sets |
 | [GPU-driven work](render-graph-gpu-driven.md) Q15.2 | Deferred versus forward-from-VB decides the shading entry point | Blocks W16.1 and W22.1 |
 
 ## Architecture
 
-- **Bundles**: `Engine.GFX.Material` extended (layer model, requirements, parameter blocks). New `Engine.GFX.Transparency` (OIT targets, composite, refraction copy) and `Engine.GFX.Post` (chain fragments, LUTs, exposure, output transform). All shaders in ASL under `assets/shader/material/*`, `transparency/*`, `post/*`.
+- **Bundles**: `Engine.Graphics.Material` extended (layer model, requirements, parameter blocks). New `Engine.Graphics.Transparency` (OIT targets, composite, refraction copy) and `Engine.Graphics.Post` (chain fragments, LUTs, exposure, output transform). All shaders in ASL under `assets/shader/material/*`, `transparency/*`, `post/*`.
 - **Provides**: material model and parameter blocks mapped to the GPU material table; `Requirements` per prototype; OIT and refraction passes; a post chain with jitter and motion vectors from the first version.
 - **Consumes**: visibility resolve (S15), pipeline cache (S13), froxel volume (S21), probes (S20), swapchain colour-space query (`Engine.Driver.Vulkan`).
 
@@ -31,7 +31,7 @@
 | `PostChain` | Ordered fragments: `Exposure (histogram)`, `Bloom`, `DepthOfField`, `MotionBlur`, `Temporal (TAA or upscaler)`, `ToneMap`, `Grade (3D LUT, log space)`, `OutputTransform (sRGB, scRGB, HDR10)`, `UiComposite`. Each is a `PassDecl`; jitter and motion vectors exist from the first version. |
 | `ToneMapOp` | `PbrNeutral`, `AgX`, `Aces` behind one effect interface; default from Q23.1. |
 
-Placement: `Engine.GFX.Material/{MaterialModel,ParameterBlock,Requirements}.hpp`, `Engine.GFX.Transparency/`, `Engine.GFX.Post/`. Tests: harness goldens against a path-traced reference for a layered material; glass, smoke and water scene under camera motion; SDR and HDR output goldens.
+Placement: `Engine.Graphics.Material/{MaterialModel,ParameterBlock,Requirements}.hpp`, `Engine.Graphics.Transparency/`, `Engine.Graphics.Post/`. Tests: harness goldens against a path-traced reference for a layered material; glass, smoke and water scene under camera motion; SDR and HDR output goldens.
 
 ## Work chunks
 

@@ -15,7 +15,7 @@
 
 ## Architecture
 
-- **Bundles**: new `Engine.GFX.Volumetric` (atmosphere LUTs, aerial perspective, froxel volume, clouds, cloud shadow map) and new `Engine.World.Weather` (state, transitions, regions, wind field service, precipitation occlusion, wetness parameters). Weather sits in L3 world and exposes a query service; rendering reads it through the service, not the other way round.
+- **Bundles**: new `Engine.Graphics.Volumetric` (atmosphere LUTs, aerial perspective, froxel volume, clouds, cloud shadow map) and new `Engine.World.Weather` (state, transitions, regions, wind field service, precipitation occlusion, wetness parameters). Weather sits in L3 world and exposes a query service; rendering reads it through the service, not the other way round.
 - **Provides**: sky and aerial perspective, shared froxel volume, cloud shadows; `WeatherState` per region, `WindField` CPU and GPU, precipitation occlusion map, wetness inputs for materials.
 - **Consumes**: compute pipelines (S12), render graph (S14), cells and layers (S40, S29), replication (S56, later), terrain height for occlusion (S27), flow maps (S33, optional).
 
@@ -32,7 +32,7 @@
 | `PrecipitationOcclusion` | Top-down depth around each viewer from terrain and static geometry; dirty-tile invalidation from terrain edits (S28). |
 | `WetnessParams` | Accumulation per material from precipitation and occlusion; puddle masks from flow maps when S33 bakes them. |
 
-Placement: `Engine.GFX.Volumetric/{AtmosphereLuts,FroxelVolume,CloudPass,CloudShadowMap}`, `Engine.World.Weather/{WeatherState,WeatherRegion,WindField,PrecipitationOcclusion}`. Tests: LUT goldens; day-cycle golden video; wind CPU and GPU agreement; rain under a roof fixture.
+Placement: `Engine.Graphics.Volumetric/{AtmosphereLuts,FroxelVolume,CloudPass,CloudShadowMap}`, `Engine.World.Weather/{WeatherState,WeatherRegion,WindField,PrecipitationOcclusion}`. Tests: LUT goldens; day-cycle golden video; wind CPU and GPU agreement; rain under a roof fixture.
 
 ## Work chunks
 

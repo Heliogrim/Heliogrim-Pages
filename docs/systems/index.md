@@ -5,7 +5,7 @@ How each engine system works, written for someone who has to change it. Explorat
 | System | Status | Modules |
 |--------|--------|---------|
 | [Accel shader toolchain](accel/index.md): [ASL](accel/asl.md), [IR and passes](accel/ir.md), [compiler](accel/compiler.md) | <span class="hg-status design">experimental</span> | `Engine.Accel.Lang`, `Engine.Accel.Compile` |
-| [Render graph](render-graph.md) | <span class="hg-status planned">planned page</span> | `Engine.GFX.RenderGraph`, `Engine.GFX.RenderGraph.Compile` |
+| [Render graph](render-graph.md) | <span class="hg-status planned">planned page</span> | `Engine.Graphics.RenderGraph`, `Engine.Graphics.RenderGraph.Compile` |
 | [Micropoly renderer](micropoly-renderer.md) | <span class="hg-status planned">planned</span> | none in the engine yet |
 | [Animation pipeline](animation-pipeline.md) | <span class="hg-status planned">planned</span> | none in the engine yet |
 

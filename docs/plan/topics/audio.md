@@ -9,7 +9,7 @@ A fully integrated sound engine written in the project: a scene system mapping s
 
 ## Current state (checked 2026-11-07)
 
-- `Engine.SFX`: WAV, FLAC and Vorbis importers, `Audio` and `AudioFormat` types. No playback, device or DSP. Opus is not supported (the design wants it).
+- `Engine.Audio`: WAV, FLAC and Vorbis importers, `Audio` and `AudioFormat` types. No playback, device or DSP. Opus is not supported (the design wants it).
 - The runtime design draft covers: instance to control step (audibility score, real and virtual voices), voice with a compiled per-voice chain, bus graph, device thread outside fibers, null device for offline tests, milestone 1 as an in-memory WAV emitter with camera listener, pan and distance, master bus, WASAPI.
 
 ## Guidance

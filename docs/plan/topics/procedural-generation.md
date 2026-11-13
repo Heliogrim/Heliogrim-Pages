@@ -9,7 +9,7 @@ Deterministic, seed-driven, graph-based generation for terrain detail, scatter (
 
 ## Current state (checked 2026-11-07)
 
-- Nothing. `Editor.GFX.Graphs` holds node definitions for material-style graphs without a compiler; the owner's notes mention "environment painting with automatic instantiation".
+- Nothing. `Editor.Graphics.Graphs` holds node definitions for material-style graphs without a compiler; the owner's notes mention "environment painting with automatic instantiation".
 
 ## Research summary (all unverified)
 

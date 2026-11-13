@@ -186,7 +186,7 @@ Sources:
 - Academy Software Foundation. OpenPBR Surface specification. Repo https://github.com/AcademySoftwareFoundation/OpenPBR (subproject of MaterialX, Apache-2.0, no tagged release); spec https://academysoftwarefoundation.github.io/OpenPBR/ (spec page itself not opened). `verified (abstract/landing page)`
 
 Applicability to Heliogrim:
-- The existing material prototype/effect split in `Engine.GFX.Material` is compatible with a layered parameter model; the IR gets the layering as compile-time composition (function inlining), not runtime branches.
+- The existing material prototype/effect split in `Engine.Graphics.Material` is compatible with a layered parameter model; the IR gets the layering as compile-time composition (function inlining), not runtime branches.
 - Choose a small fixed layer count (base + clearcoat + sheen optional) for real-time; full arbitrary layering is unnecessary for v1.
 - Emissive: store emissive intensity separately so GI can consume it (probe injection or emissive light list).
 - Adopt glTF/OpenPBR parameter naming for import interoperability.

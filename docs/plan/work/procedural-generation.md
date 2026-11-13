@@ -8,7 +8,7 @@
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
 | [Visual scripting work](visual-scripting-hmr.md) S47 | Graph IR compiled to C++ | Generators are the second graph-compiler client after scripts (or third after particles) |
-| `Editor.GFX.Graphs` | Node definitions without a compiler | Point-data nodes are a new node family |
+| `Editor.Graphics.Graphs` | Node definitions without a compiler | Point-data nodes are a new node family |
 | [Storage work](storage-streaming.md) S40 | Cells stream on Background fibers | Generation runs inside cell streaming |
 | [Terrain work](terrain.md) | Tiles, op-log deltas | Erosion bakes into tiles; runtime edits are deltas |
 | [Particles and foliage work](particles-foliage.md) S25 | Instances derived from scatter | Scatter output contract |

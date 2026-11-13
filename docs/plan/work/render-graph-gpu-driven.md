@@ -16,7 +16,7 @@
 
 ## Architecture
 
-- **Bundles**: `Engine.GFX.RenderGraph` (+`.Compile`) evolve into v2 in place (declarations, compile cache, derived barriers, aliasing, queues). `Engine.GFX.Render.Subpass/Impl` is superseded by declarative passes in a new `Engine.GFX.Render.Passes`. New `Engine.GFX.Scene.Gpu` (instance, material, geometry, light tables, upload rings) and `Engine.GFX.Render.Culling` (frustum, HZB, meshlet culling, indirect argument generation), `Engine.GFX.Render.Visibility` (visibility pass, classification, resolve). `Engine.Math` split out of `Engine.Common` with `dvec3` and `WorldPosition`. `Engine.Driver.Vulkan` gains bindless layout, timeline semaphores, multi-queue.
+- **Bundles**: `Engine.Graphics.RenderGraph` (+`.Compile`) evolve into v2 in place (declarations, compile cache, derived barriers, aliasing, queues). `Engine.Graphics.Render.Subpass/Impl` is superseded by declarative passes in a new `Engine.Graphics.Render.Passes`. New `Engine.Graphics.Scene.Gpu` (instance, material, geometry, light tables, upload rings) and `Engine.Graphics.Render.Culling` (frustum, HZB, meshlet culling, indirect argument generation), `Engine.Graphics.Render.Visibility` (visibility pass, classification, resolve). `Engine.Math` split out of `Engine.Common` with `dvec3` and `WorldPosition`. `Engine.Driver.Vulkan` gains bindless layout, timeline semaphores, multi-queue.
 - **Layer**: L3 rendering, `Engine.Math` in L1.
 - **Provides**: pass declaration API, compiled frame graph, GPU-resident scene, indirect draw pipeline, visibility buffer; `WorldPosition` for every system.
 - **Consumes**: `InterfaceDesc` (S11), pipeline kinds (S12), `Waitable` for fences (S02), spans (S04), cell origin (S40), material requirements (S16).
@@ -44,13 +44,13 @@ flowchart LR
 | `WorldPosition` | `dvec3`; `Transform { WorldPosition translation; quatf rotation; vec3f scale }`; `getUniverseTransform` folds translation in double. |
 | `CameraOrigin` | Current render origin (double); the mirror rebuilds camera-relative floats when the camera moves beyond the threshold from Q07.1; aligned to cell origins (S40). |
 
-Placement: `Engine.GFX.RenderGraph/{PassDecl,GraphBuilder,CompiledGraph}`, `Engine.GFX.Scene.Gpu/Tables.hpp`, `Engine.GFX.Render.Culling/`, `Engine.GFX.Render.Visibility/`, `Engine.Math/{DVec3,WorldPosition,Transform}.hpp`. Tests: graph compile tests without a device (barrier derivation on fixtures), harness tests for culling and visibility, a 100 km origin test.
+Placement: `Engine.Graphics.RenderGraph/{PassDecl,GraphBuilder,CompiledGraph}`, `Engine.Graphics.Scene.Gpu/Tables.hpp`, `Engine.Graphics.Render.Culling/`, `Engine.Graphics.Render.Visibility/`, `Engine.Math/{DVec3,WorldPosition,Transform}.hpp`. Tests: graph compile tests without a device (barrier derivation on fixtures), harness tests for culling and visibility, a 100 km origin test.
 
 ## Work chunks
 
 ### W14.0 Write the render graph "as is" system page · explore · ready
 
-- **Goal**: read `Engine.GFX.RenderGraph` and `.Compile`, the subpass implementations and `VkRCmdTranslator`; describe the lifecycle with source links; list what v2 keeps.
+- **Goal**: read `Engine.Graphics.RenderGraph` and `.Compile`, the subpass implementations and `VkRCmdTranslator`; describe the lifecycle with source links; list what v2 keeps.
 - **Output**: `systems/render-graph.md` filled from the template.
 
 ### W07.1 Large-world coordinates design · design · ready
