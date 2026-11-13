@@ -15,6 +15,7 @@ Overview documents for the engine and editor systems. Exploration notes are not 
 | [Affine threads](affine-thread-design.md) | <span class="hg-status design">design</span> draft 2026-11-09 | One owned-thread seam for the platform pump and IO: inbox, OS waker, `post` returning a future, modal-safe drain |
 | [Task graph](task-graph-design.md) | <span class="hg-status design">design</span> draft 2026-11-11, reviewed 2026-11-12 | Declared stages `{ name, reads, writes, lane, after, before }`, a checked builder (cycles, conflicts), a counting runner with a TLA+ model, lanes stamped on the task; every frame stage with its sets |
 | [Storage](storage-design.md) | <span class="hg-status design">design</span> draft 2026-11-09 | Resolved-stack reuse (per-stage cache, invalidation after commit) and the async path: IOCP `IoSystem` with DirectStorage-shaped batches, fibers park per read, windowed archive residency |
+| [Accel Lang](accel-lang-design.md) | <span class="hg-status design">design</span> record 2026-11-13 | Intent, layer and binding rules, IR part list, region-borrow rules and reserved names of the shader toolchain, moved from the engine-side specs |
 
 ## Explorations
 
@@ -24,6 +25,7 @@ Overview documents for the engine and editor systems. Exploration notes are not 
 | [Agent and player sync](agent-sync-exploration.md) | <span class="hg-status exploration">exploration</span> 2026-11-09 | Tiered prediction, scheduled actions, cost per player (W56.0 desk study) |
 | [Audio and DSP](audio-dsp.md) | <span class="hg-status exploration">exploration</span> | Middleware, DAW ingestion, live and baked processing |
 | [Bounding volumes](bounding-volumes.md) | <span class="hg-status exploration">exploration</span> | Spatial queries |
+| [Engine stop teardown](engine-stop-teardown-exploration.md) | <span class="hg-status exploration">exploration</span> 2026-11-13 | Stop vs. in-flight frames: ownership retire, stage-owned teardown (#178) |
 | [Fiber scheduler iteration](fiber-scheduler-exploration.md) | <span class="hg-status exploration">exploration</span> | Waiting, wake lists, task dependencies |
 | [Input backends](input-exploration.md) | <span class="hg-status closed">closed</span> 2026-11-09 | Result: SDL3 base, native capability side channels, ADR [placeholder](../adr/placeholder-input-backend-sdl3-base.md) |
 | [Navmesh library fit](navigation-exploration.md) | <span class="hg-status closed">closed</span> 2026-11-09 | Result: vendor recastnavigation, ADR [placeholder](../adr/placeholder-navmesh-recastnavigation.md); detail-mesh patch halves tile builds with byte-identical output |

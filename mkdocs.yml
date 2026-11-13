@@ -95,17 +95,21 @@ nav:
           - Promise and future: architecture/promise-future-design.md
           - Affine threads: architecture/affine-thread-design.md
           - Task graph: architecture/task-graph-design.md
+          - Worker policy: architecture/worker-policy-design.md
           - Storage: architecture/storage-design.md
+          - Accel Lang: architecture/accel-lang-design.md
       - Explorations:
           - Actor system: architecture/actor-system.md
           - Agent and player sync: architecture/agent-sync-exploration.md
           - Audio and DSP: architecture/audio-dsp.md
           - Bounding volumes: architecture/bounding-volumes.md
+          - Engine stop teardown: architecture/engine-stop-teardown-exploration.md
           - Fiber scheduler iteration: architecture/fiber-scheduler-exploration.md
           - Input backends: architecture/input-exploration.md
           - Navmesh library fit: architecture/navigation-exploration.md
           - Observability and profiling: architecture/observability-exploration.md
           - Pointer sets: architecture/pointer-sets-exploration.md
+          - Scheduler lanes and priority: architecture/lane-policy-exploration.md
           - Scripting by native codegen: architecture/scripting-native-codegen-exploration.md
           - Scripting runtime: architecture/scripting-runtime-exploration.md
           - Serializer evolution and VCS: architecture/serialization-evolution-exploration.md

@@ -100,6 +100,21 @@ Issue column: existing issues are linked by number; `new` means an issue is crea
 | S63 | Coding standard and quality bar: written standard, review checklist, contract comments | M1 | none | [quality-and-process](topics/quality-and-process.md) | [#143](https://github.com/Heliogrim/Heliogrim-Engine/issues/143) |
 | S64 | Documentation system: reference generation, system pages per shipped system | M1 onward | none | [quality-and-process](topics/quality-and-process.md) | [#144](https://github.com/Heliogrim/Heliogrim-Engine/issues/144) |
 
+## Progress (checked 2026-11-10)
+
+Every battle-plan issue carries a comment "Battle-plan sync from Heliogrim-Pages (2026-11-10)" with its chunk statuses, decisions and engine state; this table is the same state per system. Systems not listed have no chunk started. Chunk detail lives on the [work pages](work/index.md).
+
+| ID | Chunks done | Engine state |
+|----|-------------|--------------|
+| S02 | W02.1, W02.2, W02.3 | W02.2 in PR [#159](https://github.com/Heliogrim/Heliogrim-Engine/pull/159) (`feat/scheduler-waitables` into `feat/wip`, merged into `feat/wip` 2026-11-11, closes #157 once `feat/wip` reaches `master`). W02.3 in PR [#164](https://github.com/Heliogrim/Heliogrim-Engine/pull/164), merged into #159 2026-11-11. Found on the way: #160 to #163; real-input checks (drag, resize, dialog) still owed. W02.4 done 2026-11-11; W02.5 plan half in PR [#175](https://github.com/Heliogrim/Heliogrim-Engine/pull/175) into `feat/wip` (task graph runs the frame, auto worker count), its relaxation half blocked behind W02.8 and W02.6 (2026-11-13). Next: W02.8, W02.6, W02.0 |
+| S03 | W03.1, W03.2, W03.3 | W03.2 in PR [#169](https://github.com/Heliogrim/Heliogrim-Engine/pull/169), merged into `feat/wip` 2026-11-13; editor shader-load check and #24 with the owner. W03.4 in progress on `feat/async-storage` from `feat/wip` (plan `docs/superpowers/plans/2026-11-09-async-storage-iocp.md`, untracked). Q03.5 and Q03.6 decided |
+| S10 | none | W10.3 code done 2026-11-10: spelled-out bundle names (`Engine.Physics`, `Engine.Graphics*`, `Editor.Graphics*`, `Engine.Audio`) in PR #167, merged into `feat/wip` 2026-11-11. W10.1 code done 2026-11-10: header diet without PCH in stacked PR #168, merged into `feat/wip` 2026-11-11; clean build-time number open. Both unmerged |
+| S11 | W11.1 region borrows (#82) | Milestone 2 and the region borrows (PR [#156](https://github.com/Heliogrim/Heliogrim-Engine/pull/156)) are on `master` (checked 2026-11-13). W11.0 code done 2026-11-13: #148 fix on `fix/asl-reserved-names` (unpushed), [design page](../architecture/accel-lang-design.md) written |
+| S37 | W37.0 | Nothing vendored. Detail-mesh sample cache patch and spike source untracked under `docs/superpowers/patches/`. Owner call open: offer the patch upstream. W37.1 waits on W27.1, W40.1 |
+| S39 | W39.0 | No engine change. SDL 3.2.22 to 3.4.x upgrade is task 1 of the W39.1 plan |
+| S56 | W56.0 (desk study) | No engine change. Prototype half waits on W55.3 |
+| S64 | W64.4 (seeded) | [Glossary](../glossary.md) with about 130 terms; hover terms open |
+
 ## Existing issues absorbed by systems
 
 | Issue | System |
@@ -118,3 +133,11 @@ Issue column: existing issues are linked by number; `new` means an issue is crea
 | #77 Arci split-count protocol | S02 (foundation for waitables) |
 | #78, #82 Accel IR | S11, S12 |
 | #80 sealed actor archetypes | S40 (streaming cell as handle space) |
+| #148 GLSL name collisions | S11 (W11.0) |
+| #150, #158, #160, #161, #162 engine and editor stop ordering | S02 |
+| #154 `Resource<T>` never releases, #166 nested storage deadlock, #171 `Path::name()` wide characters | S03 |
+| #163 shader modules destroyed late on editor exit | S12 |
+| #170 `CompileMap` find above 56 entries | S09 |
+| #174 `Signal` destroy rule | S02 |
+
+Open bug issues and the 25 logged test-note bugs are tracked together in the W61.1 ledger on the [quality work page](work/quality-and-process.md) (synced 2026-11-13).

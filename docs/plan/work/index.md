@@ -26,16 +26,16 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 ## Ready now
 
-32 chunks have no open dependency. Suggested order inside M1, by how much they unblock:
+31 chunks have no open dependency. Suggested order inside M1, by how much they unblock:
 
 | Order | Chunk | Kind | Why first |
 |---|---|---|---|
-| 1 | [W02.0](concurrency-fibers.md), [W02.5](concurrency-fibers.md) | explore, execute | The scheduler shapes storage, audio, observability, physics and replay; W02.4 is done (2026-11-11), its plan is ready to run |
+| 1 | [W02.0](concurrency-fibers.md), [W02.11](concurrency-fibers.md), [W02.14](concurrency-fibers.md) | explore, design+execute, design+plan+execute | The scheduler shapes storage, audio, observability, physics and replay; W02.5 closed at its plan half (PR #175), its rest split 2026-11-13 into W02.11 (stage access review, relaxation), W02.12 (scene key split, after W02.11), W02.13 (lanes, done 2026-11-13: lane policy exploration, implemented by W02.14) |
 | 2 | [W01.1](serialization-and-reflection.md) | design | Serialisation versioning gates partition, actions, packages, hot reload |
 | 3 | [W05.1](diagnostics-and-crash.md) | design | Every later system returns `Diagnostic` |
-| 4 | [W03.2](storage-streaming.md), [W03.5](storage-streaming.md) | execute, explore | Stack cache closes #24 (W03.1 design done), W03.5 decides the codec |
-| 5 | [W63.1](quality-and-process.md), [W62.1](quality-and-process.md), [W26.1](quality-and-process.md), [W61.1](quality-and-process.md), [W10.1](quality-and-process.md), [W64.1](quality-and-process.md) | mixed | Gates that make every other chunk safer |
-| 6 | [W11.0](accel-lang.md), [W11.1](accel-lang.md) | execute | Milestone 2 is done but unmerged; the borrows plan exists |
+| 4 | [W03.5](storage-streaming.md), [W03.4](storage-streaming.md) | explore, execute | W03.5 decides the codec; W03.4 code done 2026-11-13 in PR #180 into `feat/wip` (editor run open; registry removal excluded); W03.5 also owns the in-flight cap (Q03.5) |
+| 5 | [W63.1](quality-and-process.md), [W62.1](quality-and-process.md), [W26.1](quality-and-process.md), [W61.1](quality-and-process.md), [W10.1](quality-and-process.md), [W64.1](quality-and-process.md) | mixed | Gates that make every other chunk safer; W61.1 has a bug ledger (12 of 25 fixed, none filed) and the tracker's open bug issues |
+| 6 | [W11.0](accel-lang.md) | execute | Code done 2026-11-13: #148 fix on `fix/asl-reserved-names` (unpushed), [design page](../../architecture/accel-lang-design.md) written; W11.2 is next once the PR merges |
 | 7 | [W09.1](serialization-and-reflection.md), [W07.1](render-graph-gpu-driven.md), [W14.0](render-graph-gpu-driven.md), [W15.0](render-graph-gpu-driven.md), [W58.1](build-and-deploy.md), [W39.1](input.md) | design, explore | M2 designs with no M1 dependency |
 | 8 | [W38.0](audio.md) | design | The audio design is one builder check from approval |
 | 9 | [W06.1](diagnostics-and-crash.md), [W36.0](animation.md), [W37.0](navigation.md) (done 2026-11-09), [W52.0](localization.md), [W44.0](editor-workflows.md) | explore | Vendor fit and benchmark spikes; each is a day or two |
@@ -46,12 +46,12 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 
 | Work page | Systems | Chunks | Ready | Open questions |
 |---|---|---|---|---|
-| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.7 | W02.0, W02.5 (W02.1 to W02.4 done) | Q02.1 to Q02.8 |
+| [Concurrency and fibers](concurrency-fibers.md) | S02 | W02.0 to W02.14 | W02.0, W02.9, W02.11, W02.14 ready, W02.10 done (polling waits parked), W02.13 done (lane policy exploration), W02.12 after W02.11, W02.6 deferred (2026-11-13), W02.5 done (plan half merged via PR #175, rest split 2026-11-13; W02.1 to W02.4 done), W02.8 done (PR #181 merged into `feat/wip`) | Q02.1 to Q02.10 |
 | [Diagnostics, observability, crash](diagnostics-and-crash.md) | S04, S05, S06 | W04.1 to W04.3, W05.1 to W05.3, W06.1 to W06.3 | W05.1, W06.1 | Q04.1 to Q04.4, Q05.1, Q05.2, Q06.1, Q06.2 |
-| [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.2, W03.5; W03.4 after W03.2 (W03.1, W03.3 done) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
+| [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.5 (W03.1 to W03.3 done; W03.4 code done on `feat/async-storage`) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
 | [Serialisation, reflection, packages](serialization-and-reflection.md) | S01, S09, S41 | W01.1 to W01.5, W09.1, W09.2, W41.1, W41.2 | W01.1, W09.1 | Q01.1 to Q01.3, Q09.1, Q09.2, Q41.1, Q41.2 |
-| [Quality and process](quality-and-process.md) | S10, S26, S61 to S64 | W10.1, W10.2, W26.1 to W26.3, W61.1 to W61.3, W62.1 to W62.3, W63.1, W63.2, W64.1 to W64.3 | W63.1, W62.1, W26.1, W61.1, W64.1, W10.1 | Q10.1, Q26.1, Q62.1 to Q62.3, Q63.1, Q63.2, Q64.1 |
-| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.4, W12.1 to W12.3, W13.1, W13.2, W60.1 | W11.0, W11.1 | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
+| [Quality and process](quality-and-process.md) | S10, S26, S61 to S64 | W10.1, W10.2, W26.1 to W26.3, W61.1 to W61.3, W62.1 to W62.3, W63.1, W63.2, W64.1 to W64.3 | W63.1, W62.1, W26.1, W61.1, W64.1 (W10.1 code done, W10.3 done) | Q10.1, Q26.1, Q62.1 to Q62.3, Q63.1, Q63.2, Q64.1 |
+| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.4, W12.1 to W12.3, W13.1, W13.2, W60.1 | none (W11.0 code done, W11.1 done) | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
 | [Render graph, GPU-driven, large world](render-graph-gpu-driven.md) | S07, S14, S15 | W07.1, W07.2, W14.0 to W14.2, W15.0 to W15.3 | W14.0, W07.1, W15.0 | Q07.1, Q07.2, Q14.1, Q14.2, Q15.1 to Q15.3 |
 | [Materials, transparency, post](materials-post.md) | S16, S22, S23 | W16.1, W16.2, W22.1, W22.2, W23.1 to W23.3 | none | Q16.1, Q16.2, Q22.1, Q23.1, Q23.2 |
 | [Micropolygon](micropolygon.md) | S18 | W18.1 to W18.7 | none | Q18.1 to Q18.3 |
@@ -74,11 +74,11 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Build and headless roles](build-and-deploy.md) | S53, S58 | W53.1 to W53.5, W58.1 to W58.4 | W58.1 | Q53.1, Q53.2, Q58.1, Q58.2 |
 | [Networking, replication, mesh, replay](networking-mmo.md) | S55 to S57, S59 | W55.0 to W55.3, W56.1 to W56.3, W57.0 to W57.2, W59.0 to W59.2 | W59.0 (W56.0 desk study done) | Q55.1, Q55.2, Q56.1 to Q56.4, Q57.1, Q57.2, Q59.1 |
 
-Totals: 232 chunks (about 50 explore, 70 design, 110 execute), 32 ready, 130 owner questions (three added by W56.0, Q02.7 and Q02.8 by W02.4). The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
+Totals: 239 chunks (about 52 explore, 72 design, 114 execute; W02.9 and W02.10 added 2026-11-13, W02.11 to W02.13 split from W02.5 the same day, W02.14 from W02.13), 35 ready (W02.6 deferred, W02.10 and W02.13 done, W02.14 added), 132 owner questions (three added by W56.0, Q02.7 and Q02.8 by W02.4, Q02.9 and Q02.10 by W02.5). The [questions page](questions.md) groups the questions into batches so one conversation can clear many chunks.
 
 ## Cross-cutting findings from the cross-reference
 
-Cross-cutting owner decision (2026-11-09): bundles get spelled-out names, `Engine.Physics` and `Engine.Graphics`, with `Engine.Particles` and `Engine.Foliage` for new ones (W10.3 on the [quality page](quality-and-process.md)). Pages keep the current names until the rename lands.
+Cross-cutting owner decision (2026-11-09): bundles get spelled-out names, `Engine.Physics` and `Engine.Graphics`, with `Engine.Particles` and `Engine.Foliage` for new ones (W10.3 on the [quality page](quality-and-process.md)). The rename landed in PR [#167](https://github.com/Heliogrim/Heliogrim-Engine/pull/167) (merged into `feat/wip` 2026-11-11); pages use the spelled-out names.
 
 
 1. **Three paused brainstorms** hold requirements that the plan already uses but nobody closed: canvas and MSDF (W42.0), picking and gizmos (W44.1), audio design approval (W38.0). Closing them is cheap and removes the oldest open threads.
