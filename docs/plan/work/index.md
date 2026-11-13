@@ -35,7 +35,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | 3 | [W05.1](diagnostics-and-crash.md) | design | Every later system returns `Diagnostic` |
 | 4 | [W03.5](storage-streaming.md), [W03.4](storage-streaming.md) | explore, execute | W03.5 decides the codec; W03.4 code done 2026-11-13 in PR #180 into `feat/wip` (editor run open; registry removal excluded); W03.5 also owns the in-flight cap (Q03.5) |
 | 5 | [W63.1](quality-and-process.md), [W62.1](quality-and-process.md), [W26.1](quality-and-process.md), [W61.1](quality-and-process.md), [W10.1](quality-and-process.md), [W64.1](quality-and-process.md) | mixed | Gates that make every other chunk safer; W61.1 has a bug ledger (12 of 25 fixed, none filed) and the tracker's open bug issues |
-| 6 | [W11.0](accel-lang.md) | execute | Code done 2026-11-13: #148 fix on `fix/asl-reserved-names` (unpushed), [design page](../../architecture/accel-lang-design.md) written; W11.2 is next once the PR merges |
+| 6 | [W11.2](accel-lang.md) | design | Direct SPIR-V backend design; W11.0 done 2026-11-13 (#148 fix merged via PR #183, [design page](../../architecture/accel-lang-design.md) written) |
 | 7 | [W09.1](serialization-and-reflection.md), [W07.1](render-graph-gpu-driven.md), [W14.0](render-graph-gpu-driven.md), [W15.0](render-graph-gpu-driven.md), [W58.1](build-and-deploy.md), [W39.1](input.md) | design, explore | M2 designs with no M1 dependency |
 | 8 | [W38.0](audio.md) | design | The audio design is one builder check from approval |
 | 9 | [W06.1](diagnostics-and-crash.md), [W36.0](animation.md), [W37.0](navigation.md) (done 2026-11-09), [W52.0](localization.md), [W44.0](editor-workflows.md) | explore | Vendor fit and benchmark spikes; each is a day or two |
@@ -51,7 +51,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.5, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.5 (W03.1 to W03.3 done; W03.4 code done on `feat/async-storage`) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
 | [Serialisation, reflection, packages](serialization-and-reflection.md) | S01, S09, S41 | W01.1 to W01.5, W09.1, W09.2, W41.1, W41.2 | W01.1, W09.1 | Q01.1 to Q01.3, Q09.1, Q09.2, Q41.1, Q41.2 |
 | [Quality and process](quality-and-process.md) | S10, S26, S61 to S64 | W10.1, W10.2, W26.1 to W26.3, W61.1 to W61.3, W62.1 to W62.3, W63.1, W63.2, W64.1 to W64.3 | W63.1, W62.1, W26.1, W61.1, W64.1 (W10.1 code done, W10.3 done) | Q10.1, Q26.1, Q62.1 to Q62.3, Q63.1, Q63.2, Q64.1 |
-| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.4, W12.1 to W12.3, W13.1, W13.2, W60.1 | none (W11.0 code done, W11.1 done) | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
+| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.4, W12.1 to W12.3, W13.1, W13.2, W60.1 | W11.2 ready (W11.0 and W11.1 done) | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
 | [Render graph, GPU-driven, large world](render-graph-gpu-driven.md) | S07, S14, S15 | W07.1, W07.2, W14.0 to W14.2, W15.0 to W15.3 | W14.0, W07.1, W15.0 | Q07.1, Q07.2, Q14.1, Q14.2, Q15.1 to Q15.3 |
 | [Materials, transparency, post](materials-post.md) | S16, S22, S23 | W16.1, W16.2, W22.1, W22.2, W23.1 to W23.3 | none | Q16.1, Q16.2, Q22.1, Q23.1, Q23.2 |
 | [Micropolygon](micropolygon.md) | S18 | W18.1 to W18.7 | none | Q18.1 to Q18.3 |

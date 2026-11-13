@@ -40,7 +40,7 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 
 ## Work chunks
 
-### W11.0 Land milestone 2 and record ASL state on the site · execute · code done 2026-11-13 (#148 fix on engine branch `fix/asl-reserved-names`, unpushed; design page written)
+### W11.0 Land milestone 2 and record ASL state on the site · execute · done 2026-11-13 (#148 fix merged via PR [#183](https://github.com/Heliogrim/Heliogrim-Engine/pull/183) into `feat/wip`; design page written)
 
 - **Goal**: milestone 2 has landed (Q11.1); fix #148 on the GLSL path, write `architecture/accel-lang-design.md` from the engine-side specs so the IR shape, rules and the region-borrow spec live on the site.
 - **Done when**: branch merged (done: on `feat/wip` and `master`); #148 closed (fix `cf89c70b` on `fix/asl-reserved-names`, reviewed and squashed, off `feat/wip`: the parser rejects GLSL reserved words, `gl_`, `_hg_` and the region suffixes at module scope; 469 Lang and 45 Compile tests pass; closes on merge); the design page exists with the IR part list and the borrow rules (done: [Accel Lang design](../../architecture/accel-lang-design.md)).
@@ -53,7 +53,7 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 - **Result**: commits `1a047450` (range borrows and region parameters) to `b6473e3e` (region helpers specialised per root), merged as PR [#156](https://github.com/Heliogrim/Heliogrim-Engine/pull/156) into `feat/wip`, now on `master`.
 - **Done when**: the micropolygon scratchpad layout compiles and the borrow tests pass; GLSL oracle unchanged for shaders without borrows.
 
-### W11.2 Direct SPIR-V backend design · design · after W11.0
+### W11.2 Direct SPIR-V backend design · design · ready (W11.0 done 2026-11-13)
 
 - **Goal**: emitter structure, capability analysis, `spirv-val` and `spirv-opt` in tests, debug info, the oracle protocol (GLSL path becomes test-only after parity), the Slang question. The emitter must make name conflicts unrepresentable: identity by result id, user names only as debug info, no generated name in a user-visible namespace (closes the collisions in [design page section 6](../../architecture/accel-lang-design.md#6-open)).
 - **Inputs**: IR parts list, SPIRV-Tools, Slang user guide (module and link-time specialisation chapters).
