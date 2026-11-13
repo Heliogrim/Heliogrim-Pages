@@ -52,7 +52,8 @@ The task graph replaces that with declarations: a stage says what it reads, what
 ## 5. Anti-goals
 
 - No frame order that depends on module registration order. Two stages with no declared order and a shared write are an error, never "whichever was registered first".
-- No stage declaration through strings for things that have a type. Access keys are `type_id`s.
+- No stage declaration through strings for things that have a type. Access keys come from types, and only from the closed set of registered resources (6.1).
+- No two keys for one piece of state. A key for a derived type (`GameScene`) next to its root (`SceneBase`) would hide the overlap from the conflict check, so it must not compile.
 - No second task type, no new allocator, no new bundle (section 7.1).
 
 ## 6. Contract
@@ -62,7 +63,22 @@ The task graph replaces that with declarations: a stage says what it reads, what
 ```cpp
 namespace hg::engine::scheduler::graph {
 	using StageName = string_view;        // the existing stage identifier constants
-	using AccessKey = hg::type_id;        // the type of the state touched
+
+	template <typename Type_>
+	struct access_resource : std::false_type {};   // explicit specialisations in AccessResources.hpp only
+
+	template <typename Type_>
+	concept AccessResource = access_resource<Type_>::value;
+
+	class AccessKey final {                        // the identity of one registered resource
+		constexpr explicit AccessKey(type_id);     // private
+	public:
+		AccessKey() = delete;
+		template <AccessResource Type_>
+		static consteval AccessKey of();           // the only way to make a key
+		constexpr type_id id() const;
+		constexpr bool operator==(ref<const AccessKey>) const = default;
+	};
 
 	enum class Lane : u8 { eCritical, eNormal, eBackground };
 
@@ -78,9 +94,10 @@ namespace hg::engine::scheduler::graph {
 ```
 
 - `reads` and `writes` name the state the stage's tasks touch; a key in `writes` need not be repeated in `reads`. A key stands for one whole piece of state: when a sub-part gets its own key (section 8: `PhysicsSceneSystem` inside `Scene`), every stage that touches the sub-part declares the sub-part's key and the stages that touch the whole keep the whole key; a stage that reaches the sub-part through the whole declares both. Otherwise the conflict check sees two keys and no overlap.
+- **Access keys (Decided 2026-11-12, Q02.10)**: an `AccessKey` is made only by `AccessKey::of<T>()`, `consteval`, and only for a `T` in the closed set: an explicit `access_resource<T>` specialisation in `Engine.Scheduler/Graph/AccessResources.hpp`, which forward-declares the roots and so adds no dependency on their bundles. No empty key, no key from a raw `type_id` or number, no key made at runtime. Specialisations do not inherit, so `AccessKey::of<GameScene>()` does not compile and the stage names the root `SceneBase`; a type and one of its bases are never both registered. The registered roots today: `acs::Registry`, `core::Timing`, `Input`, `physics::PhysicsSceneSystem`, `graphics::scene::RenderSceneManager`, `reflow::WindowManager`, `scene::SceneBase`. Tests register their own tag types in their translation unit. Why not reflection: `InheritBase`/`InheritMeta` (`Engine.Reflect/Inherit`) carry a compile-time base list, but only for types built on them (`SceneBase`, `Scene<...>`); `Registry`, `Timing`, `RenderSceneManager`, `Input` and `WindowManager` are not, and nothing lists derived types, so reflection cannot map every key type to a root. What C++ cannot stop: a specialisation written outside that file, or a type registered next to its base; both are deliberate, greppable acts, caught in review. Not enforced either: that a stage touches only what it declares; the W02.6 serial-versus-parallel hash check is the backstop, debug-checked access through a stage context is deferred until the hash check shows misses.
 - `after` lists stage names the stage must follow; `before` lists stage names that must follow it. A `before` edge is the same edge declared from the other end, so a pipeline that is not always mounted (Reflow is installed by the editor boot only, Graphics will be absent in a headless role, section 2) carries its own edges and takes them with it when it is absent. Without `before`, `RenderTick after Reflow::Tick` lives in the Graphics pipeline and the game engine fails at setup, as it does today. These edges are authoritative: the sets never add an edge, they only check for missing ones (6.2). Reason: deriving an order from sets needs a tie-break, and every tie-break is registration order, which anti-goal 1 forbids. This deviates from the wording of #84 and the topic page ("the builder derives edges from read and write sets"); the check is what those pages want from the derivation, without the tie-break.
 - `lane` picks the `Schedule` work set the stage's tasks are pushed to (6.4).
-- A `PipelineStage` provides its declaration through one new virtual, `decl() -> StageDecl`. The key spans point at `static constexpr` arrays (`refl::ctid` is `consteval`); the name spans point at function-local `static const` arrays inside `decl()`, because the stage name constants are dynamically initialised `inline` strings in other translation units (section 2) and a namespace-scope array built from them would race static initialisation. `StagePipeline::declareDependencies` and `_orderedStages` are removed; `mount` and `dismount` stay as the registration unit.
+- A `PipelineStage` provides its declaration through one new virtual, `decl() -> StageDecl`. The key spans point at `static constexpr` arrays (`AccessKey::of` is `consteval`); the name spans point at function-local `static const` arrays inside `decl()`, because the stage name constants are dynamically initialised `inline` strings in other translation units (section 2) and a namespace-scope array built from them would race static initialisation. `StagePipeline::declareDependencies` and `_orderedStages` are removed; `mount` and `dismount` stay as the registration unit.
 - Two pipelines registering the same stage name (ref-counted today, tested by `DuplicateRegistrationSharesStage`) produce one node whose declaration is the union of their reads, writes, `after` and `before`; a lane mismatch is an error.
 
 ### 6.2 Builder (**Proposal**)
@@ -126,7 +143,7 @@ What the check proves, and what it does not: a pass means no two stages that may
 
 No new waitable is needed: the counters are plain atomics (`pending`, `remaining`, the slot's signal count), reset per frame, never waited on; `stop()` keeps its `Signal`.
 
-**Workers (Proposal, for the owner)**: the `workers_ = 1uL` override in `CompScheduler::setup` means nothing has ever run on two workers. With one worker, fan-out is fiber interleaving and the W02.5 "parallel where the sets allow" check measures nothing. W02.5 lifts the override (auto count by default, the existing `USE_WORKER_COUNT` path to force a number, 1 for the serial check) as its own task with a reentrancy pass over `dispatch`, `complete`, `submit` and `stop`, and runs the editor on it. Until the owner says yes, the plan keeps that task last and the editor default at 1. Recorded as follow-up question Q02.7 on the work page. The runner above is written for N workers regardless, so lifting the override later changes no runner code, only the test engine's worker count.
+**Workers (Proposal, for the owner)**: the `workers_ = 1uL` override in `CompScheduler::setup` means nothing has ever run on two workers. With one worker, fan-out is fiber interleaving and the W02.5 "parallel where the sets allow" check measures nothing. W02.5 lifts the override (auto count by default, the existing `USE_WORKER_COUNT` path to force a number, 1 for the serial check) as its own task with a reentrancy pass over `dispatch`, `complete`, `submit` and `stop`, and runs the editor on it. Until the owner says yes, the plan keeps that task last and the editor default at 1. Recorded as follow-up question Q02.7 on the work page. The runner above is written for N workers regardless, so lifting the override later changes no runner code, only the test engine's worker count. Q02.7 was answered yes and the override is gone. The auto count itself (`max(hardware_concurrency() - 1, 1)`, logical processors, plus a critical and an IO worker split whose masks `FifoWorkSet::pop` ignores) is replaced by the worker policy of Q02.9, chunk W02.8: idle workers park, the count follows physical cores minus the threads that really run hot, the `eIO` worker mask goes because IO belongs to the affine IO thread, latency-critical affine threads get OS priority instead of a reserved core, and the count comes from `Engine.Config`.
 
 ### 6.4 Lanes (**Proposal**)
 
@@ -227,7 +244,7 @@ Observations from the table, for W02.5:
 ## 12. Decisions made in this document (for review)
 
 1. `after` edges are authoritative; sets only check (6.1). No order is ever derived from registration order.
-2. Access keys are `type_id`s; one key per touched state type, `Scene` kept as one key for now (6.1, 8).
+2. Access keys are made only through `AccessKey::of<T>()` from a closed set of registered root types; one key per touched state type, `Scene` kept as one key for now (6.1, 8). Hardened 2026-11-12 (Q02.10): no empty, raw or derived-type key compiles.
 3. Conflicts, cycles and unknown names are startup errors through `Result<Graph, GraphError>` (6.2).
 4. Topological ties break by name (6.2 step 3).
 5. The builder lives inside `Engine.Scheduler`, not a new bundle (7.1).
@@ -242,3 +259,4 @@ Observations from the table, for W02.5:
 14. Every completion decrement is `acq_rel`; the runner is written for N workers from the start (6.3).
 15. The runner's counters get a TLA+ model beside the source, mutation-checked, per the repository rule; Relacy stays pending as for every primitive; the stress test ships with the worker-override task (7.3).
 16. The game engine is not a check of this chunk: `Heliogrim.Main` is an unlinked library that does not compile; the sixteen-stage frame is pinned by a builder test instead (2, 7.2).
+17. The worker auto-count is not tuned here; the worker policy (parking, count, no IO workers, OS priority, config) is W02.8 behind Q02.9 (6.3).

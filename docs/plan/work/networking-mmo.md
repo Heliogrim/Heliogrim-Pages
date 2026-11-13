@@ -8,7 +8,7 @@
 | Existing input | What it already settles | Still open or in tension |
 |---|---|---|
 | Engine vision note | Single-shard MMO, no layering; Gemini's "lock-free state migration" and layering claims rejected as unsourced | S57 prototypes before design |
-| [Concurrency work](concurrency-fibers.md) | Deterministic mode in the scheduler; affine network thread | S59 record and replay sit on W02.6 |
+| [Concurrency work](concurrency-fibers.md) | Deterministic mode in the scheduler; affine network thread | S59 record and replay sit on W02.6, deferred 2026-11-13: the deterministic mode is planned with W59.1; only simulation state opts into a hash |
 | [Storage work](storage-streaming.md) S40 | Cells, spatial index | Interest management and authority units |
 | [Serialisation work](serialization-and-reflection.md) S01, S09 | Versioned records, replication attributes | Migration payload and schema source |
 | [Physics work](physics-cloth.md) | Deterministic profile, worlds per cell group | Rollback tests and handover |
@@ -53,12 +53,12 @@ Placement: `Engine.Network/{Transport,Socket}`, `Engine.Network.Quic/`, `Engine.
 - **Output**: ADR placeholder; section in `architecture/determinism-exploration.md`.
 - **Questions**: Q59.1.
 
-### W59.1 Replay design · design · after W59.0, W02.6
+### W59.1 Replay design · design · after W59.0 (takes over the deterministic mode from W02.6, deferred 2026-11-13)
 
 - **Goal**: deterministic math set, strict-FP profile and lint, state hash contract per system, record format (S01), playback and divergence report.
 - **Output**: `architecture/replay-design.md`; plan.
 
-### W59.2 Implement deterministic math, hashes, record and playback · execute · after W59.1, W02.6
+### W59.2 Implement deterministic math, hashes, record and playback · execute · after W59.1
 
 - **Done when**: a recorded session replays to identical hashes on the same binary; a deliberate FMA difference is caught.
 

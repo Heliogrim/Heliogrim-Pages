@@ -242,12 +242,12 @@ Every current wait class, its sites and its replacement. Each row becomes one ta
 
 | Class | Sites | Replacement |
 |---|---|---|
-| **A. Spin-yield loops** `while (!cond) fiber::self::yield()` | `Engine.GFX/Swapchain/VkSwapchain.cpp` (2, ring buffer full/empty), `Engine.Scheduler/Pipeline/CompositePipeline.cpp:69` (stop flag, has the `TODO: waitOnAtomic`) | Swapchain: keep the yield loop (it waits on the presentation engine, a bounded spin is correct there) and mark it `shortcut:` until W02.3 gives presentation an affine seam. CompositePipeline: `Signal _stopped`; the last stage sets it; `stop()` awaits it |
-| **B. Atomic-flag signals** `await_signal`, `hg::await(ptr<await_signal_sub_type>)` | `Engine.GFX/Surface/Surface.cpp:73`, `Editor.Action/Log/ActionDispatcher.cpp` (3), `Editor.Boot/Boot/AssetInit.cpp:453`, `Engine.Reflow/Window/WindowManager.cpp` (2), `Editor.Assets.Actions/UnknownImport.cpp:140`, `Editor.Action/Action/{Action,SimpleAction,AutoImportAction}` conversion operators | `await(future)` or `await(action.finished())` per section 8 |
+| **A. Spin-yield loops** `while (!cond) fiber::self::yield()` | `Engine.Graphics/Swapchain/VkSwapchain.cpp` (2, ring buffer full/empty), `Engine.Scheduler/Pipeline/CompositePipeline.cpp:69` (stop flag, has the `TODO: waitOnAtomic`) | Swapchain: keep the yield loop (it waits on the presentation engine, a bounded spin is correct there) and mark it `shortcut:` until W02.3 gives presentation an affine seam. CompositePipeline: `Signal _stopped`; the last stage sets it; `stop()` awaits it |
+| **B. Atomic-flag signals** `await_signal`, `hg::await(ptr<await_signal_sub_type>)` | `Engine.Graphics/Surface/Surface.cpp:73`, `Editor.Action/Log/ActionDispatcher.cpp` (3), `Editor.Boot/Boot/AssetInit.cpp:453`, `Engine.Reflow/Window/WindowManager.cpp` (2), `Editor.Assets.Actions/UnknownImport.cpp:140`, `Editor.Action/Action/{Action,SimpleAction,AutoImportAction}` conversion operators | `await(future)` or `await(action.finished())` per section 8 |
 | **C. Thread-blocking atomic waits** `waitOnAtomic`, `waitUntilAtomic` | `Editor.Core/EditorEngine.cpp` (12), `Engine.Core.Game/GameEngine.cpp` (11), `Engine.Pedantic.Resource/ExclusiveResource.hpp:83`, `Engine.Resource/Manage/UniqueResource.hpp:47`, `Engine.Storage.Action/Access/ExclusiveIoResource.hpp`, `Engine.Scheduler.Test/test.cpp` | Engine lifecycle counters (`setupCounter`, `moduleCount`, `next`): each phase knows its child count before starting any child (`getCoreModuleCount()`, 1 for the sub-module task) and the counters are reset between phases, so each phase gets a fresh `JoinCounter(n)` or `Signal`; no `add()` and no reset API. Awaited from the main thread (thread path). The three `ExclusiveResource`-style acquire loops: `FiberMutex` replaces the `atomic_flag` + `waitOnAtomic` pair. `waitOnAtomic` / `waitUntilAtomic` are then deleted |
 | **D. Blocking future waits** `concurrent::future::get/join` | `Engine.Async.Test/Promise.cpp` (4), no production site | `future_state` on `Signal` (section 8); tests keep calling `get()` and gain a fiber-side test |
 | **E. Promise bodies as tasks** `make_task(promise)` | `Engine.Scheduler/Async.hpp`, `Engine.Scheduler.Test/test.cpp:98`, platform and importer promises | unchanged; completion calls `Signal::set()` through `future_state::complete()` |
-| **F. OS mutexes reachable from tasks** | `UnfairSpinLock` in `Engine.GFX/Command/{CommandPool,CommandBuffer}`, `Engine.Driver.Vulkan/VkCmdMgr.cpp`; `SpinMutex` shortcut in `Engine.Accel.Lang/Ir/Variant.hpp` | `FiberMutex` for the command pool and buffer, `FiberSharedMutex` for the variant caches (closes the `shortcut:` from PR #156). `FifoWorkSet` keeps `UnfairSpinLock` (no suspension inside) |
+| **F. OS mutexes reachable from tasks** | `UnfairSpinLock` in `Engine.Graphics/Command/{CommandPool,CommandBuffer}`, `Engine.Driver.Vulkan/VkCmdMgr.cpp`; `SpinMutex` shortcut in `Engine.Accel.Lang/Ir/Variant.hpp` | `FiberMutex` for the command pool and buffer, `FiberSharedMutex` for the variant caches (closes the `shortcut:` from PR #156). `FifoWorkSet` keeps `UnfairSpinLock` (no suspension inside) |
 | **G. Worker loop** | `Engine.Scheduler/Worker/Worker.cpp:150-200` | handshake step 2 replaces "reschedule suspended task"; the `awaiter.ready()` poll is gone; the idle branch stays as is (idle strategy is W02.5) |
 
 Not in the list: `thread::self::yield()` in `WinPlatform.cpp:323` and `CompScheduler.cpp` run on plain threads and stay.
@@ -297,3 +297,46 @@ Contracts that implementation added or sharpened, binding from here on:
 7. Swapchain yield loops stay, marked `shortcut:` (9.A).
 
 Builder check (2026-11-08, independent reviewer reading this page cold) found four protocol holes, all folded in above: plain `yield()` needs the `eIdle` state or the worker drops the task (6.2); `FiberMutex::unlock` must re-set `eContended` when waiters remain and the slow path must restart on a failed CAS (6.5); `FiberSharedMutex` needs handoff, a re-check in the writer slow path and a defined owner of `eWriterWaiting` (6.5); thread nodes cannot live on the stack and `next` must be read before `unpark` (6.2). Its three questions (per-phase counters, which schedule `unpark` uses, converted non-worker threads) are answered in 9.C, 7 and 6.2.
+
+## 13. The last polling waits (W02.10, 2026-11-13)
+
+Follow-up from [W02.10](../plan/work/concurrency-fibers.md). With parked workers ([worker policy design](worker-policy-design.md)) a fiber that waits by `fiber::self::yield()` in a loop keeps one worker cycling for the whole wait. Checked against master `7f33eae5`; three sites were named, the source holds these:
+
+| Site | What it waits for | Replacement |
+|---|---|---|
+| `hg::await(ptr<await_signal_sub_type>)` (`Heliogrim/Async/Await.cpp`) | an `std::atomic_flag` set by someone | **Delete** with `AwaitSignal.hpp`. W02.2 migrated every caller (section 8); no call site is left, tests included. The 18 `await` call sites the chunk counted already use the parking `Signal`, `JoinCounter` and `Future` overloads. |
+| `CompositePipeline::stop()` | after `_stopped.wait()`, spins until `_activeCalls` is 0 (every `complete()` call has returned, task graph design 6.3) | **Park**: fold "frame ended under stop" into `_activeCalls` as a high bit; the `complete()` call whose decrement leaves only that bit sets `_stopped`. `stop()` then needs one wait (13.1). |
+| release `VkSwapchain::consumeNext` | `_rQueue.try_push` failing | **Unreachable, assert it.** `setup()` asserts at most two images and the ring holds two, so the ring always has room for the index just taken from `_pQueue`. The debug build already treats a failure as a bug (`breakpoint`); the release spin becomes the same check (`assertrt`). The commented-out yield loop in `acquireNext` goes too. Section 9.A's `shortcut:` is retired, not upgraded: nothing waits there. |
+
+Not in scope: `thread::self::yield()` on plain threads (`CompScheduler`, the platform pump), the scheduler and async tests' own loops, and the frame-pacing question (W02.9).
+
+### 13.1 Stop without a second wait (**Proposal**)
+
+Today the frame end sets `_stopped` while other `complete()` calls may still be inside the pipeline (they decremented `_remaining` earlier but have not yet reached their `_activeCalls` decrement), so `stop()` must poll for zero. A separate `Signal` for "zero" cannot be set safely: a call that reads a flag after its own decrement can find the pipeline already destroyed.
+
+Protocol (one atomic, so a call never touches `this` after its decrement unless it is the releaser):
+
+1. `complete()` enters with `_activeCalls.fetch_add(1)`, as today.
+2. The frame end under `_stopping` (`prevRemaining == 1`) clears `_stopping` and does `_activeCalls.fetch_or(kStopped)` instead of `_stopped.set()`. It is itself still counted, so the bit is set while the count is at least 1.
+3. Every call leaves with `prev = _activeCalls.fetch_sub(1, acq_rel)`. Exactly one call sees `prev == (kStopped | 1)`: after the bit is set no new `complete()` can start (the frame has ended and was not restarted), so the count only falls. That call calls `_stopped.set()` as its last access (the `Signal` destroy rule allows destruction while `set()` unwinds).
+4. `stop()` does `_stopped.wait()`, stores 0 into `_activeCalls` and re-arms `_stopped`, as today.
+
+A call that drains to zero before the frame end has set the bit sees `prev == 1` and leaves; the frame-ending call is counted after it and becomes the releaser. `acq_rel` on the leaving decrement chains every call's pipeline accesses into the releaser, and `set()`/`wait()` hands them to `stop()`. `kStopped = 1u << 31`; the count of concurrent calls is bounded by the worker count.
+
+Model: `CompositePipeline.tla` gains the counter, the bit and a stopper that waits for the release; invariant "after the release no worker is inside a call"; mutations (a) the old protocol, `_stopped` set at the frame end, and (b) reading the bit in a load after the decrement, must both fail it. The model header's assumption "stop() waits for in-flight calls, steps after the last counter operation are not modelled" is replaced by the check.
+
+### 13.2 Tests
+
+- `CompositePipeline` stop tests stay green on several workers; a stop from a fiber and from a plain thread (both exist) now never yield.
+- No new test for the swapchain (no GPU harness); the build and the editor run cover it.
+- Done-when grep: no `yield()` loop in a wait under `src/` outside `*.Test/`.
+
+### 13.3 Decisions made in this section (for review)
+
+1. The deprecated atomic-flag `await` is deleted, not ported: no caller is left (amends decision 12.6).
+2. `stop()` parks once; the in-flight drain moves into the `_activeCalls` word (13.1).
+3. The swapchain spin is an invariant check, not a wait (amends decision 12.7).
+
+### 13.4 As built (2026-11-13)
+
+Built as written on engine branch `refactor/park-polling-waits` (`3d203483`, `6dccb990`, `e217a7f5`). The frame-end `fetch_or` is relaxed: the releaser's `acq_rel` `fetch_sub` is a later read-modify-write on the same word and sees it. `CompositePipeline.tla` passes at 3 workers (29,038 distinct states); mutations (c) release at the frame end and (d) bit read after the decrement both fail `NoCallAfterRelease`. Not run with real presentation: the release build's swapchain path.
