@@ -16,6 +16,7 @@ Overview documents for the engine and editor systems. Exploration notes are not 
 | [Task graph](task-graph-design.md) | <span class="hg-status design">design</span> draft 2026-11-11, reviewed 2026-11-12 | Declared stages `{ name, reads, writes, lane, after, before }`, a checked builder (cycles, conflicts), a counting runner with a TLA+ model, lanes stamped on the task; every frame stage with its sets |
 | [Storage](storage-design.md) | <span class="hg-status design">design</span> draft 2026-11-09 | Resolved-stack reuse (per-stage cache, invalidation after commit) and the async path: IOCP `IoSystem` with DirectStorage-shaped batches, fibers park per read, windowed archive residency |
 | [Accel Lang](accel-lang-design.md) | <span class="hg-status design">design</span> record 2026-11-13 | Intent, layer and binding rules, IR part list, region-borrow rules and reserved names of the shader toolchain, moved from the engine-side specs |
+| [Diagnostics](diagnostics-design.md) | <span class="hg-status design">design</span> accepted 2026-11-14 | One pointer-sized, deep-copied `Diagnostic` with registered codes, four location kinds, text-edit fixes, renderer and LSP shape; `Result<T, Diagnostic>` at boundaries only, measured free on the success path; migration order ASL (done in W05.2), storage, importers, serialisation, editor |
 
 ## Explorations
 

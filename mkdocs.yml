@@ -98,6 +98,7 @@ nav:
           - Worker policy: architecture/worker-policy-design.md
           - Storage: architecture/storage-design.md
           - Accel Lang: architecture/accel-lang-design.md
+          - Diagnostics: architecture/diagnostics-design.md
       - Explorations:
           - Actor system: architecture/actor-system.md
           - Agent and player sync: architecture/agent-sync-exploration.md

@@ -28,7 +28,7 @@ Tension: the topic page puts `Engine.Diagnostics` below `Engine.Logging`; the ex
 |---|---|
 | `DiagnosticCode` | `{ domain: 3 or 4 letters, number: u16 }` (`ASL0042`, `SER0007`). Registered in a constexpr table per bundle with a one-line summary and a docs slug; the table is exported to the site (S64). Unknown codes fail a test. |
 | `Location` | Variant: `SourceSpan { file, line, col range }`, `AssetPath { url, record path }`, `ActorPath { handle, component path }`, `ByteOffset { blob id, offset, length }`. |
-| `Diagnostic` | `{ code, severity, message: arena string, primary: Location, labels: InlineVector<Label, 2>, notes, fixes }`. Constructed through a builder; the success path of `Result<T, Diagnostic>` allocates nothing. Move only. |
+| `Diagnostic` | `{ code, severity, message: arena string, primary: Location, labels: InlineVector<Label, 2>, notes, fixes }`. Constructed through a builder; the success path of `Result<T, Diagnostic>` allocates nothing. Move only. Superseded by the [design](../../architecture/diagnostics-design.md) 4.5: one boxed `Data`, deep copy (ASL copies modules with warnings), no arena. |
 | `Fix` | `{ title, edits: variant<TextEdit[], RecordEdit[]>, applicability: MachineApplicable / MaybeIncorrect / HasPlaceholders }`. |
 | `DiagnosticSink` | `emit(Diagnostic&&)`; implementations: collecting sink (compiler, importer), log sink, editor panel sink. |
 | `Span` | `{ id, parent, name: static string, lane, begin, end }`. `ScopedSpan` RAII with a token so capture toggles mid-scope stay balanced. Inactive gate: one relaxed load, `[[unlikely]]` branch. Name metadata through a string-literal NTTP or `consteval`, checked on clang-cl (the exploration's compile problem). |
@@ -42,16 +42,24 @@ Placement: `Engine.Diagnostics/{Code,Location,Diagnostic,Sink}.hpp`, `Engine.Obs
 
 ## Work chunks
 
-### W05.1 Diagnostic type and code registry · design · ready
+### W05.1 Diagnostic type and code registry · design · done 2026-11-13 (accepted by the owner 2026-11-14)
 
 - **Goal**: finalise `Diagnostic`, `Location`, `Fix`, code registry, LSP-shaped serialisation, the `Result<T, Diagnostic>` convention and the migration order (ASL, storage, importers, serialisation, editor). Constraint from Q05.1: boundary APIs only, no effect on hot paths (show the success path compiles to a plain value return), and the call-site ergonomics stay simple (one `try`-style propagation helper, no nested wrappers).
 - **Inputs**: `Engine.Accel.Lang/Ir/Diagnostic.hpp`, `Engine.Common` `Result`, Rust and LSP 3.17 diagnostic models (abstract level is enough).
-- **Output**: `architecture/diagnostics-design.md`; plan with migration tasks per bundle.
-- **Questions**: Q05.1, Q05.2.
+- **Output**: [Diagnostics design](../../architecture/diagnostics-design.md) (draft, builder-checked); plan `docs/superpowers/plans/2026-11-13-diagnostics-and-asl-migration.md` in the engine checkout, 7 tasks for W05.2 plus a W05.3 outline (storage, importers, serialisation, editor). Success path measured on clang-cl: compare, two stores, return; no call or allocation. Deviations from the code design above: `Diagnostic` copies deeply, no arena string, `Fix::edits` a plain text-edit list until S01 adds record edits, storage migrates before importers.
+- **Questions**: Q05.1, Q05.2 (both decided).
 
-### W05.2 Implement `Engine.Diagnostics` and migrate ASL · execute · after W05.1
+### W05.2 Implement `Engine.Diagnostics` and migrate ASL · execute · in review 2026-11-14 (PR [#188](https://github.com/Heliogrim/Heliogrim-Engine/pull/188), branch `feat/diagnostics` on `feat/wip` `eb700a82`)
 
 - **Done when**: ASL compiler returns engine `Diagnostic`s with identical rendered text (golden); code table generated; one ASL fix applies and recompiles in a test.
+- **Result (2026-11-14)**: nine signed commits on `feat/diagnostics`, one concern per commit, scoped by bundle: the diagnostic type, codes and `propagate`; text rendering; LSP JSON; the collecting sink; `feat(logging)` `LogSink`; the ASL migration; byte ranges and source files in ASL locations; two spans and the mutability fix; the aggregate code test. New bundles `Engine.Diagnostics`, `Engine.Diagnostics.Test`, `Engine.DiagnosticCodes.Test`. The ASL table has 67 codes, `ASL0001` to `ASL0067`, numbered in compiler phase order with the `internal-*` codes (compiler bugs) last. Each code covers one failure kind and has a plain-language summary; there is no placeholder code, and a misspelled key does not compile (checked on clang-cl only). ASL messages are byte-identical. Tests: Accel.Lang 483, Accel.Compile 45, Diagnostics 28, DiagnosticCodes 2, all pass. The `'&mut'` overlap diagnostic carries both argument spans (label `overlaps the '&mut' argument`). "cannot borrow immutable" offers `declare '<name>' with 'let'` (machine-applicable), which applies and recompiles clean in a test, inside included modules too.
+- **Deviations from the design**: `Diagnostic::Data::labels` is a `Vector`, since `InlineVector` cannot be copied. `ir::SourceLoc` gains a byte range and a source index filled by the lexer. `ir::Module::sources` maps the index to the file name, so a location in an included module names its own file and keeps its range; merges remap the index, and merge validation rejects an index out of range. The LSP uri comes from `lspUriOf`, because an LSP `Diagnostic` has no uri field. StageIr and StageComposer log through `LogSink` with `while ...` context notes instead of the old prefixes.
+- **Open**: review and merge of PR [#188](https://github.com/Heliogrim/Heliogrim-Engine/pull/188). `Heliogrim-AllTests` does not build on `feat/wip` itself (`Editor.UI.Init/EditorInit.cpp:40`, undeclared `initDefaultUi`); this branch does not touch that file.
+
+### W05.4 Reword ASL messages to the diagnostic wording rules · execute · after W05.2 merges, before W05.3
+
+- **Done when**: every ASL message follows the [design](../../architecture/diagnostics-design.md) section 5 wording rules (lower-case, no trailing period, names in single quotes, no compiler jargon such as `ir`, lanes or waves); new golden tests pin the rendered text of each code; the code docs (S64) and the editor only ever show the final wording.
+- **Why now**: W05.2 kept the old messages byte-identical so the migration could be checked against the old output. Rewording before W05.3 means storage and importer diagnostics follow the rules from the start.
 
 ### W05.3 Migrate storage, importers, serialisation; editor rendering · execute · after W05.2, S43 panel (editor part may wait)
 
