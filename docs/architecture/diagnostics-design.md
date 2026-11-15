@@ -1,6 +1,6 @@
 # Diagnostics (Design)
 
-**Status**: design, accepted 2026-11-14 (draft 2026-11-13). Work chunk [W05.1](../plan/work/diagnostics-and-crash.md) (issue [#87](https://github.com/Heliogrim/Heliogrim-Engine/issues/87), system S05). Implementation is W05.2 (bundle plus ASL, built 2026-11-14, see section 10), W05.4 (ASL message wording) and W05.3 (storage, importers, serialisation, editor).
+**Status**: design, accepted 2026-11-14 (draft 2026-11-13). Work chunk [W05.1](../plan/work/diagnostics-and-crash.md) (issue [#87](https://github.com/Heliogrim/Heliogrim-Engine/issues/87), system S05). Implementation is W05.2 (bundle plus ASL, built 2026-11-14, merged into `feat/wip` 2026-11-15 via [#188](https://github.com/Heliogrim/Heliogrim-Engine/pull/188), see section 10), W05.4 (ASL message wording) and W05.3 (storage, importers, serialisation, editor).
 
 Markers: **Decided** = owner decision (the [work page](../plan/work/diagnostics-and-crash.md) Decisions table). **Proposal** = this document's call, open to correction. **Builder's call** = left to the implementer.
 
@@ -288,7 +288,7 @@ The issue lists "importers" before "storage"; this design puts storage first bec
 
 ## 10. As built (W05.2, 2026-11-14)
 
-W05.2 implements sections 3 to 7 and migration rows 1 to 4 on `feat/diagnostics`. Where the build differs from the text above:
+W05.2 implements sections 3 to 7 and migration rows 1 to 4 (merged into `feat/wip` `c80f3569`). Where the build differs from the text above:
 
 - `Diagnostic::Data::labels` is a `Vector<Label>`, not an `InlineVector`, because `InlineVector` has no copy constructor and section 4.5 requires a deep copy. The cost is one allocation per labelled diagnostic, and only on the failure path.
 - ASL locations carry their byte range and their file. `ir::SourceLoc` gains `offset`, `length` and a `source` index, which the lexer fills. `ir::Module::sources` maps the index to a file name, merges remap it, and merge validation rejects an index out of range. A location inside an included module therefore names that module and keeps its range, and a fix applies there too.
