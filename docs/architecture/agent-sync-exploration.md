@@ -136,6 +136,34 @@ On determinism, scope (b) from Q59.1 is needed only for the action evaluation fu
 - **W34.1 physics**: no physics determinism is required by this strategy; the adaptive body tiers stay independent.
 - **Animation (S36)**: actions need start-offset playback (begin mid-wind-up) and per-action hit-window data.
 
+### 7.1 Factorio as the lockstep counter-example (research 2026-11-15)
+
+Wube's Friday Facts, read in full unless marked:
+
+- **The model.** Only input actions travel, and every peer simulates the whole world at 60 UPS, slowing down rather than skipping (FFF #76, 2015). Since 0.14 the server orders and merges inputs per tick and sends one packet per client. It can delay a lagging player's actions ("never ignored, only delayed") but holds no authority over state (FFF #147, 2016; #302, 2019).
+- **Latency state (FFF #83, 2015; #302).** Every tick, a small subset of the state is rebuilt from the confirmed game state and the unconfirmed local inputs are replayed onto it. It drives rendering and is never corrected explicitly. Combat is excluded because it "cascades".
+  - Failure that shipped: the queue mishandled skipped ticks and latency changes. A recovering client re-simulated up to 400 ticks and emitted about 400 actions in one tick. With more than 200 clients the fan-out saturated the server upload (FFF #302).
+- **Determinism tooling.**
+  - A heuristic CRC every tick; on mismatch, a reconnect with a fresh map download.
+  - Debug modes: a full CRC every tick, or save/load/check every tick.
+  - Desync reports bundle the client save, the server save and a tagged per-tick dump (FFF #55, #188).
+  - Positions are int32 fixed point at 1/256 tile.
+  - Determinism across platforms broke on `%g` formatting (FFF #108).
+  - Threaded belts run in groups that never interact. Wake-ups are queued and applied in a fixed group order (FFF #364, 2021: belts 4 to 1.6 ms).
+- **Scale.** About 150 smooth players and 400 as a record on 0.14 (FFF #156); 521 peak on 0.18 (FFF #332). The limits are the server's fan-out bandwidth and the slowest client CPU, because everyone simulates everything. Joining means downloading the full map, then catching up faster than real time.
+- **Space Age platforms** each own a surface. Travel is a scalar distance along a connection, not motion through a shared world (Lua API; FFF #381, 2023).
+
+Why it does not fit here: every client would simulate the whole world, the slowest CPU would set the pace, there is no interest management (so no secrecy against cheats), and fan-out is O(players × actions). W56.0's choice stands: state replication with only action evaluation deterministic.
+
+What transfers:
+
+1. **T0 prediction as a latency state**: rebuilt from confirmed state, inputs replayed, no explicit correction. Skipped ticks and latency changes need tests from the start.
+2. **Inputs are delayed, never dropped**, and inputs per tick are counted, so a replay burst cannot become a fan-out outage.
+3. **Tooling for the deterministic slice** (action evaluation, W59): a cheap CRC per tick, a full CRC and save/load per tick in debug, and a report that pairs client and server state at the first divergent tick.
+4. **Deterministic parallelism**: partitions that never interact, and side effects queued and merged in a fixed order.
+5. **Sleeping entities woken by events**, so the update walks only active entities.
+6. **Surfaces as frames whose travel is abstract**: a ship or instance whose route is a scalar needs no world motion at all. This is a cheaper variant of the nested frames in [engine loop 5.2g](engine-loop-exploration.md).
+
 ## 8. Prototype (after W55.3)
 
 Loopback on one machine with injected delay, jitter and loss (50, 100, 150 ms RTT; 10 ms jitter; 1% loss). Measure:
@@ -144,7 +172,9 @@ Loopback on one machine with injected delay, jitter and loss (50, 100, 150 ms RT
 2. NPC attack start error against the server timeline for a range of `d`;
 3. remote player hit-window alignment and visible wind-up shortening;
 4. client resimulation cost against the T1 cap (16, 32, 64);
-5. a blind A/B by the owner: server-only against tiered, the same encounter, latency fixed.
+5. a blind A/B by the owner: server-only against tiered, the same encounter, latency fixed;
+6. send on perceived error ([engine loop 5.2c](engine-loop-exploration.md), C): bandwidth and server CPU per observer against a fixed-rate tier baseline, with Dyconits' bounded-inconsistency policy as the comparison;
+7. encode once per (entity, baseline step) (5.2c, D): encodes saved against the extra delta bytes from older shared baselines, at crowd densities from the mass-battle benchmark (Q56.2).
 
 Numbers go into this page with the hardware stated.
 
