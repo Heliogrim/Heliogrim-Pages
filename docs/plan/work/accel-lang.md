@@ -1,6 +1,6 @@
 # Work: Accel Lang, Pipeline Kinds, Variant Cache, JIT
 
-**Systems** S11, S12, S13, S60 · **Issues** [#82](https://github.com/Heliogrim/Heliogrim-Engine/issues/82), [#92](https://github.com/Heliogrim/Heliogrim-Engine/issues/92), [#78](https://github.com/Heliogrim/Heliogrim-Engine/issues/78), [#93](https://github.com/Heliogrim/Heliogrim-Engine/issues/93), [#140](https://github.com/Heliogrim/Heliogrim-Engine/issues/140), [#148](https://github.com/Heliogrim/Heliogrim-Engine/issues/148) · **Track** B, E · **Milestone** M2, M6
+**Systems** S11, S12, S13, S60 · **Issues** [#82](https://github.com/Heliogrim/Heliogrim-Engine/issues/82), [#92](https://github.com/Heliogrim/Heliogrim-Engine/issues/92), [#78](https://github.com/Heliogrim/Heliogrim-Engine/issues/78), [#93](https://github.com/Heliogrim/Heliogrim-Engine/issues/93), [#140](https://github.com/Heliogrim/Heliogrim-Engine/issues/140), [#148](https://github.com/Heliogrim/Heliogrim-Engine/issues/148), [#202](https://github.com/Heliogrim/Heliogrim-Engine/issues/202) · **Track** B, E · **Milestone** M2, M6
 **Status**: <span class="hg-status summary">plan</span>. Work breakdown for [Accel Lang](../topics/accel-lang.md).
 
 ## Cross-reference
@@ -63,9 +63,12 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 - **Questions**: Q11.2, Q11.3 (decided, refined 2026-11-14).
 - **Order (owner, 2026-11-14)**: diagnostics go through the engine `Diagnostic` type from W05.2 (`feat/diagnostics`). The design includes verification on the GPU harness, so W26.1 and W26.2 come first.
 
-### W11.3 Implement SPIR-V emitter, feature analysis, interface export · execute · ready (plan accepted 2026-11-16; subagent-driven)
+### W11.3 Implement SPIR-V emitter, feature analysis, interface export · execute · code done 2026-11-16 (engine PR [#203](https://github.com/Heliogrim/Heliogrim-Engine/pull/203) into `feat/wip`)
 
 - **Done when**: every engine shader compiles to SPIR-V, passes `spirv-val`, passes the GPU harness tests (W26.2; the same tests ran on the GLSL path before); `InterfaceDesc` is emitted per entry point; glslang and the GLSL emitter are removed ([design 7.8, 7.9](../../architecture/accel-lang-design.md#79-verification)).
+- **Result**: eleven signed commits on `feat/wip` `273094ef` (head `a944c909`), including a separate `fix(accel)` commit for `while` bodies that were never typechecked ([#202](https://github.com/Heliogrim/Heliogrim-Engine/issues/202)). All Done-when items met: the 21 engine shaders and every fixture compile and validate, Gpu.Test 33/33 unchanged, `InterfaceDesc` per entry, glslang out of build and vendor. Lang 603, Compile 47 pass. Every task and the whole branch reviewed (`/review-branch`, six lenses, one fix wave).
+- **Numbers for the PR** (Debug, 21 shaders, sum of min-of-5): GLSL path 143 ms compose plus 8549 ms glslang; SPIR-V path 252 ms compose including emit plus 90 ms `spirv-val` (Dev tier only). Module size 22374 words (glslang) to 21082 words. `spirv-opt` on the Build-tier output: performance recipe 17151 to 10786 words in 953 ms, size recipe 10681 words in 753 ms, all still valid; the Build tier stays without `spirv-opt` until the owner picks a list (design 7.7).
+- **Open for the owner**: run `spirv-val` in the shipped Build tier or not (security lens; design 7.4 says no); Dev-tier `OpName` still names generated `$` locals (design 7.5 says generated names stay unnamed); style residue in `Ir/Spirv/*` (access-label order, blank lines after guards, definition order); release validation and the editor build stay as in W26.2.
 
 ### W11.4 Uniformity and interface check passes · execute · after W11.3
 
