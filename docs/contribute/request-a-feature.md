@@ -17,7 +17,7 @@ The first button opens the engine repository's feature request form. Tasks have 
 
 - **Lead with the problem**, not the solution. "Level streaming stalls the frame" beats "add a thread pool".
 - **Say what you tried.** Alternatives and workarounds show whether the engine already covers the need.
-- **Check the docs.** The [architecture](../architecture/index.md) section may already explore it, and the [timeline](../architecture/timeline.md) shows what is blocked on what.
+- **Check the docs.** The [architecture](../architecture/index.md) section may already explore it, and the [battle plan](../plan/systems.md) shows what is planned and what blocks it.
 - **Keep it small.** Large requests are split into tasks on the board.
 
 If the request needs a design decision, it will be redirected to a [proposal](propose-a-change.md).

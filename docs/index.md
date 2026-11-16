@@ -36,9 +36,9 @@ An accepted ADR. Short, numbered, never rewritten. Superseded only by a newer on
 ## Where to go
 
 <div class="hg-index" markdown>
-<a class="hg-row" href="architecture/"><span class="n">01</span><span class="t">Architecture</span><span class="d">Explorations, designs and the rundown of priorities across all of them.</span><span class="a">→</span></a>
+<a class="hg-row" href="architecture/"><span class="n">01</span><span class="t">Architecture</span><span class="d">Explorations and designs: the options weighed and the direction chosen.</span><span class="a">→</span></a>
 <a class="hg-row" href="systems/"><span class="n">02</span><span class="t">Systems</span><span class="d">How each built engine system works, checked against an engine commit.</span><span class="a">→</span></a>
-<a class="hg-row" href="architecture/timeline/"><span class="n">03</span><span class="t">Timeline</span><span class="d">What comes first, what it unblocks, and a dated log of what changed.</span><span class="a">→</span></a>
+<a class="hg-row" href="architecture/timeline/"><span class="n">03</span><span class="t">Timeline</span><span class="d">A dated log of what was explored, designed, decided and merged.</span><span class="a">→</span></a>
 <a class="hg-row" href="adr/"><span class="n">04</span><span class="t">Decisions</span><span class="d">Architecture decision records: the accepted outcomes and the alternatives rejected.</span><span class="a">→</span></a>
 <a class="hg-row" href="guides/"><span class="n">05</span><span class="t">Guides</span><span class="d">How to work on the docs, write an exploration, and record a decision.</span><span class="a">→</span></a>
 <a class="hg-row" href="contribute/"><span class="n">06</span><span class="t">Contribute</span><span class="d">Report a bug, request a feature, propose a change, find the project board.</span><span class="a">→</span></a>

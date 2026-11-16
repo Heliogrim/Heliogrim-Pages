@@ -76,7 +76,7 @@ Microsoft docs ([Fibers](https://learn.microsoft.com/en-us/windows/win32/procthr
 - **Exceptions across switches.** Unverified on Windows; needs a test that throws inside a fiber after a migration.
 - **Resumption affinity.** A coroutine awaiting a fiber event: where does its continuation run? Options: the completer's thread (stack depth risk), a worker queue (cost), or the scheduler of the task (P3552 style).
 - **Stackful inside stackless.** A coroutine body calling `fiber::self::yield()` suspends the whole worker fiber the coroutine is currently resumed on. This is legal only if every coroutine runs on a fiber; decide that rule early.
-- **Fiber identity.** `Fiber` has no id or context; storage, profiler spans and script awaiters all want one (see [Exploration rundown](exploration-rundown.md), cross-cutting themes).
+- **Fiber identity.** `Fiber` has no id or context; storage, profiler spans and script awaiters all want one.
 - **Lifetime of tasks.** `TaskDelegate` is referenced by raw pointer and the fiber pointer is stored inside it; a wait list needs defined ownership.
 - **Public API.** `Heliogrim/Async` exposes `Future`, `Await`, `AwaitSignal`, `Yield`; changes need a compatibility plan.
 
@@ -126,4 +126,4 @@ Folly fibers/coro interop, Seastar, cppcoro, libunifex; SEH and exception state 
 - [Actor system](actor-system.md): tick stages.
 - [Storage engine](storage-exploration.md): async paths that resume on I/O completion.
 - [Observability](observability-exploration.md): fiber-aware spans.
-- [Exploration rundown](exploration-rundown.md)
+- [Scheduler system](../systems/scheduler/index.md): what was built from this exploration.

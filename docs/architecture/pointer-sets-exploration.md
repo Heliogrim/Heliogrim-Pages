@@ -89,4 +89,3 @@ Earlier plan, for reference: one template, storage selects the mode. `hg::DenseS
 
 - [Storage engine](storage-exploration.md): resolved-stack caches are a candidate use.
 - [Actor system](actor-system.md): component and actor reference sets.
-- [Rundown](exploration-rundown.md): this experiment's place among the five topics.

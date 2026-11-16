@@ -86,8 +86,6 @@ nav:
       - Module map: architecture/modules.md
       - Timeline: architecture/timeline.md
       - Code documentation: architecture/code-documentation.md
-      - Exploration rundown: architecture/exploration-rundown.md
-      - Gap analysis: architecture/gap-analysis.md
       - Designs:
           - Sealed actor archetypes: architecture/actor-archetypes-design.md
           - Audio runtime: architecture/audio-runtime-design.md

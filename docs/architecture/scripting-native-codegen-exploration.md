@@ -98,4 +98,3 @@ Flax, Stride, IL2CPP; flecs, EnTT and Mass measurements; RTTI identity across re
 - [Scripting runtime](scripting-runtime-exploration.md): C# route, fiber awaiters, analyzers.
 - [Actor system](actor-system.md): tick stages and component model.
 - [Observability](observability-exploration.md): spans around kernel invocation.
-- [Exploration rundown](exploration-rundown.md)

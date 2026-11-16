@@ -1,6 +1,8 @@
 # Gap Analysis: Engine Against the Targets
 
-**Status**: <span class="hg-status summary">plan</span>. Per target: what the engine has, what is missing, and how far away it is. Checked against the source on 2026-11-07 (bundle file lists and sizes, the test notes from 2026-10, and the explorations on this site). The earlier [documentation gap analysis](../architecture/gap-analysis.md) covers this site; this page covers the code.
+**Status**: <span class="hg-status summary">plan</span>. Per target: what the engine has, what is missing, and how far away it is. Checked against the source on 2026-11-07 (bundle file lists and sizes, the test notes from 2026-10, and the explorations on this site). [Documentation and project](#documentation-and-project) covers this site and the repository around the code.
+
+This page is a dated snapshot, not a tracker. Progress is tracked on the [work packages](work/index.md). The page is re-run when a milestone closes, and the date above changes with it.
 
 Distance: **near** a bounded change on existing code · **mid** a new subsystem on existing foundations · **far** new subsystem plus foundation changes · **research** the approach itself must be chosen by measurement first.
 
@@ -87,3 +89,62 @@ Distance: **near** a bounded change on existing code · **mid** a new subsystem 
 4. **Editor targets are mid-distance** because Reflow, actions and the asset registry exist. The canvas (S42) is the one far item and gates the rest of the editor's polish.
 5. **Scale targets are the furthest** and the least researched. Transport and replication can start after S02; the server mesh is research until a prototype measures handover.
 6. **Quality is the cheapest lever**: a coding standard, CI gates and the GPU harness are mid-distance and make every other item safer.
+
+## Documentation and project
+
+Merged on 2026-11-16 from the documentation gap analysis of 2026-11-06, which compared this site with commercial engines (Unreal Engine 5, Unity 6, Godot 4, O3DE) and enterprise documentation. Where the two pages overlapped, the targets above take precedence. Its list of topics without an exploration is dropped: networking, physics, world streaming, GPU-driven culling, memory budgets, determinism, hot reload, localisation and crash reporting are all targets above. It does not claim that Heliogrim needs all of this.
+
+### Landing page
+
+A commercial engine's home page answers these questions on its first screen. [Home](../index.md) answers none of them yet:
+
+| Question | State | Needs |
+|----------|-------|-------|
+| What is it, and who is it for? | The lede describes the docs, not the engine | Owner's pitch: genre, scale, how it differs (the [vision](vision.md) holds the material) |
+| What does it look like? | One abstract SVG | Screenshots or captures of the engine and editor |
+| How mature is it? | Not stated | A status line and a list of what runs today ([systems](../systems/index.md) is the honest list) |
+| Which platforms and hardware? | Windows-first is implied, not stated | A support matrix |
+| Under which license? | The engine repository has no `LICENSE` file (checked 2026-11-16) | An owner decision |
+| What comes next? | The [roadmap](roadmap.md) defines milestones; Home does not link them | A link, if the owner wants them public |
+
+### Documentation types
+
+Grouped by the [Diátaxis](https://diataxis.fr/) categories:
+
+| Type | State | What commercial engines provide |
+|------|-------|---------------------------------|
+| Tutorials | none | First project, first actor, first material |
+| How-to guides | docs work only | Build, debug, profile, package, add a module |
+| Reference | [module map](../architecture/modules.md) and the [glossary](../glossary.md) | API, build options, file formats, command-line flags |
+| Explanation | strong: explorations and designs; [system pages](../systems/index.md) for the shader toolchain, scheduler, storage, diagnostics, actors, render graph and GPU test harness | The same for every built system |
+
+Built systems without a system page: the Vulkan backend, the asset pipeline and cooking, the editor (undo, selection, tools), input, physics, UI (Reflow and uikit), the platform layer, memory and allocators, the build options in `Options.cmake`, unit testing, and packaging.
+
+Topics without an exploration and without a target above: accessibility (UI, input remapping, subtitles) and performance regression testing in CI.
+
+### Project hygiene
+
+Enterprise and open-source projects publish these. None exists in the engine repository (checked 2026-11-16):
+
+- `LICENSE`, `SECURITY.md`, a code of conduct, and a contribution sign-off (DCO or CLA)
+- Governance: who accepts an ADR (see the [ADR index](../adr/README.md))
+- Releases: version scheme, changelog, deprecation policy
+- A supported toolchain, OS and GPU matrix
+- Docs versioned per engine release, once releases exist
+
+### Refinement on this site
+
+- [Getting started](../guides/getting-started.md) has never been run on a clean machine.
+- System pages carry a verified commit but no update loop yet; they go stale as the engine moves.
+- Several sources are labelled as Gemini reviews or conversations. Readers outside the project weigh such sources lower than primary ones. Each claim should state whether it was checked against a primary source or the code.
+- The early explorations (serialisation, scripting, observability) still rest on claims nobody has measured.
+
+### Research needed
+
+| Item | Why | Owner |
+|------|-----|-------|
+| License | Blocks adoption, contributions and publishing code excerpts ([code documentation](../architecture/code-documentation.md)) | engine owner |
+| Feature baseline against UE5, Unity 6, Godot 4, O3DE | Separates deliberate gaps from missing work | open |
+| Target hardware and OS matrix | Already open in [storage](../architecture/storage-exploration.md) | open |
+| clang-doc spike | The only route to a symbol-level reference | open |
+| Available media | The landing page needs screenshots that are true today | engine owner |
