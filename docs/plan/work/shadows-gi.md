@@ -51,7 +51,7 @@ Placement: `Engine.Graphics.Shadow/{CascadeSet,ContactShadowPass,VirtualShadowMa
 
 - **Done when**: pixel-sharp sun shadows at 1 km within the page budget.
 
-### W19.4 Ray-query shadow tier · execute · after W12.3, W19.2
+### W19.4 Ray-query shadow tier · execute · after W12.3, W19.2, W11.5 (B3)
 
 - **Done when**: area-light shadows with a denoiser pass a golden on a capable GPU; skipped with a recorded reason elsewhere.
 

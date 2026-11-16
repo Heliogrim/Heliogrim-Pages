@@ -53,22 +53,57 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 - **Result**: commits `1a047450` (range borrows and region parameters) to `b6473e3e` (region helpers specialised per root), merged as PR [#156](https://github.com/Heliogrim/Heliogrim-Engine/pull/156) into `feat/wip`, now on `master`.
 - **Done when**: the micropolygon scratchpad layout compiles and the borrow tests pass; GLSL oracle unchanged for shaders without borrows.
 
-### W11.2 Direct SPIR-V backend design · design · ready (W11.0 done 2026-11-13)
+### W11.2 Direct SPIR-V backend design · design · done 2026-11-16 (design and plan accepted by the owner)
 
-- **Goal**: emitter structure, capability analysis, `spirv-val` and `spirv-opt` in tests, debug info, the oracle protocol (GLSL path becomes test-only after parity), the Slang question. The emitter must make name conflicts unrepresentable: identity by result id, user names only as debug info, no generated name in a user-visible namespace (closes the collisions in [design page section 6](../../architecture/accel-lang-design.md#6-open)).
-- **Inputs**: IR parts list, SPIRV-Tools, Slang user guide (module and link-time specialisation chapters).
+- **Goal**: emitter structure, capability analysis, `spirv-val` and `spirv-opt` in tests, debug info, the verification protocol (owner, 2026-11-14: the GLSL emitter and backend are removed once SPIR-V lands, no parity suite; correctness comes from the GPU harness tests against pre-computed values, which do not depend on the backend; DXIL not now), the Slang question. The emitter must make name conflicts unrepresentable: identity by result id, user names only as debug info, no generated name in a user-visible namespace (closes the collisions in [design page section 6](../../architecture/accel-lang-design.md#6-open)).
+- **Language core (2026-11-16)**: ASL states the semantics GLSL used to supply: evaluation order, short-circuit and lazy ternary, implicit conversions, integer division, shift and overflow rules, reference meaning of `&mut` (pointer versus copy, per storage class), `discard` as `OpTerminateInvocation`, reserved names shrunk to ASL keywords; the IR gets typed literals and an operator enum. Language additions beyond that are W11.5.
+- **Inputs**: [SPIR-V backend references](../sources/research-spirv-backend.md) (licence check and source list, 2026-11-14), IR parts list, SPIRV-Tools, Slang user guide (module and link-time specialisation chapters).
 - **Output**: section in `accel-lang-design.md`; plan.
-- **Questions**: Q11.2, Q11.3.
+- **Result**: [Accel Lang design section 7](../../architecture/accel-lang-design.md#7-spir-v-backend) (owner approved the design 2026-11-16; builder check answered: fixed capability profile, per-pipeline interface numbers, `rep` adapter kept until W14.2). Plan untracked in the engine checkout: `docs/superpowers/plans/2026-11-16-spirv-backend.md` (ten tasks: typed literals and operator enum, explicit conversions, writer and validation, reference lowering, three emitter tasks, pipeline switch, glslang removal, `spirv-opt` measurement).
+- **Questions**: Q11.2, Q11.3 (decided, refined 2026-11-14).
+- **Order (owner, 2026-11-14)**: diagnostics go through the engine `Diagnostic` type from W05.2 (`feat/diagnostics`). The design includes verification on the GPU harness, so W26.1 and W26.2 come first.
 
-### W11.3 Implement SPIR-V emitter, feature analysis, interface export · execute · after W11.2
+### W11.3 Implement SPIR-V emitter, feature analysis, interface export · execute · ready (plan accepted 2026-11-16; subagent-driven)
 
-- **Done when**: every engine shader compiles to SPIR-V, passes `spirv-val`, renders identically to the GLSL path in the harness; `InterfaceDesc` is emitted per entry point.
+- **Done when**: every engine shader compiles to SPIR-V, passes `spirv-val`, passes the GPU harness tests (W26.2; the same tests ran on the GLSL path before); `InterfaceDesc` is emitted per entry point; glslang and the GLSL emitter are removed ([design 7.8, 7.9](../../architecture/accel-lang-design.md#79-verification)).
 
 ### W11.4 Uniformity and interface check passes · execute · after W11.3
 
 - **Done when**: a barrier in divergent flow and an interface mismatch with a pass declaration are diagnostics with both locations.
 
-### W12.1 Pipeline kinds design · design · after W11.2 (interfaces), W14.1 (graph nodes)
+### W11.5 ASL language extensions after GLSL · design · after W11.2 (core semantics); each item before its first consumer
+
+- **Goal**: the language room that opens once GLSL no longer sits between the IR and SPIR-V (owner, 2026-11-16: its own work package). W11.2 settles only the semantics the emitter cannot do without (evaluation order, conversions, integer rules, reference meaning of `&mut`, `discard`, reserved names shrunk to ASL keywords). The items below add to that core. None of them changes it, so each one is designed and implemented just before its first consumer, not upfront.
+- **Items**:
+
+| Item | Language addition | SPIR-V basis | First consumer |
+|---|---|---|---|
+| B1 | `switch` | `OpSwitch` | none; on demand after W11.3 |
+| B2 | Statements that end a block (`emit_tasks`), task payload declaration, per-primitive outputs, mesh output counts | `SPV_EXT_mesh_shader` | W12.3, W18.6 |
+| B3 | Ray query object, usable by reference only | `SPV_KHR_ray_query` | W12.3, W19.4 |
+| B4 | Ray payloads, hit attributes, callable data, `terminate_ray` and `ignore_intersection` as block-ending statements, the six ray-tracing stage kinds | `SPV_KHR_ray_tracing` | the ray-tracing pipeline execute chunk that W12.1 cuts |
+| B5 | `nonuniform` marking on descriptor indices | `NonUniform` decoration, descriptor indexing | W15.1 (`BindlessSet`) |
+| B6 | Subgroup operations, with a stated reconvergence rule | `GroupNonUniform*`, maximal reconvergence | W15.2 (culling); guess, the W15.1 design names the first real user |
+| B7 | Workgroup memory reuse across phases (a non-goal of the region-borrow design, [section 4](../../architecture/accel-lang-design.md#4-region-borrows)) | `WorkgroupMemoryExplicitLayoutKHR` | W18.5 |
+| B8 | Buffer device addresses (typed pointers into buffers) | `PhysicalStorageBuffer64` | W15.1, if its GPU tables use them |
+| B9 | User generics, specialised per use like the region helpers | none; resolved in the IR | none; on demand |
+
+- **Not here**: work graphs stay an enum value (Q12.1); revisit when an EXT or KHR extension exists (only `VK_AMDX_shader_enqueue` as of 2026-11).
+- **Output**: one section per item in `accel-lang-design.md`, written when the item's consumer is next; the implementation goes into the consumer's execute chunk or a small execute chunk of its own.
+- **Done when**: never as a whole; each item is closed when its consumer runs on it.
+
+### W11.6 Value-range analysis (Deep tier) · design · after W11.3
+
+- **Goal** (owner, 2026-11-16): track the possible values of every scalar and vector component through swizzles, arithmetic, loops and calls, so an index into a bounded array or buffer that can leave its range is reported with the chain that produced it. Runs only in the Deep validation tier ([design 7.4](../../architecture/accel-lang-design.md#74-validation-tiers)), cached by content hash, never on the runtime compile path.
+- **Output**: section in `accel-lang-design.md`; plan.
+- **Done when**: an out-of-range index built from a swizzled, multiplied vector component is an error when proven and a warning with the chain when possible.
+
+### W11.7 ISA measurement loop · explore · after W11.3
+
+- **Goal**: per-variant ISA statistics (registers, instruction count, occupancy) of the engine shaders from an offline ISA compiler, plus RGP captures, as the gate for every IR-level optimisation (reference downgrades of design 7.3, the Q11.3 semantic passes, `spirv-opt` choices). The tool's licence is checked against the no-licensed-software rule first.
+- **Output**: `architecture/accel-isa-measurement-exploration.md`; a repeatable measurement command.
+
+### W12.1 Pipeline kinds design · design · after W11.2 (interfaces), W14.1 (graph nodes), W11.5 (B4 for ray tracing)
 
 - **Goal**: compute, mesh and task, ray-tracing (SBT), work-graph placeholder across `Accel.Compile`, `Accel.Pipeline`, `Driver.Vulkan`; first consumers in order (sky LUT, particles, mesh test, ray-query shadow).
 - **Output**: `architecture/pipeline-kinds-design.md`; plan.
@@ -78,13 +113,14 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 
 - **Done when**: a compute pass (sky LUT) runs through the render graph with an indirect dispatch in a harness test.
 
-### W12.3 Implement mesh and ray-query pipelines · execute · after W12.2, W15.0 (minimum spec)
+### W12.3 Implement mesh and ray-query pipelines · execute · after W12.2, W15.0 (minimum spec), W11.5 (B2, B3)
 
 - **Done when**: a mesh-shader test and a ray-query shadow test pass in the harness on a capable GPU and skip with a recorded reason on lavapipe.
 
 ### W13.1 Variant and pipeline cache design · design · after W11.3
 
 - **Goal**: `VariantKey`, disk cache, pipeline library, async compile and swap, permutation control hook for S16, measurement of first-use hitches.
+- **Owner, 2026-11-16**: shipped games compile variants at runtime; the permutation set between geometry, materials and effects cannot be known at cook time, since game code may change material assignments and parameters. While a variant compiles on the client, a generalised (uber) shader of the material class is served and swapped out when the variant is ready; the generalisation comes from W16.1's merge and uber-shader analysis. The compile path used at runtime is the minimal Build tier of W11.2; heavier checks never run there.
 - **Output**: `architecture/pipeline-cache-design.md`; plan.
 - **Questions**: Q13.1.
 
@@ -102,12 +138,11 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 | ID | Decision |
 |---|---|
 | Q11.1 | The Accel IR milestone 2 has landed. W11.0 shrinks to recording the IR shape, rules and region-borrow spec on the site and fixing #148. |
-| Q11.2 | Neither. Slang is not a dependency, not as an oracle and not as a backend; the shader toolchain is written in the project. Its module model remains reading material. |
+| Q11.2 | Neither. Slang is not a dependency, not as an oracle and not as a backend; the shader toolchain is written in the project. Its module model remains reading material. Refined 2026-11-14 (owner): Slang may be read once its licence is checked, and other stable, correct references are searched as well; they inform the design only, nothing is copied one to one. |
+| Q11.3 | No general optimiser of our own. `spirv-opt` plus the driver cover the generic passes; the project writes only engine-semantic IR passes: specialisation-constant folding into variants, dead-resource elimination, uniform-to-push-constant promotion, variant deduplication, and the uniformity, borrow and interface checks. Measured with RGP captures. Refined 2026-11-14 (owner): the first step relies on `spirv-opt` and the semantic passes only. Own optimisations (for example shader generalisation) may follow later, because `spirv-opt` lacks the semantic intent the IR carries; each one needs a measurement first. |
 | Q12.1 | Reserve the work-graph pipeline kind as an enum value, no code. |
 | Q12.2 | Minimum spec is RDNA3 and Ada Lovelace class. Mesh shaders and ray query are required features, together with descriptor indexing and 64-bit atomics. If a backport to older hardware is ever needed, it is done later as its own work; no optional tiers are designed in now. |
 | Q13.1 | Pipeline library: design for it now, implement after a measured first-use hitch. |
-
-| Q11.3 | No general optimiser of our own. `spirv-opt` plus the driver cover the generic passes; the project writes only engine-semantic IR passes: specialisation-constant folding into variants, dead-resource elimination, uniform-to-push-constant promotion, variant deduplication, and the uniformity, borrow and interface checks. Measured with RGP captures. |
 | Q60.1 | S60 closes now with the gate recorded; it reopens on evidence from W60.1. Scope note from the owner: the JIT idea also covered runtime data restructuring and graph optimisation, for example re-compacting data layouts or re-optimising a graph for the shape in use, so W60.1 includes a data-layout candidate next to the code candidates. |
 
 ## Questions for the owner

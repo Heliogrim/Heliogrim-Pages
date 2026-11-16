@@ -72,6 +72,7 @@ Placement: `Engine.Graphics.RenderGraph/{PassDecl,GraphBuilder,CompiledGraph}`, 
 
 ### W14.2 Implement render graph v2 and migrate existing passes · execute · after W14.1, W11.3
 
+- **Also (from W11.2, 2026-11-16)**: delete the `rep` symbol adapter of [Accel Lang design 7.8](../../architecture/accel-lang-design.md#78-what-is-removed); resource binding moves to interface string ids.
 - **Done when**: the existing passes run as declarations; validation layer reports no synchronisation errors; transient memory drops measurably.
 
 ### W15.0 Decide the GPU minimum spec · explore · ready
@@ -79,13 +80,13 @@ Placement: `Engine.Graphics.RenderGraph/{PassDecl,GraphBuilder,CompiledGraph}`, 
 - **Goal**: record the feature matrix for the decided minimum spec (RDNA3 and Ada Lovelace, mesh shaders and ray query required, Q12.2 and Q15.1) in #95 and on the site; no optional tiers.
 - **Questions**: Q12.2, Q15.1.
 
-### W15.1 GPU-driven renderer design · design · after W14.1, W07.1, W15.0
+### W15.1 GPU-driven renderer design · design · after W14.1, W07.1, W15.0, W11.5 (B5, B8)
 
 - **Goal**: GPU tables and upload rings, culling pipeline, visibility buffer, classification and resolve (geometry-effect variants before the visibility pass, Q15.2), bindless set, the mirror's dirty tracking, feedback buffer slot for S17.
 - **Output**: `architecture/gpu-driven-design.md`; plan.
 - **Questions**: Q15.2, Q15.3.
 
-### W15.2 Implement GPU tables, culling and indirect draws · execute · after W15.1, W14.2, W07.2
+### W15.2 Implement GPU tables, culling and indirect draws · execute · after W15.1, W14.2, W07.2, W11.5 (B6)
 
 - **Done when**: a 1M-instance scene is culled and drawn by indirect draws; CPU submission time is near constant in instance count.
 

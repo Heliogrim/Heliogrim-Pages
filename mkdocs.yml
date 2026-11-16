@@ -167,6 +167,7 @@ nav:
           - World: plan/sources/research-world.md
           - Tooling: plan/sources/research-tooling.md
           - Runtime: plan/sources/research-runtime.md
+          - SPIR-V backend: plan/sources/research-spirv-backend.md
           - Simulation: plan/sources/research-simulation.md
           - Editor and quality: plan/sources/research-editor-quality.md
       - Work packages:

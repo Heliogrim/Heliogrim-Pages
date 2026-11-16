@@ -111,7 +111,7 @@ flowchart LR
 ### Scene and rendering
 
 - Game state lives in actor archetypes per world-partition cell. Scene systems mirror components into models. The render scene is one such model; it is GPU-resident (instance, material and geometry tables) so the GPU-driven pipeline culls and draws without per-object CPU work.
-- The render graph is compiled per frame from pass declarations and shader interfaces (ASL exports the resources a pass reads and writes); barriers and transient aliasing are derived, not written by hand. Material and feature requirements propagate up into pass enablement ([brainstorm](../architecture/exploration-rundown.md)).
+- The render graph is compiled per frame from pass declarations and shader interfaces (ASL exports the resources a pass reads and writes); barriers and transient aliasing are derived, not written by hand. Material and feature requirements propagate up into pass enablement (session brainstorm, not written on the site yet; [W16.1](work/materials-post.md) records it).
 - World positions are double on the CPU; the render scene stores camera-relative float positions rebuilt when the camera origin moves.
 
 ### Networking

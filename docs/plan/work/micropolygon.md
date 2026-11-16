@@ -53,12 +53,12 @@ Placement: `Engine.Graphics.Geometry.Cluster/{Meshlet,ClusterDag,GeometryPage,Cl
 
 - **Done when**: crack-free LOD transitions in the golden video test; DAG build time per asset recorded.
 
-### W18.5 Stage 3 design: software rasteriser · design · after W18.4, W11.1 (borrows)
+### W18.5 Stage 3 design: software rasteriser · design · after W18.4, W11.1 (borrows), W11.5 (B7)
 
 - **Output**: design part 3; plan.
 - **Questions**: Q18.2.
 
-### W18.6 Implement software rasteriser and the mesh-shader path · execute · after W18.5, W12.3
+### W18.6 Implement software rasteriser and the mesh-shader path · execute · after W18.5, W12.3, W11.5 (B2)
 
 - **Done when**: a 100M-source-triangle scene renders at pixel-sized clusters; the visibility resolve matches the hardware path in the harness.
 
