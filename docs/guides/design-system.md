@@ -4,7 +4,7 @@ How the docs site applies the [brand identity](brand-identity.md). The brand pag
 
 ## Idea
 
-The site reads like an engineering drawing set: bone-coloured paper in light mode, coal in dark mode, hairline rules, square corners. **Ember** is rare, as in the brand: the masthead rule, section markers, the active tab, primary buttons, index numbers. **Frost** is state: links, hover and focus, pressed toggles. Aligned with the brand on 2026-11-16 (owner choices: frost links, bone paper kept).
+The site reads like an engineering drawing set: bone-coloured paper in light mode, coal in dark mode, hairline rules, square corners. **Frost** is the rare accent: the masthead rule, section markers, the active tab, primary buttons, index numbers. **Ember** is state: links, hover and focus, pressed toggles. This flips the brand's roles (ember rare, frost state) on purpose: the owner chose it for the site on 2026-11-16, and it applies to the site only; the editor follows the [brand rules](brand-identity.md#rules). Bone paper is kept in light mode.
 
 ## Mark
 
@@ -20,9 +20,9 @@ The brand [mark](brand-identity.md#mark): `assets/brand/mark.svg` in the header,
 | Ink light | `#5f594f` | n10 `#9a9aa2` | Secondary text |
 | Ink lighter | `#8a8378` | n9 `#75757e` | Muted text, closed and planned chips |
 | Rule `--hg-rule` | `#d6d0c4` | n6 `#2e2e34` | Hairlines |
-| Ember `--hg-ember` | `#ff6a1f` | `#ff6a1f` | Ember 500: accent fills and rules |
-| Link `--md-typeset-a-color` | frost 700 `#115079` | frost 500 `#5cc8ff` | Text links (darker on paper for contrast, about 7.6:1) |
-| State `--md-accent-fg-color` | frost 600 `#1f7cb5` | frost 300 `#b3e7ff` | Hover, focus, pressed toggles |
+| Accent `--hg-accent` | frost 600 `#1f7cb5` | frost 500 `#5cc8ff` | Accent fills, markers, index numbers (darker on paper for contrast); hover frost 700 / 400. The masthead rule and active tab are frost 500 in both modes, on the coal masthead |
+| Link `--md-typeset-a-color` | ember 600 `#b5390d` | ember 400 `#ff8a4a` | Text links (darker on paper for contrast) |
+| State `--md-accent-fg-color` | ember 700 `#7a2609` | ember 300 `#ffab7a` | Hover, focus, pressed toggles |
 | Masthead | n1 `#0b0b0d` | n1 `#0b0b0d` | Header, both modes |
 
 The light mode keeps the bone paper; the coal ramp is dark-only. Neutral names (n0 to n12) and ramps are on the [brand page](brand-identity.md#palette).

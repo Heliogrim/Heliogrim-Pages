@@ -83,14 +83,14 @@ The footer makes the splash useful on the test bench. The final art, the editor 
 
 ## Site redesign brief
 
-What the docs site needed in order to follow this identity. Done on 2026-11-16; the owner chose frost for links and focus and kept the bone paper. The [site design system](design-system.md) has the resulting tokens.
+What the docs site needed in order to follow this identity. Done on 2026-11-16; the owner kept the bone paper and flipped the roles on the site: frost is the rare accent, ember marks links and state (the editor keeps the rules above). The [site design system](design-system.md) has the resulting tokens.
 
 | Area | Site before | Target (done) |
 |------|-------------|---------------|
 | Logo, favicon | All-ember crescent, ring and four ticks | Mark above: no ticks, grey hairline with frost glint (`mark.svg`, `mark-16.svg`) |
 | Dark mode | Obsidian `#12100e`, warm surfaces `#1b1815`, rule `#2e2a25` | Coal neutrals (cool, near-black): page n2 or n3, surfaces n4 and n5, rules n6 |
-| Accent | Ember `#ff6a1a` | Ember 500 `#ff6a1f` with the same "rare" rule |
-| Links, selection, focus | Ember-derived link colours | Frost for links and focus, consistent with the editor (owner) |
+| Accent | Ember `#ff6a1a` | Site flips the roles (owner): frost 500 is the rare accent, ember 500 to 700 marks links and state |
+| Links, selection, focus | Ember-derived link colours | Ember for links and focus, frost for the accent (owner; the site's flip of the brand roles) |
 | Light mode | Bone paper `#f4f1ea` | Keep the bone paper (owner); the masthead stays coal, so the mark needs no light fallback |
 | Status chips | Amber, teal, green, grey, red | Map to the semantic set; keep the word in every chip |
 | Masthead | `#14110f` | n1 |
