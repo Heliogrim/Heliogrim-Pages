@@ -1,8 +1,8 @@
-# Placeholder: Canonical Text Form as a YAML Subset
+# ADR-0004: Canonical Text Form as a YAML Subset
 
-**Date**: pending (owner decision 2026-11-08, Q01.3)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Serialisation work page](../plan/work/serialization-and-reflection.md)
+**Date**: 2026-11-08 (owner, Q01.3)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#83](https://github.com/Heliogrim/Heliogrim-Engine/issues/83), [serialisation work page](../plan/work/serialization-and-reflection.md)
 
 ## Context
 
@@ -24,6 +24,7 @@ The text form is a canonical YAML subset read and written through `ryml`: block 
 
 - **Pros**: strictest grammar, widest tooling, also supported by `ryml`.
 - **Cons**: no comments, 64-bit integers do not survive many tools, the trailing-comma rule makes diffs touch the previous line.
+- **Why not**: diffs and hand edits are the reason the text form exists, and JSON is worse at both.
 
 ## Consequences
 

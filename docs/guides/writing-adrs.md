@@ -1,19 +1,21 @@
-# Documenting an ADR
+# Writing an ADR
 
-ADRs are processed in the **engine project**: discussion, acceptance and numbering happen there. This repository documents the accepted result. Do not write an ADR here and treat it as decided.
+ADRs live in this repository. A record states one decision the owner accepted, the alternatives rejected, and the consequences. It is short: about a page, with the context in at most ten lines.
+
+## When
+
+Write the record in the same commit that records the decision: the answer to a work-package question, the acceptance of a design, or the closing of an exploration with a result. A decision still under discussion stays on its work page or design page; it does not get a file here.
 
 ## Steps
 
-1. **Decide in the engine project.** The proposal, its discussion and its acceptance follow that project's process. The engine project assigns the number and the date.
-2. **Copy the record here.** Name the file `NNNN-short-title.md` with the engine project's number. The [template](../adr/template.md) mirrors the expected format; keep the *Source* link to the engine issue or pull request.
-3. **Register it.** Replace the matching placeholder, if any, add a row to the [ADR index](../adr/README.md) and an entry under *Decisions* in `mkdocs.yml`, and append a line to the [timeline](../architecture/timeline.md) log.
-4. **Link the exploration** that led to it. The exploration stays as the record of rejected options.
-
-## Placeholders
-
-When an exploration reaches an outcome that should become an ADR, a page named `placeholder-*.md` may hold the draft. It carries a warning banner, no number and no acceptance date, and is replaced by the real record.
+1. **Number it.** Take the next free number in the [ADR index](../adr/README.md). Name the file `NNNN-short-title.md`.
+2. **Fill the [template](../adr/template.md).** *Date* is the decision date, *Status* is `accepted`, and *Source* links the battle-plan issue and the design or work page that holds the discussion. Use only what was actually decided.
+3. **Register it.** Add a row to the [ADR index](../adr/README.md), an entry under *Decisions* in `mkdocs.yml`, and a row to the [timeline](../architecture/timeline.md) log.
+4. **Link it back.** The exploration, design or work page that led to it links the record; the exploration stays as the record of rejected options.
 
 ## Rules
 
-- Records are never rewritten here. A change of decision is a new record in the engine project; mark the old one `superseded by ADR-NNNN` and link both ways.
-- Do not alter the content of a processed record when copying it.
+- Records are never rewritten. A change of decision is a new record; mark the old one `superseded by ADR-NNNN`, link both ways, and add a timeline row.
+- Corrections that do not change the decision (a broken link, a typo) are fine.
+- Do not record trivial decisions (naming, formatting).
+- "We just picked it" is not a rationale: every alternative names why it lost.

@@ -1,8 +1,8 @@
-# Placeholder: Explicit Allocators with a Debug-Only Global Hook
+# ADR-0009: Explicit Allocators with a Debug-Only Global Hook
 
-**Date**: pending (owner decision 2026-11-08, Q08.1)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Storage work page](../plan/work/storage-streaming.md)
+**Date**: 2026-11-08 (owner, Q08.1)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#90](https://github.com/Heliogrim/Heliogrim-Engine/issues/90), [storage work page](../plan/work/storage-streaming.md)
 
 ## Context
 
@@ -18,6 +18,7 @@ Explicit tagged allocators and arenas are the tracking mechanism. A global `oper
 
 - **Pros**: nothing escapes tracking.
 - **Cons**: no tag information without a thread-local context, which is banned across fiber suspension points; third-party allocations pollute the numbers.
+- **Why not**: tags must survive fiber migration, and only the call site knows them.
 
 ## Consequences
 

@@ -1,8 +1,8 @@
-# Placeholder: In-House Crash Handler
+# ADR-0008: In-House Crash Handler
 
-**Date**: pending (owner decision 2026-11-08, Q06.1 and Q06.2)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Diagnostics work page](../plan/work/diagnostics-and-crash.md)
+**Date**: 2026-11-08 (owner, Q06.1 and Q06.2)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#88](https://github.com/Heliogrim/Heliogrim-Engine/issues/88), [diagnostics work page](../plan/work/diagnostics-and-crash.md)
 
 ## Context
 

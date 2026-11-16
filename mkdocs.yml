@@ -213,17 +213,17 @@ nav:
   - Glossary: glossary.md
   - Decisions:
       - adr/README.md
-      - "Placeholder: pointer sets": adr/placeholder-pointer-sets.md
-      - "Placeholder: trace profiler": adr/placeholder-trace-profiler.md
-      - "Placeholder: record schema versioning": adr/placeholder-record-schema-versioning.md
-      - "Placeholder: text form": adr/placeholder-text-form-yaml.md
-      - "Placeholder: diagnostics at boundaries": adr/placeholder-diagnostics-at-boundaries.md
-      - "Placeholder: IOCP first": adr/placeholder-io-backend-iocp-first.md
-      - "Placeholder: explicit allocators": adr/placeholder-explicit-allocators.md
-      - "Placeholder: queue ownership": adr/placeholder-queue-ownership.md
-      - "Placeholder: in-house crash handler": adr/placeholder-in-house-crash-handler.md
-      - "Placeholder: input backends": adr/placeholder-input-backend-sdl3-base.md
-      - "Placeholder: navmesh library": adr/placeholder-navmesh-recastnavigation.md
+      - "0001: pointer sets": adr/0001-pointer-sets.md
+      - "0002: trace profiler": adr/0002-trace-profiler.md
+      - "0003: record schema versioning": adr/0003-record-schema-versioning.md
+      - "0004: text form": adr/0004-text-form-yaml.md
+      - "0005: queue ownership": adr/0005-queue-ownership.md
+      - "0006: IOCP first": adr/0006-io-backend-iocp-first.md
+      - "0007: diagnostics at boundaries": adr/0007-diagnostics-at-boundaries.md
+      - "0008: in-house crash handler": adr/0008-in-house-crash-handler.md
+      - "0009: explicit allocators": adr/0009-explicit-allocators.md
+      - "0010: navmesh library": adr/0010-navmesh-recastnavigation.md
+      - "0011: input backends": adr/0011-input-backend-sdl3-base.md
       - Template: adr/template.md
   - Guides:
       - guides/index.md

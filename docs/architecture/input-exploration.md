@@ -1,6 +1,6 @@
 # Input Backends (Exploration)
 
-**Status**: <span class="hg-status closed">closed</span> 2026-11-09. Answers chunk [W39.0](../plan/work/input.md) for decision Q39.1 (SDL3 or native input per platform). The owner accepted the recommendation in section 6 on 2026-11-09; it is recorded as ADR [placeholder](../adr/placeholder-input-backend-sdl3-base.md). [W39.1](../plan/work/input.md) designs the backend interface against section 7.
+**Status**: <span class="hg-status closed">closed</span> 2026-11-09. Answers chunk [W39.0](../plan/work/input.md) for decision Q39.1 (SDL3 or native input per platform). The owner accepted the recommendation in section 6 on 2026-11-09; it is recorded as [ADR-0011](../adr/0011-input-backend-sdl3-base.md). [W39.1](../plan/work/input.md) designs the backend interface against section 7.
 **Origin**: 2026-11-09. Engine code read on branch `feat/affine-threads`. Platform research was done by three read-only research passes. They read the SDL source (`release-3.2.x`, `release-3.4.x`, `main`), the SDL wiki, Microsoft Learn, Apple developer documentation, wayland-protocols and peer-reviewed latency papers (sources in section 8). The Windows numbers in section 3 come from a throwaway spike on the owner's workstation. No engine code was changed.
 
 ## 1. Question

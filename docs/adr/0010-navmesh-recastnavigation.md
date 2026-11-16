@@ -1,8 +1,8 @@
-# Placeholder: Vendor recastnavigation for Navmesh Build and Queries
+# ADR-0010: Vendor recastnavigation for Navmesh Build and Queries
 
-**Date**: pending (decided 2026-11-09)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Navmesh library fit](../architecture/navigation-exploration.md), chunk W37.0, question Q37.1
+**Date**: 2026-11-09 (owner, Q37.1)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#117](https://github.com/Heliogrim/Heliogrim-Engine/issues/117), [navmesh library fit](../architecture/navigation-exploration.md) (chunk W37.0)
 
 ## Context
 

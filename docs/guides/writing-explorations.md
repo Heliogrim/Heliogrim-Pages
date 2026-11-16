@@ -6,7 +6,7 @@ An exploration collects options and evidence for a system before anyone commits 
 
 1. **Exploration**: open questions, claims from outside sources, problems found. Status line: `exploration. Nothing here is decided.`
 2. **Design**: one direction chosen. Move or copy it to a page named `*-design.md` with an approval date.
-3. **Decision**: the accepted part is processed as an [ADR](writing-adrs.md) in the engine project and documented here. The exploration stays as the record of rejected options.
+3. **Decision**: the accepted part becomes an [ADR](writing-adrs.md) in the same commit. The exploration stays as the record of rejected options.
 4. **Closed**: if the work is abandoned, mark the status `closed`, state the result in one sentence, and keep the page.
 
 ## Structure
@@ -28,4 +28,4 @@ The existing pages share one shape. Reuse it:
 - Measure before you design. A claim from a blog post is a claim, not evidence.
 - Give dates for every check against the source; the engine moves.
 - Put long research under `sources/` and link it.
-- Add the page to `nav`, the [architecture index](../architecture/index.md) and the [rundown](../architecture/exploration-rundown.md).
+- Add the page to `nav` and the [architecture index](../architecture/index.md), and add a row to the [timeline](../architecture/timeline.md) log.

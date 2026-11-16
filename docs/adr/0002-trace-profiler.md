@@ -1,8 +1,8 @@
-# Placeholder: Drop the JSON Trace Profiler, Stopwatch and Macros
+# ADR-0002: Drop the JSON Trace Profiler, Stopwatch and Macros
 
-**Date**: pending (noted 2026-11-04)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Exploration rundown](../architecture/exploration-rundown.md), topic 5, and the [observability exploration](../architecture/observability-exploration.md)
+**Date**: 2026-11-04 (owner, session notes of 2026-11-03)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#86](https://github.com/Heliogrim/Heliogrim-Engine/issues/86), [observability exploration](../architecture/observability-exploration.md)
 
 ## Context
 
@@ -28,8 +28,8 @@ We drop the existing profiler, stopwatch and macros. Observability is built from
 
 ### Negative
 
-- No built-in profiling until the replacement lands (order of work item 4 in the [timeline](../architecture/timeline.md)).
+- No built-in profiling until the replacement lands (S04). The old code stays in `Engine.Common/Profiling` until then; its removal is part of W04.1.
 
 ### Risks
 
-- The replacement depends on the shared fiber context; delays there delay profiling.
+- The replacement depends on fiber identity in the scheduler (S02); delays there delay profiling.

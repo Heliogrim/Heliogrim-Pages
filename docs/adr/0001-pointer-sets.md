@@ -1,7 +1,7 @@
-# Placeholder: Keep `ankerl::unordered_dense` for Pointer Sets
+# ADR-0001: Keep `ankerl::unordered_dense` for Pointer Sets
 
-**Date**: pending (exploration closed 2026-11-04)
-**Status**: placeholder, not yet processed in the engine project
+**Date**: 2026-11-04 (owner; exploration closed)
+**Status**: accepted (recorded 2026-11-16)
 **Source**: [Pointer sets exploration](../architecture/pointer-sets-exploration.md)
 
 ## Context

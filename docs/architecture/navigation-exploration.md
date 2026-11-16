@@ -1,6 +1,6 @@
 # Navmesh Library Fit (Exploration)
 
-**Status**: <span class="hg-status closed">closed</span> 2026-11-09. Answers chunk [W37.0](../plan/work/navigation.md) for decision Q37.1 (which navmesh library, or an in-house builder). The owner accepted section 6 on 2026-11-09; it is recorded as ADR [placeholder](../adr/placeholder-navmesh-recastnavigation.md). The owner then asked for a performance pass, which is section 10. [W37.1](../plan/work/navigation.md) designs against sections 7 and 10.
+**Status**: <span class="hg-status closed">closed</span> 2026-11-09. Answers chunk [W37.0](../plan/work/navigation.md) for decision Q37.1 (which navmesh library, or an in-house builder). The owner accepted section 6 on 2026-11-09; it is recorded as [ADR-0010](../adr/0010-navmesh-recastnavigation.md). The owner then asked for a performance pass, which is section 10. [W37.1](../plan/work/navigation.md) designs against sections 7 and 10.
 **Origin**: 2026-11-09. One read-only research pass covered the options in section 3: repositories, headers, release pages, papers and engine documentation (sources in section 9). The build and the numbers in sections 4 and 5 come from a throwaway spike in the session scratchpad on the owner's workstation. Engine checked on branch `feat/affine-threads` (HEAD `a9242621`). No engine code was changed.
 
 ## 1. Question
@@ -106,7 +106,7 @@ Evidence marks: **V** means verified in a header, README, source or release page
 
 ## 8. Open points for the owner
 
-- Section 6 was accepted on 2026-11-09 (ADR [placeholder](../adr/placeholder-navmesh-recastnavigation.md)).
+- Section 6 was accepted on 2026-11-09 ([ADR-0010](../adr/0010-navmesh-recastnavigation.md)).
 - Whether to offer the detail-mesh patch from section 10 upstream. It is outward-facing, so the owner decides.
 - The tile-size choice in section 7, row 1, is left to W37.1. The suggested default is cell 0.32 m at 64 m tiles, so the navmesh tile stays equal to the terrain tile; the spike showed no quality problem at that cell size on open terrain.
 - The TileCache compressor should come from the codec decision (W03.5). FastLZ is only the demo's choice. The spike's 20:1 ratio is on smooth terrain.

@@ -1,8 +1,8 @@
-# Placeholder: Schema Versioning on Records
+# ADR-0003: Schema Versioning on Records
 
-**Date**: pending (owner decision 2026-11-08, Q01.1 and Q01.2)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Serialisation work page](../plan/work/serialization-and-reflection.md), [Serialization evolution exploration](../architecture/serialization-evolution-exploration.md)
+**Date**: 2026-11-08 (owner, Q01.1 and Q01.2)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#83](https://github.com/Heliogrim/Heliogrim-Engine/issues/83), [serialisation work page](../plan/work/serialization-and-reflection.md), [serializer evolution exploration](../architecture/serialization-evolution-exploration.md)
 
 ## Context
 
@@ -23,7 +23,8 @@ Top-level records (one asset, one actor) carry a header: type id as a 64-bit has
 ### Full header on every struct, nested included
 
 - **Pros**: uniform.
-- **Cons**: about 16 bytes per component, sampler or layer instance; the owner rejected this cost.
+- **Cons**: about 16 bytes per component, sampler or layer instance.
+- **Why not**: the owner rejected this cost; the parent's field schema already names the type.
 
 ## Consequences
 

@@ -1,8 +1,8 @@
-# Placeholder: IOCP First, DirectStorage-Shaped Interface
+# ADR-0006: IOCP First, DirectStorage-Shaped Interface
 
-**Date**: pending (owner decision 2026-11-08, Q03.2 and Q03.3)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Storage work page](../plan/work/storage-streaming.md), [Storage exploration](../architecture/storage-exploration.md)
+**Date**: 2026-11-08 (owner, Q03.2 and Q03.3)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#85](https://github.com/Heliogrim/Heliogrim-Engine/issues/85), [storage design](../architecture/storage-design.md) section 2, implementation PR [#180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) (open)
 
 ## Context
 

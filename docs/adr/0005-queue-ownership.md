@@ -1,8 +1,8 @@
-# Placeholder: Per-Queue Ownership, No Single Submit Thread
+# ADR-0005: Per-Queue Ownership, No Single Submit Thread
 
-**Date**: pending (owner decision 2026-11-08, Q02.4)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Concurrency work page](../plan/work/concurrency-fibers.md)
+**Date**: 2026-11-08 (owner, Q02.4)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84), [affine threads design](../architecture/affine-thread-design.md), applied in PRs [#159](https://github.com/Heliogrim/Heliogrim-Engine/pull/159) and [#164](https://github.com/Heliogrim/Heliogrim-Engine/pull/164)
 
 ## Context
 
@@ -18,6 +18,7 @@ There is no single submit thread. Each `VkQueue` has exactly one owner at a time
 
 - **Pros**: no queue locks anywhere.
 - **Cons**: serialises all submission through one thread; gives up a capability the API was chosen for.
+- **Why not**: the cost is paid on every frame, and the race it prevents is better caught by declared queue ownership.
 
 ## Consequences
 

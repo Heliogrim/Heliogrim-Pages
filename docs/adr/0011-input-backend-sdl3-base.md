@@ -1,8 +1,8 @@
-# Placeholder: SDL3 as Base Input Backend, Native Capability Side Channels
+# ADR-0011: SDL3 as Base Input Backend, Native Capability Side Channels
 
-**Date**: pending (exploration closed 2026-11-09)
-**Status**: placeholder, not yet processed in the engine project
-**Source**: [Input backends exploration](../architecture/input-exploration.md), chunk W39.0, question Q39.1
+**Date**: 2026-11-09 (owner, Q39.1; exploration closed)
+**Status**: accepted (recorded 2026-11-16)
+**Source**: [#119](https://github.com/Heliogrim/Heliogrim-Engine/issues/119), [input backends exploration](../architecture/input-exploration.md) (chunk W39.0)
 
 ## Context
 
