@@ -68,7 +68,7 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 - **Done when**: every engine shader compiles to SPIR-V, passes `spirv-val`, passes the GPU harness tests (W26.2; the same tests ran on the GLSL path before); `InterfaceDesc` is emitted per entry point; glslang and the GLSL emitter are removed ([design 7.8, 7.9](../../architecture/accel-lang-design.md#79-verification)).
 - **Result**: eleven signed commits on `feat/wip` `273094ef` (head `a944c909`), including a separate `fix(accel)` commit for `while` bodies that were never typechecked ([#202](https://github.com/Heliogrim/Heliogrim-Engine/issues/202)). All Done-when items met: the 21 engine shaders and every fixture compile and validate, Gpu.Test 33/33 unchanged, `InterfaceDesc` per entry, glslang out of build and vendor. Lang 603, Compile 47 pass. Every task and the whole branch reviewed (`/review-branch`, six lenses, one fix wave).
 - **Numbers for the PR** (Debug, 21 shaders, sum of min-of-5): GLSL path 143 ms compose plus 8549 ms glslang; SPIR-V path 252 ms compose including emit plus 90 ms `spirv-val` (Dev tier only). Module size 22374 words (glslang) to 21082 words. `spirv-opt` on the Build-tier output: performance recipe 17151 to 10786 words in 953 ms, size recipe 10681 words in 753 ms, all still valid; the Build tier stays without `spirv-opt` until the owner picks a list (design 7.7).
-- **Open for the owner**: run `spirv-val` in the shipped Build tier or not (security lens; design 7.4 says no); Dev-tier `OpName` still names generated `$` locals (design 7.5 says generated names stay unnamed); style residue in `Ir/Spirv/*` (access-label order, blank lines after guards, definition order); release validation and the editor build stay as in W26.2.
+- **Owner rulings (2026-11-17)**: `spirv-val` stays out of the shipped Build tier (design 7.4); Dev-tier `OpName` keeps the generated `$` locals (design 7.5); the Build tier ships with the `spirv-opt` performance recipe, and any other list is judged by GPU run time, not size or optimiser time (design 7.7, W11.7); a vendor directory without `CMakeLists.txt` fails the configure loudly. Style residue, the literal diagnostic span and the `impure()` index checks are fixed on the PR branch. Release validation and the editor build stay as in W26.2.
 
 ### W11.4 Uniformity and interface check passes · execute · after W11.3
 
@@ -105,6 +105,7 @@ Placement: `Engine.Accel.Lang/Ir/Spirv/`, `Engine.Accel.Lang/Ir/Pass/`, `Engine.
 
 - **Goal**: per-variant ISA statistics (registers, instruction count, occupancy) of the engine shaders from an offline ISA compiler, plus RGP captures, as the gate for every IR-level optimisation (reference downgrades of design 7.3, the Q11.3 semantic passes, `spirv-opt` choices). The tool's licence is checked against the no-licensed-software rule first.
 - **Output**: `architecture/accel-isa-measurement-exploration.md`; a repeatable measurement command.
+- **First question (owner, 2026-11-17)**: does the shipped `spirv-opt` performance recipe beat no optimisation and the size recipe on GPU run time and ISA statistics, per vendor, on the heavy engine shaders (`brdf.fs`, `gbuffer.fs`, the BRDF generators)? Timing comes from W26.4.
 
 ### W12.1 Pipeline kinds design · design · after W11.2 (interfaces), W14.1 (graph nodes), W11.5 (B4 for ray tracing)
 
