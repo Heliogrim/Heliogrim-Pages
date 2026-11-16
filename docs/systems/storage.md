@@ -1,9 +1,9 @@
 # Storage
 
-**Status**: <span class="hg-status accepted">implemented</span> for synchronous reads and writes. The async entry points exist as signatures only.
+**Status**: <span class="hg-status accepted">implemented</span> for synchronous reads and writes, and since PR [#180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) (merged into `feat/wip` 2026-11-16, `f9ee8b8f`) for async reads and writes on an IOCP thread. The sections below were verified at `273094ef` and still describe the sync path; the async path is summarised under Limits and in [storage design](../architecture/storage-design.md) 2.11.
 **Verified against**: engine commit [`273094ef`](https://github.com/Heliogrim/Heliogrim-Engine/tree/273094efc25f0c71471360f2170e6ad19275c032), the head of `feat/wip`, 2026-11-16. Not on `master` yet.
 **Modules** (see the [module map](../architecture/modules.md)): `Engine.Storage` (module), `Engine.Storage.Registry` (URLs, storages, repositories, providers), `Engine.Storage.System` (`StorageSystem`, request and query API), `Engine.Storage.Action` (actions, guards, stack cache), `Engine.Storage.Boot` (the resolvers that open blobs, packages and archives), `Engine.Storage.Package` (package read, write and commit), with `Engine.Resource.Blob`, `Engine.Resource.Package` and `Engine.Resource.Archive` as the data types.
-**Related**: [storage design](../architecture/storage-design.md) (sections 1.9 and 2.11 are the as-built notes), [storage exploration](../architecture/storage-exploration.md), [storage work page](../plan/work/storage-streaming.md), PRs [#169](https://github.com/Heliogrim/Heliogrim-Engine/pull/169) (stack cache, merged) and [#180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) (async IOCP path, open), issues [#24](https://github.com/Heliogrim/Heliogrim-Engine/issues/24) and [#166](https://github.com/Heliogrim/Heliogrim-Engine/issues/166).
+**Related**: [storage design](../architecture/storage-design.md) (sections 1.9 and 2.11 are the as-built notes), [storage exploration](../architecture/storage-exploration.md), [storage work page](../plan/work/storage-streaming.md), PRs [#169](https://github.com/Heliogrim/Heliogrim-Engine/pull/169) (stack cache, merged) and [#180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) (async IOCP path, merged), issues [#24](https://github.com/Heliogrim/Heliogrim-Engine/issues/24) and [#166](https://github.com/Heliogrim/Heliogrim-Engine/issues/166).
 
 ## Purpose
 
@@ -334,7 +334,7 @@ To look into the cache from a test, `StackCacheIntegration.cpp` reads `StorageSy
 
 ## Limits and known issues
 
-- **Synchronous only.** Every read blocks the calling worker on `std::fstream`. The async request path (`IoSystem`, IOCP backend, `IoFileBlob`, `WindowedBlob`, real `queryAsync`/`mutateAsync`) is in [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180), not merged at this commit. `Engine.IO.Dispatcher` holds only the `IoThread` skeleton and a `Dispatcher` stub; nothing starts or references them.
+- **Async path not re-verified here.** Since [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180) (`f9ee8b8f`), `StorageModule` owns an `IoSystem` (`Engine.IO.Dispatcher`) on the IO thread: local-file stages use `IoFileBlob` (one fiber park per read or write) while it runs and `LfsSyncBlob` after `stopIo()`; large archive ranges stream through `WindowedBlob` (8 MiB); `queryAsync`/`mutateAsync` run the call as a scheduler task. A query racing `stopIo` can still cache an IO-backed stage whose reads come back empty (`shortcut:` in `StorageModule::stopIo`).
 - **No game runtime storage.** `GameEngine` never calls `StorageModule::setup`.
 - **Shader reads go through storage but are untested in the editor.** `ShaderReadTest` covers `readTextViaStorage`; the editor shader-load check for [#24](https://github.com/Heliogrim/Heliogrim-Engine/issues/24) was still open when #169 merged.
 - **Count bound, not a budget.** 512 entries, LRU over unheld entries, `O(n)` scan on eviction (`shortcut:` in `StackCache::insert`).

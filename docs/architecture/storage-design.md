@@ -237,7 +237,7 @@ Checked on `feat/wip` at `027985d2`, after PR #169. Still true as written in sec
 
 ### 2.11 As built (W03.4, 2026-11-13)
 
-Engine branch `feat/async-storage` (8 commits, [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180)). Where the build departs from 2.2 to 2.10:
+Engine branch `feat/async-storage` (8 commits, [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180), merged into `feat/wip` 2026-11-16, head `f9ee8b8f`). Where the build departs from 2.2 to 2.10:
 
 - **`keepAlive` is `Arci<IoKeepAlive>`**, not `Arci<void>`, because an intrusive `Arci<void>` cannot exist. Callers derive from `IoKeepAlive`. The batch releases it when the batch resolves, not when each request completes.
 - **Aborted reads**: an `ERROR_OPERATION_ABORTED` that moved bytes reports `eShort` with the byte count. `eCancelled` always means zero bytes were written.
