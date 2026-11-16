@@ -59,19 +59,30 @@
 
 - **Done when**: nightly runs ASan+UBSan over all tests, libFuzzer over every loader for a fixed budget, and a performance scenario regresses and blocks with numbers in the log.
 
-### W26.1 GPU harness design page · design · ready
+### W26.1 GPU harness design page · design · done (design and W26.2 plan accepted by the owner 2026-11-15)
 
 - **Goal**: write the approved October design down (device per test, validation as leak check, FLIP comparison, per-implementation goldens, lavapipe in CI).
+- **Result (2026-11-14)**: [GPU test harness design](../../architecture/gpu-test-harness-design.md), from an owner conversation. It replaces the October spec. The function tier comes first; one contract for every implementation (no baselines per implementation); epsilon or comparison kernels; a report independent of gtest; shared shader functions may be included; target 1 s per test and 30 s per bundle. Q26.1: per test, with a global default. W26.4 and the shared probe mechanism split out.
+- **Result (2026-11-15)**: W26.2 plan, seven tasks (contracts, report with previous-run store, headless device and fixture, float target and readback, function tier entry point, `shared/pbr.asl` tests with the included-bindings check, timing). Untracked in the engine checkout: `docs/superpowers/plans/2026-11-15-gpu-function-harness.md`. Code checks for the design's open points: slicing drops unused `@input` bindings only when the spec names its target symbols, so the harness names `color` (`TmpBrdfLutPass` names none and keeps all); `shared/pbr.asl` declares no bindings; headless keeps the instance and device extension lists unchanged and only adds a selection branch that checks features and the float format, honours `HELIOGRIM_TEST_GPU`, and throws. The October triangle, depth and stencil checks are left out of W26.2.
 - **Output**: `architecture/gpu-test-harness-design.md`; plan.
 - **Questions**: Q26.1.
 
-### W26.2 Implement the harness and the five baseline shader tests · execute · after W26.1
+### W26.2 Implement the harness and the five baseline shader tests · execute · in review (branch `feat/gpu-function-harness`, head `c2c7ac87`, 2026-11-16; not pushed)
 
-- **Done when**: `brdf`, `gbuffer`, `predepth`, `sky`, `ui` render at 64x64 and match goldens locally.
+- **Done when** (rescoped 2026-11-14, see the design section 7): the function tier runs a first set of shading-function tests (a BRDF term at least) against contracts, and the report shows the result, both diffs and the failing inputs. The October triangle, depth and stencil checks are included if they fit.
+- **Result (2026-11-15)**: plan executed off `feat/wip` (`c80f3569`) in ten signed commits (head `af48c2d9`) on `feat/gpu-function-harness` (worktree `Heliogrim-CLion-wt/gpu-function-harness`), after the owner accepted the design and plan. New bundle `Engine.Graphics.Gpu.Test` (excluded from `Heliogrim-AllTests`, ctest label `gpu`): contracts (epsilon, relative, monotonic, slope, custom kernels), a YAML report with the previous passing run, a headless device per test with the validation layer as leak check, an RGBA32F target with readback, and `runFunction`. `shared/pbr.asl` checks pass for `ndfGgx`, `geoSchlickSmith`, `fresnelSchlick` and `disneyDiffuse` against CPU references from the cited papers (max error 3.6e-6 relative for GGX, 6e-8 absolute for the rest), and a changed exponent fails with its texels and inputs listed. Production change: `Application::setup(bool headless_ = false)`, a headless branch in `Device::setup()` that checks features and the float format, honours `HELIOGRIM_TEST_GPU` and throws `no GPU with these capabilities found`, and `Graphics::setupHeadless`/`destroyHeadless`. Timing (Debug, RX 9070 XT): function tests 540-940 ms, bundle 5.8 s for 32 tests (33 after the review fixes). `/review-branch` ran; its fixes are one extra commit on top, not folded into the original commits.
+- **Result (2026-11-16)**: a second fix wave (no throwing wait in teardown destructors, device rollback releases queues and allocator first, the extra device holders were its own queues and allocator) and a second `/review-branch`, whose accepted findings were fixed. All fixes are folded into their original commits: nine signed commits, head `c2c7ac87`, not pushed. Gpu.Test 33/33. Filed: [#192](https://github.com/Heliogrim/Heliogrim-Engine/issues/192) included `@input` bindings are not sliced (design 6.1), [#191](https://github.com/Heliogrim/Heliogrim-Engine/issues/191) compiler-stage diagnostics reach only the log.
+- **Open for the owner**: (1) the GPU tests need the validation layer and debug utils, which `Application` enables only in Debug, so the bundle fails in Release; (2) `Heliogrim-Editor` does not build on `feat/wip` (`EditorInit.cpp:40`, `initDefaultUi` undeclared); the owner runs the editor and fixes it centrally, until then the production device path is unchecked in the editor; (3) the deferred review items in the untracked `docs/superpowers/reviews/2026-11-1{5,6}-feat-gpu-function-harness.md` (in the worktree); (4) the design's 6.2 builder's calls; (5) push and PR into `feat/wip`.
 
 ### W26.3 Harness in CI on lavapipe · execute · after W26.2, W62.2
 
 - **Done when**: the five tests pass in CI with lavapipe goldens.
+
+### W26.4 Shader performance analysis adapter · design+plan+execute · after W26.2 (added 2026-11-14)
+
+- **Goal**: measure and optimise shader implementations, for example new shading functions written for materials, on the dispatches the harness already describes. Mainly a tool for the editor, not a gtest check. It needs GPU timing queries, readback, and pipeline state and ISA statistics from the driver (owner, 2026-11-14, split out of W26.1 to keep that scope small).
+- **Inputs**: the GPU harness design (W26.1): a test describes its dispatch, so timing can later wrap the same dispatch without rewriting the test. The Q11.3 measurement rule: own shader optimisations need numbers first.
+- **Open**: which driver interfaces provide the statistics (for example `VK_KHR_pipeline_executable_properties`, vendor tools), where the editor shows results, and how measurements stay stable enough to compare.
 
 ### W61.1 Logged bugs to issues and fixes · execute · in progress (12 of 25 fixed, 2 not bugs; no issues filed yet, checked 2026-11-13)
 

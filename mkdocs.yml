@@ -96,6 +96,7 @@ nav:
           - Affine threads: architecture/affine-thread-design.md
           - Task graph: architecture/task-graph-design.md
           - Worker policy: architecture/worker-policy-design.md
+          - GPU test harness: architecture/gpu-test-harness-design.md
           - Storage: architecture/storage-design.md
           - Accel Lang: architecture/accel-lang-design.md
           - Diagnostics: architecture/diagnostics-design.md
