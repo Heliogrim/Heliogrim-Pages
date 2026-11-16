@@ -10,6 +10,9 @@ The site reads like an engineering drawing set: bone-coloured paper (or obsidian
 
 A crescent inside a ring with four cardinal ticks: an eclipse, or a dial. Files: `assets/logo.svg` (header), `assets/favicon.svg`, `assets/dial.svg` (landing illustration, the same motif at large size). Plain geometric shapes, no third-party artwork. Always ember on dark or light backgrounds; do not recolour, outline, or add effects.
 
+!!! note "Superseded by the brand identity"
+    The owner accepted a refined mark and palette on 2026-11-16 in [Brand identity](brand-identity.md). This page still describes the site as built; its [site redesign brief](brand-identity.md#site-redesign-brief) lists what changes.
+
 !!! note "Refinement open"
     The mark is approved as a base. Candidates for refinement: optical balance of the crescent, tick length at 16 px, a stacked lockup with the wordmark. The brand image in the engine repository (`docs/brand.png`) was a prototype and is not the reference.
 

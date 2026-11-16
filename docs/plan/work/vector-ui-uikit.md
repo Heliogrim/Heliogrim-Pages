@@ -73,11 +73,13 @@ Placement: `Engine.Canvas/{CanvasCommand,CanvasBackend,AnimatedValue}`, `Engine.
 
 ### W43.1 Uikit design · design · after W43.0, W42.1
 
-- **Goal**: layout protocol and invalidation (#39, #43), stable identity, widget set, theming tokens, semantic tree, accessibility, data provisioning (#22).
+- **Goal**: layout protocol and invalidation (#39, #43, #10: today prefetch and compute run over every widget on both axes every frame), stable identity, widget set, theming tokens, semantic tree, accessibility, data provisioning (#22).
 - **Output**: `architecture/uikit-design.md`; plan grouped by issue cluster.
 - **Questions**: Q43.1.
 
 ### W43.2 Implement invalidation protocol and inputs (#27 to #36) · execute · after W43.1, W42.2
+
+- **Done when**: an unchanged frame lays out no widget (#10), render-version propagation stops early (#43), and the input widgets are uikit components.
 
 ### W43.3 Implement lists, trees, tables, docking, dialogs, menus, notifications · execute · after W43.2
 

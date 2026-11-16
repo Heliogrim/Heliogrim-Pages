@@ -100,11 +100,13 @@ nav:
           - Storage: architecture/storage-design.md
           - Accel Lang: architecture/accel-lang-design.md
           - Diagnostics: architecture/diagnostics-design.md
+          - Reflow and uikit runtime: architecture/uikit-design.md
       - Explorations:
           - Actor system: architecture/actor-system.md
           - Agent and player sync: architecture/agent-sync-exploration.md
           - Audio and DSP: architecture/audio-dsp.md
           - Bounding volumes: architecture/bounding-volumes.md
+          - Editor UI and UX: architecture/editor-ui-exploration.md
           - Engine loop: architecture/engine-loop-exploration.md
           - Engine stop teardown: architecture/engine-stop-teardown-exploration.md
           - Fiber scheduler iteration: architecture/fiber-scheduler-exploration.md
@@ -244,6 +246,7 @@ nav:
       - Writing an exploration: guides/writing-explorations.md
       - Writing an ADR: guides/writing-adrs.md
       - Design system: guides/design-system.md
+      - Brand identity: guides/brand-identity.md
   - Contribute:
       - contribute/index.md
       - Report a bug: contribute/report-a-bug.md

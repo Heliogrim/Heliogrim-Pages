@@ -1,0 +1,155 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Editor UI mockup: interaction-v3</title><style>body{margin:0;padding:24px;background:#16171a;color:#ececee;font:14px system-ui,sans-serif}h2{margin:0 0 4px}.subtitle{color:#9a9aa2;margin:0 0 18px}.mockup{border:1px solid #2e2e34;border-radius:8px;margin:12px 0;overflow:hidden}.mockup-header{padding:6px 10px;color:#9a9aa2;font-size:12px;border-bottom:1px solid #2e2e34}.mockup-body{padding:10px}</style><script>function toggleSelect(){}</script></head><body>
+<h2>v3: tabs, in-place editing, hover, menus</h2>
+<p class="subtitle">Four small views. Items tagged <b>guess</b> are my proposals.</p>
+
+<style>
+  .ed{font:12px/1.35 system-ui,sans-serif;color:#d4d7dd;background:#0e0f12;border-radius:8px;position:relative}
+  .ed *{box-sizing:border-box}
+  .row{display:flex}
+  .isl{background:#1b1d22;border-radius:9px;margin:3px;display:flex;flex-direction:column;overflow:hidden}
+  .ph{height:28px;display:flex;align-items:center;padding:0 10px;font-weight:600;font-size:11.5px;color:#c9cdd4}
+  .tag{font-size:9px;background:#5b4a1d;color:#f5d58a;border-radius:3px;padding:0 4px;margin-left:6px;font-weight:400}
+  /* tabs */
+  .tabs{height:34px;align-items:center;gap:4px;padding:0 10px}
+  .tab{padding:5px 11px;border-radius:6px;color:#8d939d;display:flex;gap:6px;align-items:center;cursor:pointer;transition:background .12s,color .12s}
+  .tab:hover{background:#17191d;color:#d4d7dd}
+  .tab.on{background:#1b1d22;color:#fff}
+  .tab svg{width:13px;height:13px}
+  .tab .c{opacity:0;margin-left:2px}
+  .tab:hover .c,.tab.on .c{opacity:.6}
+  .tbar{display:flex;gap:4px;padding:6px 8px;align-items:center}
+  .tbtn{height:24px;padding:0 9px;border-radius:5px;background:#24272d;display:flex;align-items:center;gap:5px;cursor:pointer;transition:background .12s}
+  .tbtn:hover{background:#2e323a}
+  .tbtn.on{background:#e8833a2a;color:#f3a46b}
+  /* tiles */
+  .t{width:96px;border-radius:7px;background:#23262c;overflow:visible;position:relative;cursor:pointer;transition:background .12s}
+  .t:hover{background:#2a2e35}
+  .pv{height:86px;display:flex;align-items:center;justify-content:center;position:relative}
+  .ball{width:58px;height:58px;border-radius:50%}
+  .ty{position:absolute;left:5px;bottom:4px;width:16px;height:16px;color:#cfd3da;opacity:.9}
+  .nm{padding:4px 7px 7px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c8cf}
+  .hov{position:absolute;left:104px;top:0;width:220px;background:#262930;border-radius:9px;box-shadow:0 10px 30px #000a;padding:10px 12px;font-size:11px;z-index:2}
+  .hov b{display:block;font-size:12px;margin-bottom:6px}
+  .hov .kv{display:flex;color:#8d939d;line-height:1.7}.hov .kv span:last-child{margin-left:auto;color:#d4d7dd}
+  /* menu */
+  .menu{width:236px;background:#23262c;border-radius:12px;padding:6px;box-shadow:0 14px 40px #000b,0 0 0 1px #ffffff0d;font-size:12.5px}
+  .mi{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:8px;color:#d4d7dd;cursor:pointer;transition:background .1s}
+  .mi:hover,.mi.on{background:#30343c}
+  .mi svg{width:15px;height:15px;opacity:.75}
+  .mi .k{margin-left:auto;font-size:11px;color:#7d838e}
+  .mi.dng{color:#ef7a73}.mi.dng:hover{background:#3a2426}
+  .mi.dis{color:#5e646d;cursor:default}.mi.dis:hover{background:none}
+  .sep{height:1px;background:#ffffff0f;margin:5px 8px}
+  .mh{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#6c727c;padding:6px 10px 3px}
+  .cur{display:inline-flex;gap:6px;align-items:center;background:#24272d;border-radius:5px;padding:4px 9px;margin:3px}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-mat" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 6.5c2 1.5 6 1.5 8 0" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-img" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 12l4-4 3 3 2-2 2 2" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-geo" viewBox="0 0 16 16"><path d="M8 2l5.5 3v6L8 14l-5.5-3V5z M8 8v6 M8 8l5.5-3 M8 8L2.5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-land" viewBox="0 0 16 16"><path d="M1.5 13l4-6 3 4 2-3 4 5z" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-snd" viewBox="0 0 16 16"><path d="M3 6v4h3l4 3V3L6 6z M12 6c1 1 1 3 0 4" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="5" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="9.5" y="9.5" width="5" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4.5c4 0 0 7 3 7" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-scene" viewBox="0 0 16 16"><path d="M2 12l6 2.5 6-2.5M8 2l6 3-6 3-6-3z" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-open" viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7 9M11 10v3H3V5h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-win" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 16 16"><path d="M3 13l1-3 7-7 2 2-7 7z" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 16 16"><rect x="5" y="5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 10V3h7" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-del" viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-ref" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5"/></symbol>
+</svg>
+
+<h3>1. Tabs are documents; each asset type opens its own editor <span class="tag">guess</span></h3>
+<div class="mockup"><div class="mockup-body" style="padding:0">
+  <div class="ed">
+    <div class="row tabs">
+      <div class="tab on"><svg><use href="#i-scene"/></svg>Sponza<span class="c">×</span></div>
+      <div class="tab"><svg><use href="#i-mat"/></svg>Brick_01<span class="c">×</span></div>
+      <div class="tab"><svg><use href="#i-geo"/></svg>Lion<span class="c">×</span></div>
+      <div class="tab"><svg><use href="#i-graph"/></svg>PlayerController<span class="c">×</span></div>
+      <div class="tab"><svg><use href="#i-snd"/></svg>Ambience Mixer<span class="c">×</span></div>
+      <div class="tab" title="New…"><svg><use href="#i-plus"/></svg></div>
+    </div>
+  </div>
+</div></div>
+<table style="width:100%;font-size:12.5px;border-collapse:collapse;margin-top:8px">
+  <tr style="color:#888"><td style="padding:4px 8px">Asset type</td><td>Opens as</td><td>Tab-specific tools (examples)</td></tr>
+  <tr><td style="padding:4px 8px">Scene</td><td>Scene editor</td><td>Select, transform gizmos, Add, Play</td></tr>
+  <tr><td style="padding:4px 8px">Material</td><td>Node graph + preview</td><td>Preview mesh, lighting, compile</td></tr>
+  <tr><td style="padding:4px 8px">Geometry</td><td>Model editor (model, sculpt, UV, skeleton)</td><td>Brushes, selection modes, symmetry</td></tr>
+  <tr><td style="padding:4px 8px">Texture, Video</td><td>Viewer</td><td>Channels, mips, compression, playback</td></tr>
+  <tr><td style="padding:4px 8px">Animation, Sequencer</td><td>Timeline</td><td>Keys, curves, tracks</td></tr>
+  <tr><td style="padding:4px 8px">Sound, SFX mixer</td><td>Waveform / mixer console</td><td>Clip markers, EQ and compressor bands</td></tr>
+  <tr><td style="padding:4px 8px">Node graph</td><td>Graph editor</td><td>Breakpoints, watch, step</td></tr>
+  <tr><td style="padding:4px 8px"><b>Landscape</b>, foliage</td><td><b>No own tab; edited in the scene</b></td><td>See 2</td></tr>
+</table>
+<p style="font-size:12.5px;color:#aaa">Open: double-click a tile; if the asset is already open, its tab is focused. Middle-click or drag a tab out to get a new OS window. Create: asset browser <i>Create ▸ category</i>, the <i>+</i> on the tab bar, or Ctrl K "new material". The asset appears in the current folder with its name being edited, then its tab opens.</p>
+
+<h3>2. Editing a landscape in place, inside the scene tab <span class="tag">guess</span></h3>
+<div class="mockup"><div class="mockup-body" style="padding:0">
+  <div class="ed row" style="height:250px;padding:4px">
+    <div class="isl" style="flex:1;position:relative;background:linear-gradient(#2a3442,#1d2128 55%,#3c4a2e 56%,#2b3522)">
+      <div class="tbar" style="position:absolute;top:4px;left:4px;right:4px;background:#15171bdd;border-radius:7px">
+        <span style="color:#8d939d;margin-right:6px">Editing <b style="color:#fff">Terrain_Main</b></span>
+        <div class="tbtn on">Sculpt</div><div class="tbtn">Smooth</div><div class="tbtn">Flatten</div><div class="tbtn">Paint layer</div><div class="tbtn">Foliage</div>
+        <div class="tbtn" style="margin-left:auto">Done <span style="color:#7d838e;font-size:10px">Esc</span></div>
+      </div>
+      <div style="position:absolute;left:46%;top:58%;width:90px;height:40px;border:2px solid #e8833a;border-radius:50%;box-shadow:0 0 0 14px #e8833a22"></div>
+    </div>
+    <div class="isl" style="width:200px">
+      <div class="ph">Brush</div>
+      <div style="padding:0 10px;color:#9aa0aa;line-height:2">Radius <span style="float:right;color:#ddd">12 m</span><br>Strength <span style="float:right;color:#ddd">0.4</span><br>Falloff <span style="float:right;color:#ddd">Smooth</span><br>Layer <span style="float:right;color:#ddd">Grass</span></div>
+    </div>
+  </div>
+</div></div>
+<p style="font-size:12.5px;color:#aaa">Selecting the landscape and pressing Enter, or double-clicking it, swaps the viewport toolbar and the properties panel to landscape tools. The rest of the scene stays visible and lit. Esc leaves.</p>
+
+<h3>3. Icon badges and hover details</h3>
+<div class="mockup"><div class="mockup-body" style="background:#1b1d22;padding:16px 16px 40px">
+  <div class="ed row" style="background:none;gap:10px">
+    <div class="t"><div class="pv"><div class="ball" style="background:radial-gradient(circle at 35% 30%,#e9c46a,#8a6a1c)"></div><svg class="ty"><use href="#i-mat"/></svg></div><div class="nm">Fabric - Weave 04</div>
+      <div class="hov"><b>Fabric - Weave 04</b>
+        <div class="kv"><span>Type</span><span>Material</span></div>
+        <div class="kv"><span>Path</span><span>Content/Materials/Fabric</span></div>
+        <div class="kv"><span>Size</span><span>1.4 MB</span></div>
+        <div class="kv"><span>Used by</span><span>3 assets</span></div>
+        <div class="kv"><span>Modified</span><span>today 14:02</span></div>
+        <div class="kv"><span>Tags</span><span>Fabric, Cloth</span></div></div></div>
+    <div style="width:230px"></div>
+    <div class="t"><div class="pv"><div style="width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:50px solid #7d8796"></div><svg class="ty"><use href="#i-geo"/></svg></div><div class="nm">Curtain_Mesh</div></div>
+    <div class="t"><div class="pv"><div style="width:56px;height:56px;background:#a2763f;border-radius:3px"></div><svg class="ty"><use href="#i-img"/></svg></div><div class="nm">Weave_Albedo</div></div>
+    <div class="t"><div class="pv"><svg style="width:50px;height:50px;color:#8fa36b"><use href="#i-land"/></svg><svg class="ty"><use href="#i-land"/></svg></div><div class="nm">Terrain_Main</div></div>
+  </div>
+</div></div>
+
+<h3>4. Context menu (roomy, HeroUI-like) and cursors</h3>
+<div class="mockup"><div class="mockup-body" style="background:#1b1d22;display:flex;gap:40px;align-items:flex-start">
+  <div class="menu">
+    <div class="mi on"><svg><use href="#i-open"/></svg>Open<span class="k">Enter</span></div>
+    <div class="mi"><svg><use href="#i-win"/></svg>Open in new window</div>
+    <div class="sep"></div>
+    <div class="mi"><svg><use href="#i-edit"/></svg>Rename<span class="k">F2</span></div>
+    <div class="mi"><svg><use href="#i-copy"/></svg>Duplicate<span class="k">Ctrl D</span></div>
+    <div class="mi"><svg><use href="#i-ref"/></svg>Find references</div>
+    <div class="mi dis"><svg><use href="#i-open"/></svg>Export…</div>
+    <div class="sep"></div>
+    <div class="mh">Create</div>
+    <div class="mi"><svg><use href="#i-mat"/></svg>Material<span class="k">›</span></div>
+    <div class="mi"><svg><use href="#i-plus"/></svg>More…<span class="k">›</span></div>
+    <div class="sep"></div>
+    <div class="mi dng"><svg><use href="#i-del"/></svg>Delete<span class="k">Del</span></div>
+  </div>
+  <div style="font-size:12.5px;line-height:1.6">
+    <b>Cursors</b> (hover the chips)<br>
+    <span class="cur" style="cursor:pointer">Button, tab, tile: pointer</span><br>
+    <span class="cur" style="cursor:text">Text field: I-beam</span><br>
+    <span class="cur" style="cursor:ew-resize">Number field: drag to scrub ↔</span><br>
+    <span class="cur" style="cursor:col-resize">Panel splitter: resize</span><br>
+    <span class="cur" style="cursor:grab">Tab or panel header: grab</span><br>
+    <span class="cur" style="cursor:not-allowed">Disabled or read-only: not-allowed</span>
+    <p style="color:#aaa">Hover on tabs, buttons, tiles and menu items: a quiet background lift (≈120 ms), no borders.</p>
+  </div>
+</div></div>
+</body></html>

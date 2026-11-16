@@ -1,0 +1,149 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Heliogrim identity preview</title><style>body{margin:0;padding:24px;background:#0b0b0d;color:#ececee;font:14px system-ui,sans-serif}h2{font-weight:600;margin:0 0 4px}.subtitle{color:#9a9aa2;margin:0 0 18px}</style></head><body>
+<h2>Heliogrim identity: final preview</h2>
+<p class="subtitle">Mark B, wordmark A and D, the engine splash, title bar, app icon, UI icon style and the hybrid palette, all on one page.</p>
+
+<style>
+  .hy{font:12px/1.4 system-ui,sans-serif;color:#ececee}
+  .pan{background:#111113;border-radius:12px;padding:16px;margin-bottom:16px}
+  .lab{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#75757e;margin:0 0 10px}
+  .rowx{display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+  .cell{display:flex;flex-direction:column;align-items:center;gap:6px;color:#75757e;font-size:10px}
+  .bg{background:#060607;border-radius:6px;padding:8px;display:flex;align-items:center;justify-content:center}
+  .app{background:linear-gradient(160deg,#1b1b1f,#0b0b0d);border-radius:22%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #ffffff12}
+  .wa{font-weight:300;letter-spacing:.42em}
+  .wd{font-weight:500;letter-spacing:.24em;text-transform:uppercase;line-height:1.15}
+  .wd small{display:block;font-size:.38em;letter-spacing:.5em;color:#75757e;margin-top:3px}
+  .splash{width:820px;max-width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;position:relative;background:#060607;box-shadow:0 24px 70px #000c,0 0 0 1px #ffffff10;margin:0 auto}
+  .art{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 78% 110%,#ff5a0fb0,#5a1405 42%,transparent 70%),radial-gradient(ellipse 55% 50% at 88% -12%,#5cc8ff55,#0c2638 48%,transparent 74%),linear-gradient(90deg,#060607 32%,transparent 70%)}
+  .dialart{position:absolute;right:-96px;top:50%;transform:translateY(-50%);width:560px;height:560px}
+  .lock{position:absolute;left:48px;top:50%;transform:translateY(-62%);display:flex;align-items:center;gap:20px}
+  .meta{position:absolute;left:48px;right:48px;bottom:26px;font-size:10.5px;color:#75757e;display:flex;flex-direction:column;gap:7px}
+  .pb{height:2px;background:#ffffff14;overflow:hidden}
+  .pb i{display:block;height:100%;width:40%;background:#5cc8ff99;animation:load 7s linear infinite}
+  @keyframes load{from{width:4%}to{width:100%}}
+  .row{display:flex}.row span:last-child{margin-left:auto}
+  .win{border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px #ffffff12;background:#0e0f12;width:100%;max-width:820px}
+  .tbar{height:34px;display:flex;align-items:center;gap:10px;padding:0 0 0 10px;background:#0b0b0d}
+  .tbar .menu span{margin-right:12px;color:#9a9aa2}
+  .tbar .search{margin:0 auto;width:300px;height:22px;border-radius:6px;background:#1b1b1f;display:flex;align-items:center;padding:0 9px;color:#75757e}
+  .tbar .search b{margin-left:auto;font-weight:400;font-size:10px;border:1px solid #3d3d44;border-radius:3px;padding:0 4px}
+  .tbar .wc{display:flex}.tbar .wc span{width:44px;height:34px;display:flex;align-items:center;justify-content:center;color:#9a9aa2}
+  .tbar .wc span:last-child:hover{background:#c42b1c;color:#fff}
+  .tabs{display:flex;gap:4px;padding:4px 10px;background:#0b0b0d}
+  .tab{padding:4px 11px;border-radius:6px;color:#75757e;display:flex;gap:6px;align-items:center}
+  .tab.on{background:#151518;color:#ececee;box-shadow:inset 0 -2px 0 #ff6a1f}
+  .taskbar{display:flex;gap:6px;background:#1b1b1f;border-radius:8px;padding:6px 10px;align-items:center}
+  .taskbar .tk{width:40px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative}
+  .taskbar .tk.on{background:#ffffff10}
+  .taskbar .tk.on::after{content:"";position:absolute;bottom:2px;width:14px;height:3px;border-radius:2px;background:#9a9aa2}
+  .ramp{display:flex;gap:3px;margin:4px 0 12px}
+  .ramp div{flex:1;height:38px;border-radius:5px;display:flex;flex-direction:column;justify-content:flex-end;padding:3px;font:9px ui-monospace,monospace;color:#fffb}
+  .ramp div.l{color:#000b}
+  .pl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9a9aa2}
+  .pl span{text-transform:none;letter-spacing:0;color:#75757e;margin-left:8px}
+  .ui{display:flex;gap:6px;flex-wrap:wrap}
+  .ui div{width:34px;height:34px;border-radius:7px;background:#1b1b1f;display:flex;align-items:center;justify-content:center;color:#c4c4ca}
+  .ui div.on{background:#ff6a1f22;color:#ff8a4a}
+  .ui svg{width:16px;height:16px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.two{grid-template-columns:1fr}}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="u-mat" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5c2 1.5 6 1.5 8 0" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="u-img" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 12l4-4 3 3 2-2 2 2" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="u-geo" viewBox="0 0 16 16"><path d="M8 2l5.5 3v6L8 14l-5.5-3V5z M8 8v6 M8 8l5.5-3 M8 8L2.5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="u-land" viewBox="0 0 16 16"><path d="M1.5 13l4-6 3 4 2-3 4 5z" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="u-snd" viewBox="0 0 16 16"><path d="M3 6v4h3l4 3V3L6 6z M12 6c1 1 1 3 0 4" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="u-graph" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="5" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="9.5" y="9.5" width="5" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4.5c4 0 0 7 3 7" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="u-scene" viewBox="0 0 16 16"><path d="M2 12l6 2.5 6-2.5M8 2l6 3-6 3-6-3z" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="u-raise" viewBox="0 0 16 16"><path d="M1.5 13c3 0 3-8 6.5-8s3.5 8 6.5 8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v3M6.5 3L8 1.5 9.5 3" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="u-smooth" viewBox="0 0 16 16"><path d="M1.5 10c2-3 4 1 6.5-1s4.5-2 6.5 0" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="u-tex" viewBox="0 0 16 16"><path d="M2 14l3-1 7.5-7.5-2-2L3 11z" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="4.5" height="4.5" rx="1" fill="currentColor" opacity=".7"/></symbol>
+  <symbol id="u-scatter" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/><circle cx="6" cy="6.5" r="1.2" fill="currentColor"/><circle cx="10" cy="7" r="1.2" fill="currentColor"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="u-open" viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7 9M11 10v3H3V5h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="u-del" viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="u-ref" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.4"/></symbol>
+</svg>
+
+<div class="hy">
+
+<div class="pan"><div class="lab">Engine splash</div><div class="splash">
+  <div class="art"></div>
+  <svg class="dialart" viewBox="0 0 400 400" fill="none"><defs><mask id="dc"><rect width="400" height="400" fill="#fff"/><circle cx="238" cy="162" r="84" fill="#000"/></mask><linearGradient id="dg" x1=".85" y1="0" x2=".15" y2="1"><stop offset="0" stop-color="#9fe0ff" stop-opacity=".8"/><stop offset=".3" stop-color="#5cc8ff" stop-opacity=".35"/><stop offset=".7" stop-color="#5cc8ff" stop-opacity=".04"/><stop offset="1" stop-color="#5cc8ff" stop-opacity="0"/></linearGradient></defs>
+    <g stroke="#9a9aa2" stroke-opacity=".28"><circle cx="200" cy="200" r="196" stroke-width="10" stroke-dasharray="2 15.1"/><circle cx="200" cy="200" r="178"/><circle cx="200" cy="200" r="138" stroke-dasharray="3 6"/><circle cx="200" cy="200" r="110"/><path d="M200 0v56M200 344v56M0 200h56M344 200h56" stroke-width="1.5"/></g>
+    <circle cx="200" cy="200" r="92" fill="#ff6a1f" mask="url(#dc)" opacity=".92"/><circle cx="200" cy="200" r="178" stroke="url(#dg)"/></svg>
+  <div class="lock"><span data-mark="62"></span><div><div class="wa" style="font-size:32px">HELIOGRIM</div><div style="font-size:10px;letter-spacing:.42em;color:#75757e;margin-top:6px">EDITOR</div></div></div>
+  <div class="meta"><div class="row"><span>Compiling shaders · 112 / 340</span><span>0.9.0-dev · feat/async-storage</span></div><div class="pb"><i></i></div><div class="row" style="font-size:9.5px;color:#55555d"><span>Sponza · Vulkan 1.4</span><span>© Heliogrim</span></div></div>
+</div></div>
+
+<div class="pan"><div class="lab">Title bar and tabs</div>
+  <div class="win">
+    <div class="tbar"><span data-mark="18"></span><div class="menu"><span>File</span><span>Edit</span><span>Actions</span><span>View</span><span>Settings</span></div><div class="search">Search actions, assets, anything…<b>Ctrl K</b></div><div class="wc"><span>—</span><span>☐</span><span>✕</span></div></div>
+    <div class="tabs"><div class="tab on"><svg width="13" height="13"><use href="#u-scene"/></svg>Sponza</div><div class="tab"><svg width="13" height="13"><use href="#u-mat"/></svg>Brick_01</div><div class="tab"><svg width="13" height="13"><use href="#u-graph"/></svg>PlayerController</div></div>
+    <div style="height:60px;background:#0e0f12"></div>
+  </div>
+</div>
+
+<div class="two">
+  <div class="pan"><div class="lab">App icon and taskbar</div>
+    <div class="rowx">
+      <div class="cell"><div class="app" style="width:128px;height:128px"><span data-mark="86"></span></div>app icon</div>
+      <div class="cell"><div class="taskbar"><div class="tk"><span style="width:22px;height:22px;border-radius:5px;background:#3b78d8;display:block"></span></div><div class="tk on"><div class="app" style="width:30px;height:30px;border-radius:7px"><span data-mark="24"></span></div></div><div class="tk"><span style="width:22px;height:22px;border-radius:5px;background:#3d3d44;display:block"></span></div></div>taskbar</div>
+    </div>
+  </div>
+  <div class="pan"><div class="lab">Mark sizes</div>
+    <div class="rowx"><div class="cell"><div class="bg"><span data-mark="128"></span></div>128</div><div class="cell"><div class="bg"><span data-mark="64"></span></div>64</div><div class="cell"><div class="bg"><span data-mark="48"></span></div>48</div><div class="cell"><div class="bg"><span data-mark="32"></span></div>32</div><div class="cell"><div class="bg"><span data-mark="24"></span></div>24</div><div class="cell"><div class="bg"><span data-mark="16"></span></div>16</div></div>
+  </div>
+</div>
+
+<div class="pan"><div class="lab">Wordmarks</div>
+  <div class="rowx" style="gap:40px">
+    <div class="cell"><div class="bg" style="padding:16px 22px;gap:16px"><span data-mark="44"></span><span class="wa" style="font-size:24px;color:#ececee">HELIOGRIM</span></div>A · splash, title, headers</div>
+    <div class="cell"><div class="bg" style="padding:16px 22px;gap:16px"><span data-mark="52"></span><span class="wd" style="font-size:22px;color:#ececee">Heliogrim<small>Engine · Editor</small></span></div>D · documents, installer, about</div>
+  </div>
+</div>
+
+<div class="pan"><div class="lab">UI icon style (16 px grid, 1.4 px stroke; placeholders until a licensed set is picked)</div>
+  <div class="ui"><div><svg><use href="#u-scene"/></svg></div><div><svg><use href="#u-mat"/></svg></div><div><svg><use href="#u-img"/></svg></div><div><svg><use href="#u-geo"/></svg></div><div><svg><use href="#u-land"/></svg></div><div><svg><use href="#u-snd"/></svg></div><div><svg><use href="#u-graph"/></svg></div><div class="on"><svg><use href="#u-raise"/></svg></div><div><svg><use href="#u-smooth"/></svg></div><div><svg><use href="#u-tex"/></svg></div><div><svg><use href="#u-scatter"/></svg></div><div><svg><use href="#u-open"/></svg></div><div><svg><use href="#u-ref"/></svg></div><div style="color:#f0555a"><svg><use href="#u-del"/></svg></div></div>
+</div>
+
+<div class="pan"><div class="lab">Palette</div>
+  <div class="pl">Coal neutrals<span>bases, surfaces, borders, text</span></div>
+  <div class="ramp"><div style="background:#060607">n0</div><div style="background:#0b0b0d">n1</div><div style="background:#111113">n2</div><div style="background:#151518">n3</div><div style="background:#1b1b1f">n4</div><div style="background:#232328">n5</div><div style="background:#2e2e34">n6</div><div style="background:#3d3d44">n7</div><div style="background:#55555d">n8</div><div style="background:#75757e">n9</div><div class="l" style="background:#9a9aa2">n10</div><div class="l" style="background:#c4c4ca">n11</div><div class="l" style="background:#ececee">n12</div></div>
+  <div class="pl">Ember<span>brand, primary action, active tab — rare</span></div>
+  <div class="ramp"><div style="background:#2a0e05">900</div><div style="background:#4d1907">800</div><div style="background:#7a2609">700</div><div style="background:#b5390d">600</div><div style="background:#ff6a1f">500</div><div class="l" style="background:#ff8a4a">400</div><div class="l" style="background:#ffab7a">300</div><div class="l" style="background:#ffd3b8">200</div></div>
+  <div class="pl">Frost<span>selection, focus, progress, links, info</span></div>
+  <div class="ramp"><div style="background:#06202f">900</div><div style="background:#0b3550">800</div><div style="background:#115079">700</div><div style="background:#1f7cb5">600</div><div class="l" style="background:#5cc8ff">500</div><div class="l" style="background:#86d7ff">400</div><div class="l" style="background:#b3e7ff">300</div><div class="l" style="background:#daf3ff">200</div></div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px"><div class="pl">Semantic</div><div class="ramp"><div style="background:#3fbf7f">success</div><div class="l" style="background:#f2c94c">warning</div><div style="background:#f0555a">danger</div><div class="l" style="background:#5cc8ff">info</div></div></div>
+    <div style="width:150px"><div class="pl">Axes</div><div class="ramp"><div style="background:#f0564f">X</div><div style="background:#7cc24f">Y</div><div style="background:#4a8ff0">Z</div></div></div>
+    <div style="flex:2;min-width:300px"><div class="pl">Data</div><div class="ramp"><div style="background:#ff6a1f">1</div><div class="l" style="background:#5cc8ff">2</div><div class="l" style="background:#e2b84a">3</div><div class="l" style="background:#3fbf7f">4</div><div style="background:#a78bfa">5</div><div style="background:#f472b6">6</div><div class="l" style="background:#2dd4bf">7</div><div class="l" style="background:#94a3b8">8</div></div></div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  let uid=0;
+  const V={cr:.68,hair:.14,glint:.88};
+  function mark(s){
+    const id='fm'+(uid++), c=s/2;
+    const w = s>=48?1.25:1;
+    const r=c-1-w/2, R=r*V.cr, mx=c+R*0.30, my=c-R*0.25, mr=R*0.80;
+    const ringW = s<=16?1.5:w;
+    return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" style="display:block">
+      <defs>
+        <mask id="${id}m"><rect width="${s}" height="${s}" fill="#fff"/><circle cx="${mx}" cy="${my}" r="${mr}" fill="#000"/></mask>
+        <linearGradient id="${id}e" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ff5a0f"/><stop offset="1" stop-color="#ff8a4a"/></linearGradient>
+        <linearGradient id="${id}g" x1=".85" y1="0" x2=".15" y2="1"><stop offset="0" stop-color="#9fe0ff" stop-opacity="${V.glint}"/><stop offset=".35" stop-color="#5cc8ff" stop-opacity=".22"/><stop offset=".55" stop-color="#5cc8ff" stop-opacity="0"/></linearGradient>
+      </defs>
+      <circle cx="${c}" cy="${c}" r="${R}" fill="url(#${id}e)" mask="url(#${id}m)"/>
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#9a9aa2" stroke-opacity="${s<=16?V.hair+.06:V.hair}" stroke-width="${ringW}"/>
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#${id}g)" stroke-width="${ringW+(s>=48?.4:.2)}"/>
+    </svg>`;
+  }
+  document.querySelectorAll('[data-mark]').forEach(e=>{e.innerHTML=mark(+e.dataset.mark);});
+})();
+</script>
+</body></html>
