@@ -1,4 +1,4 @@
-/* Heliogrim identity: obsidian masthead, bone paper, one ember accent, hairline rules, square corners. */
+/* Heliogrim identity (guides/brand-identity.md): coal masthead and dark mode, bone paper in light mode, ember rare, frost for links and state, hairline rules, square corners. */
 /* Fonts are self-hosted (SIL OFL 1.1, see assets/fonts/OFL-*.txt): no request leaves this site. */
 @font-face { font-family: "Barlow Condensed"; font-weight: 500; font-style: normal; font-display: block; src: url("../assets/fonts/barlow-condensed-latin-500-normal.woff2") format("woff2"); }
 @font-face { font-family: "Barlow Condensed"; font-weight: 600; font-style: normal; font-display: block; src: url("../assets/fonts/barlow-condensed-latin-600-normal.woff2") format("woff2"); }
@@ -12,7 +12,7 @@
 :root {
   --md-text-font: "IBM Plex Sans", system-ui, sans-serif;
   --md-code-font: "IBM Plex Mono", ui-monospace, monospace;
-  --hg-ember: #ff6a1a;
+  --hg-ember: #ff6a1f;
   --hg-display: "Barlow Condensed", "Arial Narrow", sans-serif;
 }
 [data-md-color-scheme="default"] {
@@ -23,31 +23,31 @@
   --md-default-fg-color--lightest: #d6d0c4;
   --md-code-bg-color: #ebe6db;
   --md-code-fg-color: #2a2622;
-  --md-typeset-a-color: #b83a04;
-  --md-accent-fg-color: #b83a04;
+  --md-typeset-a-color: #115079;
+  --md-accent-fg-color: #1f7cb5;
   --hg-rule: #d6d0c4;
   --hg-surface: #ebe6db;
 }
 [data-md-color-scheme="slate"] {
-  --md-default-bg-color: #12100e;
-  --md-default-fg-color: #ece6da;
-  --md-default-fg-color--light: #aaa397;
-  --md-default-fg-color--lighter: #756f65;
-  --md-default-fg-color--lightest: #2e2a25;
-  --md-code-bg-color: #1b1815;
-  --md-code-fg-color: #ddd6c8;
-  --md-typeset-a-color: #ff8a47;
-  --md-accent-fg-color: #ff8a47;
-  --md-footer-bg-color: #0c0a09;
-  --hg-rule: #2e2a25;
-  --hg-surface: #1b1815;
+  --md-default-bg-color: #111113;
+  --md-default-fg-color: #ececee;
+  --md-default-fg-color--light: #9a9aa2;
+  --md-default-fg-color--lighter: #75757e;
+  --md-default-fg-color--lightest: #2e2e34;
+  --md-code-bg-color: #1b1b1f;
+  --md-code-fg-color: #c4c4ca;
+  --md-typeset-a-color: #5cc8ff;
+  --md-accent-fg-color: #b3e7ff;
+  --md-footer-bg-color: #0b0b0d;
+  --hg-rule: #2e2e34;
+  --hg-surface: #1b1b1f;
 }
 [data-md-color-primary="custom"] {
-  --md-primary-fg-color: #14110f;
-  --md-primary-fg-color--light: #2a2622;
-  --md-primary-fg-color--dark: #0c0a09;
-  --md-primary-bg-color: #ece6da;
-  --md-primary-bg-color--light: #aaa397;
+  --md-primary-fg-color: #0b0b0d;
+  --md-primary-fg-color--light: #232328;
+  --md-primary-fg-color--dark: #060607;
+  --md-primary-bg-color: #ececee;
+  --md-primary-bg-color--light: #9a9aa2;
 }
 
 /* Masthead */
@@ -55,7 +55,7 @@
 .md-header__title { font-family: var(--hg-display); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: .95rem; }
 .md-header__button.md-logo img { height: 1.6rem; width: 1.6rem; }
 .md-header__button.hg-width { width: 2rem; height: 2rem; padding: .4rem; }
-.md-tabs { border-bottom: 1px solid #2a2622; }
+.md-tabs { border-bottom: 1px solid #232328; }
 .md-tabs__link { font-family: var(--hg-display); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; font-size: .8rem; opacity: .7; }
 .md-tabs__item--active .md-tabs__link, .md-tabs__link:hover { opacity: 1; }
 .md-tabs__item--active { box-shadow: inset 0 -2px 0 var(--hg-ember); }
@@ -86,22 +86,22 @@
 
 /* Status chips: <span class="hg-status exploration">exploration</span> */
 .hg-status { display: inline-block; font: 500 .6rem/1 "IBM Plex Mono", monospace; letter-spacing: .1em; text-transform: uppercase; padding: .3em .55em; border: 1px solid currentColor; vertical-align: .1em; white-space: nowrap; }
-.hg-status.exploration { color: #9a6000; }
-.hg-status.design { color: #1f7a80; }
-.hg-status.accepted { color: #2e7d32; }
+.hg-status.exploration { color: #7a5f00; }
+.hg-status.design { color: #115079; }
+.hg-status.accepted { color: #1f7a4d; }
 .hg-status.planned { color: var(--md-default-fg-color--lighter); border-style: dashed; }
 .hg-status.placeholder { color: #b3261e; }
-[data-md-color-scheme="slate"] .hg-status.placeholder { color: #ff8a80; }
+[data-md-color-scheme="slate"] .hg-status.placeholder { color: #f0555a; }
 .hg-status.closed, .hg-status.summary { color: var(--md-default-fg-color--lighter); }
-[data-md-color-scheme="slate"] .hg-status.exploration { color: #f0a82c; }
-[data-md-color-scheme="slate"] .hg-status.design { color: #4fc0c7; }
-[data-md-color-scheme="slate"] .hg-status.accepted { color: #6cc070; }
+[data-md-color-scheme="slate"] .hg-status.exploration { color: #f2c94c; }
+[data-md-color-scheme="slate"] .hg-status.design { color: #5cc8ff; }
+[data-md-color-scheme="slate"] .hg-status.accepted { color: #3fbf7f; }
 
 /* Buttons */
 .md-typeset .hg-btn { display: inline-block; font-family: var(--hg-display); font-weight: 600; font-size: .95rem; letter-spacing: .1em; text-transform: uppercase; padding: .55em 1.2em; border: 1px solid var(--md-default-fg-color); color: var(--md-default-fg-color); margin: 0 .5rem .5rem 0; transition: background .12s, color .12s; }
 .md-typeset .hg-btn:hover { background: var(--md-default-fg-color); color: var(--md-default-bg-color); }
-.md-typeset .hg-btn.primary { background: var(--hg-ember); border-color: var(--hg-ember); color: #14110f; }
-.md-typeset .hg-btn.primary:hover { background: #ff8a47; border-color: #ff8a47; color: #14110f; }
+.md-typeset .hg-btn.primary { background: var(--hg-ember); border-color: var(--hg-ember); color: #0b0b0d; }
+.md-typeset .hg-btn.primary:hover { background: #ff8a4a; border-color: #ff8a4a; color: #0b0b0d; }
 
 /* Landing */
 .hg-hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 2rem; align-items: center; padding: 3rem 0 2.5rem; border-bottom: 1px solid var(--hg-rule); background-image: linear-gradient(var(--hg-rule) 1px, transparent 1px), linear-gradient(90deg, var(--hg-rule) 1px, transparent 1px); background-size: 48px 48px; background-position: -1px -1px; }
@@ -145,20 +145,20 @@
 .hg-diagram-out { border: 1px solid var(--hg-rule); padding: .75rem; overflow: hidden; }
 .hg-diagram-out svg { display: block; margin: 0 auto; height: auto; max-height: min(28rem, 60vh); }
 .hg-inspect-btn { position: absolute; top: .35rem; right: .35rem; width: 1.7rem; height: 1.7rem; padding: .3rem; border: 1px solid var(--hg-rule); background: var(--md-default-bg-color); color: var(--md-default-fg-color--light); cursor: zoom-in; opacity: .55; transition: opacity .12s, color .12s; }
-.hg-figure:hover .hg-inspect-btn, .hg-inspect-btn:focus-visible { opacity: 1; color: var(--hg-ember); }
+.hg-figure:hover .hg-inspect-btn, .hg-inspect-btn:focus-visible { opacity: 1; color: var(--md-accent-fg-color); }
 .hg-inspect-btn svg { fill: currentColor; display: block; }
 /* No button until Mermaid has drawn: the empty placeholder is smaller than the button. */
 .hg-diagram-out:empty { min-height: 3rem; }
 .hg-diagram-out:empty + .hg-inspect-btn { display: none; }
 .hg-inspect { width: 95vw; height: 92vh; max-width: none; max-height: none; padding: 0; border: 1px solid var(--hg-rule); border-top: 2px solid var(--hg-ember); background: var(--md-default-bg-color); color: var(--md-default-fg-color); overflow: hidden; }
 .hg-inspect[open] { display: flex; flex-direction: column; }
-.hg-inspect::backdrop { background: rgba(12, 10, 9, .7); }
+.hg-inspect::backdrop { background: rgba(6, 6, 7, .7); }
 .hg-inspect__bar { display: flex; align-items: center; gap: .1rem; padding: .25rem .25rem .25rem .75rem; border-bottom: 1px solid var(--hg-rule); font: .62rem "IBM Plex Mono", monospace; color: var(--md-default-fg-color--lighter); }
 .hg-inspect__bar span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hg-inspect__bar i { width: 1px; height: 1.1rem; margin: 0 .3rem; background: var(--hg-rule); }
 .hg-inspect__bar button { width: 1.8rem; height: 1.8rem; padding: .35rem; border: 0; background: none; color: var(--md-default-fg-color--light); cursor: pointer; transition: color .12s, background .12s; }
 .hg-inspect__bar button svg { display: block; fill: currentColor; }
-.hg-inspect__bar button:hover, .hg-inspect__bar button:focus-visible { color: var(--hg-ember); background: var(--hg-surface); }
+.hg-inspect__bar button:hover, .hg-inspect__bar button:focus-visible { color: var(--md-accent-fg-color); background: var(--hg-surface); }
 .hg-inspect__stage { flex: 1; position: relative; overflow: hidden; cursor: grab; touch-action: none; }
 .hg-inspect__stage:active { cursor: grabbing; }
 .hg-inspect__stage > div { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
@@ -167,7 +167,7 @@
 /* Width mode: block (default, theme grid) or fluid (whole browser). Set on <html> before first paint. */
 [data-hg-width="fluid"] .md-grid { max-width: none; }
 .hg-width svg { fill: currentColor; }
-.hg-width[aria-pressed="true"] { color: var(--hg-ember); }
+.hg-width[aria-pressed="true"] { color: var(--md-accent-fg-color); }
 @media (max-width: 60em) { .hg-width { display: none; } }
 
 /* Module map */

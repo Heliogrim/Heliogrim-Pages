@@ -8,8 +8,8 @@ copyright: Heliogrim &middot; <a href="/Heliogrim-Pages/legal/privacy/">Privacy<
 theme:
   name: material
   custom_dir: overrides
-  logo: assets/logo.svg
-  favicon: assets/favicon.svg
+  logo: assets/brand/mark.svg
+  favicon: assets/brand/mark-16.svg
   font: false
   palette:
     - media: "(prefers-color-scheme: dark)"
@@ -243,7 +243,7 @@ nav:
       - Working on these docs: guides/docs-workflow.md
       - Writing an exploration: guides/writing-explorations.md
       - Writing an ADR: guides/writing-adrs.md
-      - Design system: guides/design-system.md
+      - Site design system: guides/design-system.md
       - Brand identity: guides/brand-identity.md
   - Contribute:
       - contribute/index.md

@@ -1,35 +1,35 @@
-# Design System and Identity
+# Site Design System
 
-How this site looks and why. Source of truth: `docs/stylesheets/heliogrim.css`, `overrides/main.html`, `docs/assets/`. Change those and this page together.
+How the docs site applies the [brand identity](brand-identity.md). The brand page wins on the mark, palette and colour rules; this page records only how the site implements them. Source of truth for the implementation: `docs/stylesheets/heliogrim.css`, `docs/javascripts/diagrams.js`, `overrides/main.html`, `docs/assets/`. Change those and this page together.
 
 ## Idea
 
-The site reads like an engineering drawing set: bone-coloured paper (or obsidian in dark mode), hairline rules, square corners, one hot colour. The accent is **ember**, used for the few things that matter: the masthead rule, section markers, active tab, primary actions. If everything glows, nothing does.
+The site reads like an engineering drawing set: bone-coloured paper in light mode, coal in dark mode, hairline rules, square corners. **Ember** is rare, as in the brand: the masthead rule, section markers, the active tab, primary buttons, index numbers. **Frost** is state: links, hover and focus, pressed toggles. Aligned with the brand on 2026-11-16 (owner choices: frost links, bone paper kept).
 
-## Logo
+## Mark
 
-A crescent inside a ring with four cardinal ticks: an eclipse, or a dial. Files: `assets/logo.svg` (header), `assets/favicon.svg`, `assets/dial.svg` (landing illustration, the same motif at large size). Plain geometric shapes, no third-party artwork. Always ember on dark or light backgrounds; do not recolour, outline, or add effects.
-
-!!! note "Superseded by the brand identity"
-    The owner accepted a refined mark and palette on 2026-11-16 in [Brand identity](brand-identity.md). This page still describes the site as built; its [site redesign brief](brand-identity.md#site-redesign-brief) lists what changes.
-
-!!! note "Refinement open"
-    The mark is approved as a base. Candidates for refinement: optical balance of the crescent, tick length at 16 px, a stacked lockup with the wordmark. The brand image in the engine repository (`docs/brand.png`) was a prototype and is not the reference.
+The brand [mark](brand-identity.md#mark): `assets/brand/mark.svg` in the header, `assets/brand/mark-16.svg` as favicon. The masthead is coal in both modes, so the mark always sits on dark. `assets/dial.svg` is the landing illustration, coloured as the splash art: grey line work, ember eclipse, frost glint on the outer ring. Do not recolour, outline, or add effects.
 
 ## Colour
 
 | Token | Light | Dark | Use |
 |-------|-------|------|-----|
-| Paper `--md-default-bg-color` | `#f4f1ea` | `#12100e` | Page |
-| Surface `--hg-surface` | `#ebe6db` | `#1b1815` | Table heads, code, callouts, hover |
-| Ink `--md-default-fg-color` | `#1b1917` | `#ece6da` | Text |
-| Ink light | `#5f594f` | `#aaa397` | Secondary text |
-| Rule `--hg-rule` | `#d6d0c4` | `#2e2a25` | Hairlines |
-| Ember `--hg-ember` | `#ff6a1a` | `#ff6a1a` | Accent fills and rules |
-| Link | `#b83a04` | `#ff8a47` | Text links (darker in light mode for contrast) |
-| Masthead | `#14110f` | `#14110f` | Header, both modes |
+| Paper `--md-default-bg-color` | `#f4f1ea` | n2 `#111113` | Page |
+| Surface `--hg-surface` | `#ebe6db` | n4 `#1b1b1f` | Table heads, code, callouts, hover |
+| Ink `--md-default-fg-color` | `#1b1917` | n12 `#ececee` | Text |
+| Ink light | `#5f594f` | n10 `#9a9aa2` | Secondary text |
+| Ink lighter | `#8a8378` | n9 `#75757e` | Muted text, closed and planned chips |
+| Rule `--hg-rule` | `#d6d0c4` | n6 `#2e2e34` | Hairlines |
+| Ember `--hg-ember` | `#ff6a1f` | `#ff6a1f` | Ember 500: accent fills and rules |
+| Link `--md-typeset-a-color` | frost 700 `#115079` | frost 500 `#5cc8ff` | Text links (darker on paper for contrast, about 7.6:1) |
+| State `--md-accent-fg-color` | frost 600 `#1f7cb5` | frost 300 `#b3e7ff` | Hover, focus, pressed toggles |
+| Masthead | n1 `#0b0b0d` | n1 `#0b0b0d` | Header, both modes |
 
-Status colours (chips): exploration amber, design teal, accepted green, planned dashed grey, placeholder red. Always paired with the word, never colour alone.
+The light mode keeps the bone paper; the coal ramp is dark-only. Neutral names (n0 to n12) and ramps are on the [brand page](brand-identity.md#palette).
+
+Status chips use the brand's semantic set: exploration warning yellow, design info frost, accepted success green, placeholder danger red, planned dashed grey, closed and summary muted. Dark mode uses the brand values (`#f2c94c`, `#5cc8ff`, `#3fbf7f`, `#f0555a`); light mode uses darker steps of the same hues (`#7a5f00`, `#115079`, `#1f7a4d`, `#b3261e`) for contrast on paper. Always paired with the word, never colour alone.
+
+Diagrams: node fill is the surface, node borders are neutral (`#55555d` dark, `#8a8378` light), not ember.
 
 ## Type
 

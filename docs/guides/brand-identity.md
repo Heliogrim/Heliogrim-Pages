@@ -1,6 +1,6 @@
 # Brand Identity
 
-**Status**: accepted by the owner on 2026-11-16 (editor UI brainstorm). This is the source of truth for the Heliogrim mark, palette, wordmarks and splash. The [site design system](design-system.md) still describes the current docs site; aligning the site with this page is open work (see [Site redesign brief](#site-redesign-brief)).
+**Status**: accepted by the owner on 2026-11-16 (editor UI brainstorm). This is the source of truth for the Heliogrim mark, palette, wordmarks and splash. The docs site follows it since 2026-11-16; how is recorded in the [site design system](design-system.md) (see [Site redesign brief](#site-redesign-brief)).
 
 **Preview**: [identity-preview.html](../assets/brand/identity-preview.html) shows everything on this page in one place: splash, title bar, app icon, mark sizes, wordmarks, UI icon style and palette. The editor UI mockups behind it are listed in the [editor UI exploration](../architecture/editor-ui-exploration.md).
 
@@ -83,15 +83,15 @@ The footer makes the splash useful on the test bench. The final art, the editor 
 
 ## Site redesign brief
 
-What the docs site needs in order to follow this identity. To be worked through in its own session; nothing here is changed yet.
+What the docs site needed in order to follow this identity. Done on 2026-11-16; the owner chose frost for links and focus and kept the bone paper. The [site design system](design-system.md) has the resulting tokens.
 
-| Area | Site today ([design system](design-system.md)) | Target |
-|------|-----------------------------------------|--------|
+| Area | Site before | Target (done) |
+|------|-------------|---------------|
 | Logo, favicon | All-ember crescent, ring and four ticks | Mark above: no ticks, grey hairline with frost glint (`mark.svg`, `mark-16.svg`) |
 | Dark mode | Obsidian `#12100e`, warm surfaces `#1b1815`, rule `#2e2a25` | Coal neutrals (cool, near-black): page n2 or n3, surfaces n4 and n5, rules n6 |
 | Accent | Ember `#ff6a1a` | Ember 500 `#ff6a1f` with the same "rare" rule |
-| Links, selection, focus | Ember-derived link colours | Decide: frost for links and focus (consistent with the editor) or keep ember links on the site |
-| Light mode | Bone paper `#f4f1ea` | Open: keep paper and use the all-ember mark fallback, or define light coal neutrals |
+| Links, selection, focus | Ember-derived link colours | Frost for links and focus, consistent with the editor (owner) |
+| Light mode | Bone paper `#f4f1ea` | Keep the bone paper (owner); the masthead stays coal, so the mark needs no light fallback |
 | Status chips | Amber, teal, green, grey, red | Map to the semantic set; keep the word in every chip |
 | Masthead | `#14110f` | n1 |
 | Type | Barlow Condensed, IBM Plex Sans and Mono | Unchanged unless the editor font decision picks Inter |
