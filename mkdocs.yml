@@ -206,6 +206,17 @@ nav:
           - ASL language: systems/accel/asl.md
           - IR and passes: systems/accel/ir.md
           - Compiler integration: systems/accel/compiler.md
+      - Scheduler:
+          - systems/scheduler/index.md
+          - Fibers and workers: systems/scheduler/fibers-and-workers.md
+          - Waitables: systems/scheduler/waitables.md
+          - Futures: systems/scheduler/futures.md
+          - Affine threads: systems/scheduler/affine-threads.md
+          - Task graph: systems/scheduler/task-graph.md
+      - Storage: systems/storage.md
+      - Diagnostics: systems/diagnostics.md
+      - Actors: systems/actors.md
+      - GPU test harness: systems/gpu-test-harness.md
       - Render graph: systems/render-graph.md
       - Micropoly renderer: systems/micropoly-renderer.md
       - Animation pipeline: systems/animation-pipeline.md

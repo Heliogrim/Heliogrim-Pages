@@ -317,18 +317,19 @@ Today the frame end sets `_stopped` while other `complete()` calls may still be 
 Protocol (one atomic, so a call never touches `this` after its decrement unless it is the releaser):
 
 1. `complete()` enters with `_activeCalls.fetch_add(1)`, as today.
-2. The frame end under `_stopping` (`prevRemaining == 1`) clears `_stopping` and does `_activeCalls.fetch_or(kStopped)` instead of `_stopped.set()`. It is itself still counted, so the bit is set while the count is at least 1.
-3. Every call leaves with `prev = _activeCalls.fetch_sub(1, acq_rel)`. Exactly one call sees `prev == (kStopped | 1)`: after the bit is set no new `complete()` can start (the frame has ended and was not restarted), so the count only falls. That call calls `_stopped.set()` as its last access (the `Signal` destroy rule allows destruction while `set()` unwinds).
+2. The frame end under `_stopping` (`prevRemaining == 1`) clears `_stopping` and does `_activeCalls.fetch_or(stoppedBit)` instead of `_stopped.set()`. It is itself still counted, so the bit is set while the count is at least 1.
+3. Every call leaves with `prev = _activeCalls.fetch_sub(1, acq_rel)`. Exactly one call sees `prev == (stoppedBit | 1)`: after the bit is set no new `complete()` can start (the frame has ended and was not restarted), so the count only falls. That call calls `_stopped.set()` as its last access (the `Signal` destroy rule allows destruction while `set()` unwinds).
 4. `stop()` does `_stopped.wait()`, stores 0 into `_activeCalls` and re-arms `_stopped`, as today.
 
-A call that drains to zero before the frame end has set the bit sees `prev == 1` and leaves; the frame-ending call is counted after it and becomes the releaser. `acq_rel` on the leaving decrement chains every call's pipeline accesses into the releaser, and `set()`/`wait()` hands them to `stop()`. `kStopped = 1u << 31`; the count of concurrent calls is bounded by the worker count.
+A call that drains to zero before the frame end has set the bit sees `prev == 1` and leaves; the frame-ending call is counted after it and becomes the releaser. `acq_rel` on the leaving decrement chains every call's pipeline accesses into the releaser, and `set()`/`wait()` hands them to `stop()`. `stoppedBit = 1u << 31`; the count of concurrent calls is bounded by the worker count.
 
 Model: `CompositePipeline.tla` gains the counter, the bit and a stopper that waits for the release; invariant "after the release no worker is inside a call"; mutations (a) the old protocol, `_stopped` set at the frame end, and (b) reading the bit in a load after the decrement, must both fail it. The model header's assumption "stop() waits for in-flight calls, steps after the last counter operation are not modelled" is replaced by the check.
 
 ### 13.2 Tests
 
 - `CompositePipeline` stop tests stay green on several workers; a stop from a fiber and from a plain thread (both exist) now never yield.
-- No new test for the swapchain (no GPU harness); the build and the editor run cover it.
+- No swapchain test (no GPU harness). The invariant the assert rests on (a ring of capacity N holds N − 1, so the swapchain's ring of 3 holds its two images) is pinned by `AsyncRingBuffer.CapacityThreeHoldsTwo`.
+- No gtest for a frame-ending call that is not the last to leave `complete()`: no stage body can hold a runner call inside `complete()`, so it would need a test hook in the runner. `CompositePipeline.tla`'s `NoCallAfterRelease` covers that interleaving, and mutations (c) and (d) show it catches the bug.
 - Done-when grep: no `yield()` loop in a wait under `src/` outside `*.Test/`.
 
 ### 13.3 Decisions made in this section (for review)
@@ -336,7 +337,8 @@ Model: `CompositePipeline.tla` gains the counter, the bit and a stopper that wai
 1. The deprecated atomic-flag `await` is deleted, not ported: no caller is left (amends decision 12.6).
 2. `stop()` parks once; the in-flight drain moves into the `_activeCalls` word (13.1).
 3. The swapchain spin is an invariant check, not a wait (amends decision 12.7).
+4. `JoinCounter` is not reused for the drain (branch review 2026-11-14, owner agreed). `JoinCounter::wait()` drops the creator's guard itself, but here the guard must drop at the frame end, never in `stop()`: dropped in `stop()`, the count can reach zero between two `complete()` calls while the frame still runs. Reuse would split `wait()` into a release and a wait and add a `reset()`, changing a model-checked primitive (`JoinCounter.tla`) that other code relies on, for no saved code.
 
 ### 13.4 As built (2026-11-13)
 
-Built as written on engine branch `refactor/park-polling-waits` (`3d203483`, `6dccb990`, `e217a7f5`). The frame-end `fetch_or` is relaxed: the releaser's `acq_rel` `fetch_sub` is a later read-modify-write on the same word and sees it. `CompositePipeline.tla` passes at 3 workers (29,038 distinct states); mutations (c) release at the frame end and (d) bit read after the decrement both fail `NoCallAfterRelease`. Not run with real presentation: the release build's swapchain path.
+Built as written on engine branch `refactor/park-polling-waits` (now `754e2939`, `38bdb1cc`, `a1e091b2`, plus tests `235df4ba`, `95ed5260`, after the 2026-11-14 review). The frame-end `fetch_or` is relaxed: the releaser's `acq_rel` `fetch_sub` is a later read-modify-write on the same word and sees it. `CompositePipeline.tla` passes at 3 workers (28,975 distinct states after the review tightened the frame bound); mutations (c) release at the frame end and (d) bit read after the decrement fail `NoCallAfterRelease`, (e) no stop bit at the frame end deadlocks. The swapchain `assertrt` replaces both the debug `breakpoint` and the release spin, so every build runs it; the owner's 2026-11-14 editor run reached it every viewport frame through shutdown. PR [#185](https://github.com/Heliogrim/Heliogrim-Engine/pull/185) into `feat/wip`.
