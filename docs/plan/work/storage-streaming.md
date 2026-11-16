@@ -78,12 +78,12 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 - **Output**: `architecture/storage-design.md` main section; plan.
 - **Questions**: Q03.2.
 
-### W03.4 Implement async storage · execute · done 2026-11-16 (merged into `feat/wip` by [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180)); editor run open
+### W03.4 Implement async storage · execute · done 2026-11-16 (merged into `feat/wip` by [PR #180](https://github.com/Heliogrim/Heliogrim-Engine/pull/180)); editor run done
 
 - **Result**: engine branch `feat/async-storage` (from `feat/wip` at `027985d2`): `IoSystem` with IOCP and blocking backends, four priority levels per queue, FIFO batch futures, tag cancellation through `CancelIoEx`, a draining `stop()`, `IoFileBlob` and `WindowedBlob` (8 MiB), local-file stages on the IO thread with a sync fallback, `StorageModule` ownership, `queryAsync`/`mutateAsync`. Tests: IO.Dispatcher 17, Storage 110, Storage.Package 7. A whole-branch review (six lenses) found two blockers from untrusted package ranges, both fixed (archive ranges are validated against the package size). Throughput (Debug, page-cached, 5900X): 64 KiB IOCP 3,855 vs blocking 4,299 MiB/s; 1 MiB 5,695 vs 5,158 MiB/s. This measures dispatch overhead, not the drive, so Q03.5 (in-flight cap) stays at 64 and moves to W03.5. As-built deviations: [storage design](../../architecture/storage-design.md) 2.10.
 - **Result (head)**: `384baadc`. The final review's shutdown-ordering regression is fixed: `StorageModule::stopIo` now stops the IO thread first and then clears the stack cache, so queries that start after the stop resolve sync stages. A query already past the IO check can still cache an IO-backed stage after the clear (its reads come back empty); this is noted as a `shortcut:` in the code. The IOCP backend now registers each slot before it issues the read.
 - **Merged**: PR #180 landed in `feat/wip` on 2026-11-16 (head `f9ee8b8f`, not yet on `master`).
-- **Open**: the editor was never run, and it does not build on `feat/wip` (`EditorInit.cpp:40`).
+- **Editor run**: done by the owner before the merge (2026-11-16).
 - **Scope (owner, 2026-11-13)**: `StorageRegistry::removeProvider`/`removeRepository` keep their `todo_panic` for now; they are registry removal, not the request path, and nothing calls them. The "no `todo_panic` in storage" clause below covers the query and mutation path only.
 
 - **Plan**: engine checkout `docs/superpowers/plans/2026-11-09-async-storage-iocp.md` (5 tasks), revised 2026-11-13 against the merged stack cache ([storage design](../../architecture/storage-design.md) 2.10: branch base `feat/wip`, archive stages already per query, no `IoFile` on `LocalFileStorage`, `FILE_SHARE_DELETE` and `OPEN_EXISTING` for reads, `InheritMeta` blobs, `Context::io`). Executed subagent-driven in the worktree `Heliogrim-CLion-wt/async-storage`; the editor start stays with the owner, next to the W03.2 editor check.
