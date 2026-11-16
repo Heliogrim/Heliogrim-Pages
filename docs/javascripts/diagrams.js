@@ -107,11 +107,11 @@
       themeVariables: {
         fontFamily: '"IBM Plex Sans", sans-serif',
         background: "transparent",
-        primaryColor: dark ? "#1b1b1f" : "#ebe6db",
-        primaryTextColor: dark ? "#ececee" : "#1b1917",
-        primaryBorderColor: dark ? "#55555d" : "#8a8378",
-        lineColor: dark ? "#9a9aa2" : "#5f594f",
-        edgeLabelBackground: dark ? "#111113" : "#f4f1ea",
+        primaryColor: dark ? "#1b1815" : "#ebe6db",
+        primaryTextColor: dark ? "#ece6da" : "#1b1917",
+        primaryBorderColor: dark ? "#756f65" : "#8a8378",
+        lineColor: dark ? "#aaa397" : "#5f594f",
+        edgeLabelBackground: dark ? "#12100e" : "#f4f1ea",
         clusterBkg: "transparent",
       },
     };

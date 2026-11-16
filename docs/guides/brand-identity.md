@@ -88,13 +88,13 @@ What the docs site needed in order to follow this identity. Done on 2026-11-16; 
 | Area | Site before | Target (done) |
 |------|-------------|---------------|
 | Logo, favicon | All-ember crescent, ring and four ticks | Mark above: no ticks, grey hairline with frost glint (`mark.svg`, `mark-16.svg`) |
-| Dark mode | Obsidian `#12100e`, warm surfaces `#1b1815`, rule `#2e2a25` | Coal neutrals (cool, near-black): page n2 or n3, surfaces n4 and n5, rules n6 |
+| Dark mode | Obsidian `#12100e`, warm surfaces `#1b1815`, rule `#2e2a25` | Kept warm (owner): the coal dark mode lost the site's feel, so the site keeps obsidian; coal is for the engine and editor |
 | Accent | Ember `#ff6a1a` | Site flips the roles (owner): frost 500 is the rare accent, ember 500 to 700 marks links and state |
 | Links, selection, focus | Ember-derived link colours | Ember for links and focus, frost for the accent (owner; the site's flip of the brand roles) |
 | Light mode | Bone paper `#f4f1ea` | Keep the bone paper (owner); the masthead stays coal, so the mark needs no light fallback |
 | Status chips | Amber, teal, green, grey, red | Map to the semantic set; keep the word in every chip |
-| Masthead | `#14110f` | n1 |
-| Type | Barlow Condensed, IBM Plex Sans and Mono | Unchanged unless the editor font decision picks Inter |
+| Masthead | `#14110f` | Kept `#14110f` with the warm neutrals |
+| Type | Barlow Condensed, IBM Plex Sans and Mono | Header title set as wordmark A in IBM Plex Sans 300; the rest unchanged unless the editor font decision picks Inter |
 | Landing illustration | `dial.svg` in ember and warm grey | Same dial, coloured as in the splash |
 
 Constraints that stay: square corners and no shadows on the site (the editor uses rounded islands; the site does not have to), self-hosted assets, OFL fonts, no external requests.
