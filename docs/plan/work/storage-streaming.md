@@ -90,7 +90,14 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 - **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` on the storage query and mutation path (registry removal excluded, see Scope).
 
-### W03.5 Codec and chunking benchmark · explore · in progress: drive half measured 2026-11-17; codec run waits for owner OK to read `assets/**`
+### W03.5 Codec and chunking benchmark · explore · done 2026-11-17; proposals await owner (chunk-size sweep not run)
+
+- **Result (codecs)**: the owner ran the 64 KiB codec benchmark ([storage exploration](../../architecture/storage-exploration.md) 6.2).
+  - The corpus has no BCn textures: all 985 MiB are raw RGBA8, RGBA16F and RGBA32F, none supercompressed.
+  - Ratios: zstd 19 reaches 1.60, libdeflate 12 1.58, GDeflate 12 1.58, zlib 9 1.53 and LZ4HC 1.29.
+  - CPU cost to decode at the drive ceiling: zstd 19 about 10 cores, LZ4HC about 1, GDeflate on the CPU about 25.
+  - Proposal for Q03.3: zstd per 64 KiB chunk, with the level chosen per asset class at cook time and raw storage for chunks that don't shrink; no second codec; no DirectStorage.
+  - The bigger lever is BCn encoding at import (4 to 8 times smaller). It needs its own chunk, and the codec choice should be re-checked on a BCn corpus.
 
 - **Result (drive half)**: [storage exploration](../../architecture/storage-exploration.md) section 6.
   - Samsung 970 NVMe, one IOCP thread, unbuffered: 64 KiB requests saturate at QD 8, at about 2.7 GiB/s. 256 KiB requests reach the 3.3 GiB/s ceiling at QD 4.
@@ -101,7 +108,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
     - Keep the 64 KiB compression unit, but coalesce IO requests to at least 256 KiB.
     - No DirectStorage backend now: its GPU path is D3D12-only and zstd on GPU is still a preview. Revisit when `VK_EXT_memory_decompression` is on AMD and NVIDIA.
   - The codec tool is built: zlib 1.3.1, libdeflate, GDeflate, LZ4 1.10.0 and zstd 1.5.7, 16 to 256 KiB chunks. Spike folder: engine checkout `docs/superpowers/spikes/w03-5-codec-io/` (untracked).
-  - The codec run is not done. It reads `assets/**`, which agents may not read. Q03.3 stays open until the owner runs `build.sh` or allows the read.
+  - The owner ran the codec benchmark, because it reads `assets/**`, which agents may not read. The chunk-size sweep (16 to 256 KiB) has not run; the 64 KiB unit rests on the drive numbers and the GPU tile limits.
 
 - **Goal**: measure no compression, zlib (vendored), LZ4, zstd and GDeflate (the format DirectStorage decompresses on the GPU; open specification, permissive reference implementation) on the project's assets at 64 KiB chunks; record each candidate's licence; decide the chunk size and whether DirectStorage PC's GPU decompression is worth a backend. Commercial codecs (Oodle) are out.
 - **Output**: results in `architecture/storage-exploration.md`; answers Q03.3 by measurement.

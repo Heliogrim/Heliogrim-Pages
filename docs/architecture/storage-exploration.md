@@ -59,7 +59,7 @@ Consequence for ordering: the first missing piece is not a Windows batching back
 
 ## 6. Codec, Chunk and Drive Measurements (W03.5, 2026-11-17)
 
-**Status**: the drive half is measured. The codec half is built but not run (see 6.2). The proposals below are not decided.
+**Status**: the drive and the 64 KiB codec run are measured. The chunk-size sweep has not run. The proposals below await the owner.
 
 ### 6.1 Drive: queue depth and unbuffered reads
 
@@ -89,15 +89,51 @@ Proposals for the owner:
 
 Not measured: the SATA SSD (X:, which holds the checkout), more than one IO thread, the engine's own `IoSystem` in Release, and the effect of the drive's write cache on reads.
 
-### 6.2 Codecs: not run yet
+### 6.2 Codecs at 64 KiB chunks
 
-The tool `codecbench` is built. It cuts each file into chunks (16 to 256 KiB) and compresses every chunk on its own. A chunk that does not shrink is stored raw. The tool verifies every round trip and reports the ratio per class (ktx, ktx2, other), the compression speed per thread, and decode speed on 1 and 12 threads. Configurations: none; zlib 1, 6 and 9; libdeflate 6 and 12; GDeflate 1, 6, 9 and 12; LZ4, LZ4HC 9 and 12; zstd 1, 3, 9 and 19.
+**Setup.** The tool `codecbench` cuts each file into independent 64 KiB chunks and compresses each chunk on its own. A chunk that does not shrink is stored raw. Every round trip is verified. Compression runs on 24 threads. Decoding is timed on 1 thread (best of 2) and on 12 threads, from memory and excluding IO. The owner ran it on 2026-11-17 over `assets/**`: 106 files, 985 MiB, clang-cl `/O2`, 5900X.
 
-**Why it did not run.** The benchmark reads the bytes of `assets/**`, and the project instructions forbid agents to read that folder. Auto mode refused the run. The owner either runs `build.sh` in the spike folder or allows the read; the run takes minutes.
+**The corpus has no block-compressed textures.** Every texture is raw:
 
-What is known without reading the content: the corpus is 986 MiB. Of that, 597 MiB is KTX2 (10 files), 386 MiB is KTX (23 files), and under 2 MiB is meshes and fonts. The tool also prints each KTX2 `supercompressionScheme`. If the KTX2 files already use zstd or Basis supercompression, a package codec on top gains almost nothing on them.
+- KTX2 (597 MiB): RGBA8 UNORM (3 files), R16 SFLOAT (4), RGBA16 SFLOAT (2) and RGBA32 SFLOAT (1). None uses supercompression.
+- KTX (386 MiB): sRGB8 alpha8 (12 files), RGBA8 (2), R16F (4), RGBA16F (4) and RGBA32F (1).
 
-Desk evidence on BCn data (cbloom 2020, Oodle test set, measured by the source): zstd-22 reaches 1.70:1, zlib-9 1.64:1 and LZ4HC 1.55:1. Rate-distortion-optimised (RDO) encoding multiplies these by about 1.65. BC7 without RDO compresses by under 10%. Microsoft's GACL (preview) claims up to 50% better zstd ratios through BCn bit shuffling, but the decoder undoes the shuffle only for BC1, BC3, BC4 and BC5 today. The likely conclusion for this corpus: texture encoding (RDO, stream splitting) matters more than the choice of codec. The run must confirm this.
+So the desk numbers for BCn data (cbloom: zstd-22 1.70, zlib-9 1.64, LZ4HC 1.55, about ×1.65 with RDO) do not describe this corpus.
+
+| Codec | Ratio | Compress MiB/s per thread | Decode MiB/s, 1 thread | Decode MiB/s, 12 threads | Cores to decode at the 3.3 GiB/s drive ceiling |
+|---|---|---|---|---|---|
+| none | 1.00 | n/a | n/a | n/a | 0 |
+| LZ4 | 1.16 | 140 | 3,930 | 25,238 | 1.0 |
+| LZ4HC 9 | 1.29 | 31 | 4,036 | 24,497 | 1.1 |
+| LZ4HC 12 | 1.29 | 15 | 3,885 | 20,928 | 1.1 |
+| zstd 1 | 1.40 | 127 | 1,152 | 7,781 | 4.1 |
+| zstd 3 | 1.47 | 79 | 956 | 6,417 | 5.2 |
+| zstd 9 | 1.54 | 25 | 814 | 5,202 | 6.4 |
+| zstd 19 | **1.60** | 3.6 | 555 | 3,583 | 9.7 |
+| zlib 6 (vendored) | 1.53 | 5.4 | 308 | 2,433 | 16.8 |
+| zlib 9 (vendored) | 1.53 | 5.0 | 303 | 2,550 | 17.1 |
+| libdeflate 6 | 1.54 | 47 | 448 | 3,738 | 11.6 |
+| libdeflate 12 | 1.58 | 9.8 | 437 | 3,780 | 12.2 |
+| GDeflate 6 (CPU) | 1.53 | 21 | 220 | 1,810 | 23.5 |
+| GDeflate 12 (CPU) | 1.58 | 4.5 | 217 | 1,789 | 24.6 |
+
+The last column is the drive rate (3,300 MiB/s compressed) times the ratio, divided by the single-thread decode speed. It is the CPU cost of streaming at full drive speed. The ratios by class are close to each other: KTX 1.59 and KTX2 1.61 with zstd 19. The 1.7 MiB of meshes and fonts reaches 2.4 but does not move the total.
+
+Findings:
+
+- **On this corpus, the codec is not the main lever; texture encoding is.** Raw RGBA8 and RGBA16F compress only 1.3 to 1.6 times with any codec. Encoding them to BC7 or BC6H at import would shrink them 4 times, or 8 times for BC1 and BC4, before any codec runs. Decide the codec again on a BCn corpus, after the texture import pipeline encodes block formats.
+- **zstd gives the best ratio and an ordinary decode cost.** Level 19 at cook time reaches 1.60, and decoding does not get slower as the level rises (555 against 1,152 MiB/s for level 1 on this float-heavy data). One codec with a cook-time level covers the whole range from LZ4-like speed to deflate-like size.
+- **LZ4HC is the cheap option**: 1.29 for about one core at full drive speed.
+- **Deflate is dominated.** zlib is slower than libdeflate at the same ratio. On the CPU, GDeflate decodes at half the speed of libdeflate at the same ratio. GDeflate pays off only with a GPU decoder (6.3).
+
+Proposal for **Q03.3**:
+- Use **zstd per 64 KiB chunk**. The level is chosen per asset class at cook time, 19 by default. A chunk that does not shrink is stored raw, which needs a flag per chunk.
+- Decode on the Background lane.
+- No second codec until a BCn corpus shows that one is needed. Measured trade-off: LZ4HC costs a ninth of the CPU at 0.8 times the ratio.
+- Neither vendored zlib nor GDeflate goes in the package path.
+- The texture import pipeline (BCn encoding) belongs on its own chunk. It saves more than any codec choice.
+
+Chunk sizes 16 to 256 KiB: the sweep (`CHUNKS=16,32,128,256 ONLY=none,zstd,lz4,gdeflate`) has not run yet. Until it does, the 64 KiB unit rests on 6.1 and the GPU tile limits.
 
 | Candidate | Version measured | Licence (from source) |
 |---|---|---|
@@ -115,6 +151,7 @@ Desk research (agent, 2026-11-17). Vendor claims are marked as such.
 - DirectStorage PC stable is 1.3.0 (2025-06). Version 1.4 adds zstd on CPU and GPU but is still a preview (preview2, 2026-06-16). Microsoft labels its GPU zstd shaders "not for production". Optimised drivers are promised for the second half of 2026 (vendor claim).
 - The GPU path is D3D12-only. The only Vulkan route is importing a D3D12 heap through `VK_KHR_external_memory_win32`, and no shipped engine is known to do it. The Vulkan-native route is `VK_EXT_memory_decompression` (promoted from the NV extension), which supports GDeflate only, with 64 KiB regions. Which drivers ship it is unknown.
 - Shipped GPU decompression has a stutter record on RTX 40. In Spider-Man 2 on an RTX 4090, turning DirectStorage off raised 1% lows by 18 to 25% (Tom's Hardware, 2026-03-27). Ratchet & Clank users report frame-time spikes that went away with the CPU fallback.
-- The drive ceiling measured in 6.1 is 3.3 GiB/s. On the CPU, the decoders run at a few GB/s per core (unmeasured here until 6.2 runs). Keeping up with the drive should cost a few cores on the Background lane.
+- The drive ceiling measured in 6.1 is 3.3 GiB/s. On the CPU (6.2), zstd 19 needs about 10 cores to keep up with the drive at that rate, and LZ4HC needs about one. Streaming rarely runs at the drive ceiling for long, so the realistic cost is a fraction of this.
+- GDeflate matches zstd's ratio closely (1.58 against 1.60), but its CPU fallback decodes 2.5 times slower than zstd.
 
-Provisional answer: **no DirectStorage backend now.** Revisit when 6.2 shows CPU decode cost above budget, or when `VK_EXT_memory_decompression` ships on both AMD and NVIDIA. If GDeflate lands close to zstd on ratio in 6.2, choosing it keeps the GPU path open through the Vulkan extension, without D3D12.
+Answer: **no DirectStorage backend now.** Revisit when a BCn corpus shows that CPU decode costs more than the frame budget allows, or when `VK_EXT_memory_decompression` ships on both AMD and NVIDIA. GDeflate is the only format that extension decodes. A later switch costs only a re-cook if the chunk table records the codec per chunk; the package design should include that field.
