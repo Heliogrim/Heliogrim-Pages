@@ -347,7 +347,7 @@ Measured in the W56.0 prototype before they are decided (no source measures serv
 - **C, send on perceived error**: the server runs the client's extrapolator per entity and connection and sends when the client's predicted error exceeds a threshold in the observer's space (screen angle, not world distance); the bandwidth budget steers the threshold, so tiers T1 to T3 become bands of one metric. Nearest prior art: Dyconits (ICDCS 2021, per-subscriber inconsistency bounds, 49 to 85% less bandwidth at about 200 players, PDF not read), AntReckoning (2013, up to 32% less upload), Roberts et al. 2008 (a purely spatial threshold leaves absolute error unbounded, so a time bound is needed). No peer-reviewed screen-space threshold was found.
 - **D, encode once per (entity, baseline step)**: every client that has the entity in its set and acked that baseline reuses the same bytes; no zones, the per-client sets stay as W56.0 defines them. Shipped forms: Unity Netcode pre-serialisation (cost paid even when not sent), Unreal `net.ShareSerializedData`, ReplicationGraph FastShared. Iris creates baselines at most every 60 frames by default; reading that as rationed shared baselines is an inference. Trade-off: fewer encodes against larger deltas from older baselines.
 
-### 5.2d Where change marks live (proposal, 2026-11-15, awaiting owner)
+### 5.2d Where change marks live (proposal 2026-11-15, accepted pending measurement, see 5.2j)
 
 Found in the code (`master`, 2026-11-15): archetype slots live in `ClusterRegion` chunks of 16 KiB, each slot `[component block][actor]`, with a live mask per chunk and `RelocationTable`/`relocate()` for moved slots; legacy component pools use `hybrid_storage` pages of 32 KB. Component state has no write choke point: `HierarchyComponent::getLocalTransform()` returns a mutable reference, and the universe transform is derived on read through the parent chain.
 
@@ -365,7 +365,7 @@ Suggested: the side array, written only by setters. Details:
 4. **No chunk-level mark at first.** Writers would contend on one cache line per chunk. Scanning all slot marks costs about 3.2 MB per scan at 100k entities × 8 groups, roughly 0.2 ms; only the two patchers scan the whole scene. Per-connection compares run against the network replica, which carries the step stamps it was patched with.
 5. **Hierarchy**: a child's universe transform changes when an ancestor moves, without a write to the child. See 5.2e: subtree epochs upward, world resolved per consumer replica.
 
-#### 5.2e Hierarchy: how others propagate, and a proposal (2026-11-15, awaiting owner)
+#### 5.2e Hierarchy: how others propagate, and a proposal (2026-11-15, accepted pending measurement, see 5.2j)
 
 Research pass (subagent, primary source code where public):
 
@@ -395,7 +395,7 @@ Every engine turns an ancestor write into a change of each descendant's *world* 
 
 Costs: interest management must follow parent links. Every consumer that needs world has its own resolve pass, so resolve logic is shared code across replicas. Reparenting and slot reuse are where Bevy's bugs were, so they need tests from the first commit. Moving a large tree is cheap for the scene and the network, and is paid once in each replica's resolve.
 
-#### 5.2f Local-only truth: reasoning (2026-11-15, noted by the owner, not decided)
+#### 5.2f Local-only truth: reasoning (2026-11-15, see 5.2j)
 
 All numbers below are estimates from assumed sizes (100k scene objects, 20% moving per step, mean depth 3, affine multiply about 30 ns scalar). None is measured.
 
@@ -528,6 +528,85 @@ Consequences (proposal):
 
 Effect on scene update handling: structural changes stay in `SceneComponentQueue`, stamped with the epoch and applied before value patches of the same epoch. `broadcast(flags)` becomes "epoch e is sealed": each subscriber scans marks newer than its last-seen value and builds its patches. `update(flags)` then stops polling every model twice per frame.
 
+#### 5.2j Owner decisions on 5.2d to 5.2i (2026-11-16)
+
+Each proposal is accepted as the working direction, **subject to measurement**. None is final until a benchmark backs it.
+
+1. **Marks (5.2d)**: side array plus epochs. The benchmark includes the hash-set variant (`ankerl::unordered_dense`): brute-force linear scans already lost to it at 4 elements, so "a hash insert per write is slow" is an assumption, not a fact.
+2. **Local-only truth (5.2e to 5.2g)**: adopted, with measurement. Alternatives stay open: a shared eager resolve step that runs once before consumers are notified and that several consumers reuse, plain eager world-in-scene, or something else that the numbers suggest.
+3. **Node API as the only writer (5.2h)**: accepted. The API must also support ergonomic use and **mass operations** (span or batch forms of `setLocal`, `reparent` and `destroy`). Then callers do not loop over single writes that repeat the checks and the upward epoch stamp for each element.
+4. **Skeletons out of the hierarchy, with sockets (5.2i)**: accepted, and the cost must be measured and analysed. Sockets do not rule out bone nodes later, although features built on sockets might break if that changes.
+
+#### 5.2k Physics events (proposal and research, 2026-11-16)
+
+Today `Physics.cpp` sets no `ContactListener` and no `BodyActivationListener`; both are TODOs. Research came from two subagents. Evidence labels: source = source read; docs; author = an author post; RE = community reverse engineering.
+
+**Jolt's intent** (source: `ContactListener.h`, `Docs/Architecture.md`; author: discussion #1279):
+
+- The header shows direct dispatch to a game-object handler, and the callback is where contact *modification* happens (`ContactSettings`: friction, mass scale, sensor flag, surface velocity).
+- There are hard limits. Several threads call it at once. All bodies are locked, so it may only read; a locking interface deadlocks. Order across pairs is non-deterministic ("store and sort"). The manifold lives on the stack.
+- The author says Added and Persisted can be queued if the manifold is copied; Validate and `ContactSettings` cannot. Removed carries only IDs, and the header suggests recording it and handling it after `Update`. The `SensorTest` sample collects under a mutex and applies forces in `PrePhysicsUpdate`, and Godot's Jolt module also buffers and flushes in `post_step`.
+- There is no deferred API. Issue #2128 (opened 2026-09) proposes an opt-in `OnContactSolved` that would deliver impulses.
+- Consequence: buffering events is the intended use for gameplay, and the callback itself is only for contact modification. Modifiers are registered per material or body pair, are pure functions of physics data, and must not touch gameplay state.
+
+**Proposal**: collect, then publish, then drain, as in the earlier chat note:
+
+1. In the tick, per-thread buffers receive copied records: Jolt `BodyID`s (with sequence numbers), kind, point, normal and step.
+2. In readback, the buffers are merged, sorted by (kind, pair), mapped to generational handles, and sealed with the readback epoch.
+3. Gameplay stages declare a read of "physics events of step s" and run after readback.
+
+**Lifetimes (a)**: one batch per step, which needs measurement.
+
+1. The manifold is copied in the callback, because no reference survives it.
+2. Removed has no data, so the data comes from what Added cached (source: header advice). `WereBodiesInContact` tells whether the last sub-shape contact ended.
+3. A destroyed body shows up as Removed in the *next* `Update`. The `BodyID` to handle map keeps a tombstone until that step's batch is published; after that the handle is invalid, and invalid handles are skipped.
+4. **A body falling asleep fires Removed** (source). Gameplay would read that as "contact ended". The record carries a sleep flag (from the activation listener in the same step), or sleep does not end gameplay contacts at all; the owner decides.
+5. Sub-shape IDs go stale when a compound shape changes. Records carry the body handle, and the sub-shape is only a hint.
+6. In catch-up mode, frame-rate consumers (audio, VFX, UI) read after several step batches. A batch is therefore freed when the lowest `lastSeen` epoch of all registered consumers has passed it, which is the same rule as for patches. The batches sit in a bounded ring.
+7. Contact storms, such as a collapsing pile: the record count per step is capped, and anything above the cap goes to an overflow counter plus a diagnostic. The cap is set from measurements.
+
+**Write timing (b)**: Jolt cannot take changes in the middle of a step, and every surveyed engine applies a force from a callback in the next step (Unity, Chaos game thread, Godot, rapier, Avian; CRYENGINE's immediate events are the exception). So "post-step" and "pre-step" both reach the simulation at step s+1. The real difference is **who sees the change during step s**:
+
+| Consumer | Gains from seeing it in step s |
+|---|---|
+| Network (5.2c) | Sends the hit or impulse action event this step: one step less latency, and client prediction can apply it |
+| Animation | Starts the hit reaction in this frame's pose |
+| AI perception | Hears or sees the impact one step earlier |
+| Render replica | Can extrapolate with the new velocity (motion blur) |
+| Audio and VFX | Nothing: they react to the event, not to the force |
+
+Suggested: **forces and impulses form an accumulator channel**. Stages after readback add to a pending impulse per body through the node API. The sum commutes, so the order between writers does not matter. The change is visible in this step's post-physics broadcast and is consumed by the pre-physics sync of step s+1. "Set" writes (velocity, position) go through the normal setters, and the builder orders conflicting writers. This is reactive in phase and driving in effect.
+
+**Persisted contacts (c)**:
+
+| Engine | Stay event | Opt-in |
+|---|---|---|
+| Unity | `OnCollisionStay` once per frame per touching pair, none while asleep; `ContactEvent` is "a lot faster" | Contact Pairs Mode; leaving out the parameter is cheaper |
+| Unreal Chaos | None; hit events repeat while resting (forums) | `SetNotifyRigidBodyCollision` per component |
+| Godot 4 | None; per-tick contact state through `get_contact_*` | `contact_monitor` plus `max_contacts_reported` |
+| CRYENGINE/Lumberyard | None found; immediate or logged events | Flags per event client |
+| bevy_rapier, Avian | None; query the contact graph or `CollidingEntities` | `ActiveEvents` / `CollisionEventsEnabled` per collider, off by default |
+| REDengine | Not public | |
+
+Jolt cannot switch Persisted off: once a listener is set, it fires for every awake dynamic pair in every step (source: `ContactConstraintManager.cpp`). Suggested, following Rapier and Avian:
+
+- No stream of persisted events.
+- Added and Removed are opt-in per body.
+- A per-body "current contacts" set, maintained from Added and Removed and queryable, for bodies that opt in.
+- `OnContactPersisted` returns at once unless the pair is flagged for per-step data (rolling or scraping sounds that need impulses). Its callback overhead is measured; if it shows up, #2128 or a patch that skips the call for unflagged pairs is the fix.
+
+**Owner decisions (2026-11-17)**: (a) lifetimes accepted; (c) persisted plan accepted for now; (b) BodyID-keyed accumulator approved for now; sleep recommendation accepted. All of it is still subject to measurement, and the re-Added on wake still needs a test.
+
+- **Accumulator without references.** The owner's concern: pending impulses that point at actors or components would need reference fix-ups in the next frame's housekeeping and compaction. Answer: the accumulator is owned by physics and keyed by Jolt `BodyID`, which does not change when ACS slots move. A writer resolves its handle to a `BodyID` once, at the node API, and adds into a dense per-body array. The pre-physics sync drains the array into Jolt and clears it. A body removed before the sync drops its entry with the `BodyID` tombstone from (a). Nothing on the ACS side holds a pending reference, so compaction has nothing to fix.
+- **Sleep (recommendation)**: sleep does **not** end gameplay contacts. The activation listener records which bodies fell asleep in the step. Readback drops Removed records whose pair involves such a body and keeps the pair in the contact set. On wake, Jolt rebuilds its contact cache and fires Added again (unverified, must be tested), and readback ignores an Added for a pair already in the set. Destruction still ends contacts: a destroyed body's tombstone purges it from every set and emits Removed with a `destroyed` flag. Without this, a pressure plate under a sleeping crate would release on sleep and press again on wake.
+
+**REDengine** (RE only):
+
+- Witcher 3 has the tick groups PrePhysics, PrePhysicsPost, Main, PostPhysics, PostPhysicsPost and PostUpdateTransform. Scripts get no per-frame tick; they use timers (`AddTimer` with a variable `dt`).
+- Cyberpunk 2077 groups entities into buckets (Vehicle, Character, AttachedObject). Each bucket runs PreTick, ServiceEvents, PrePhysics, a physics flush, async queries, PostPhysicsSyncResults, transform update, animation, PostPhysics and PostServiceEvents, and pushes jobs to a job queue.
+- The ServiceEvents stages suggest that events are batched at fixed points. That matches the drain stages here, but it is inferred from names only.
+- How physics events reach scripts, the step mode and render latency are not public. No CDPR talk on update scheduling was found.
+
 ### 5.3 UI and scenes rendered into each other
 
 Break the cycle per texture, not per system. Each view is its own render node: a scene viewport, a UI surface, an in-world screen. A UI surface that shows a scene viewport depends on that viewport's render; a scene that shows a UI texture depends on that surface's render. Offscreen nodes render before the nodes that sample them (as URP does). Only a real cycle, a surface that contains itself through others, samples the previous frame's texture, and that edge is declared as one frame late rather than hidden. Reflow needs sizes and bounds, not pixels, so layout never closes the loop. The editor's case (material preview, scene preview, modelling tool inside the UI) is a fan-in with no latency. Where render command capture lives follows from this: recording belongs to the render node of each view, so the UI's recording is the render node of a UI surface, not a step of the Reflow tick.
@@ -543,13 +622,13 @@ Bevy reports pairs of systems with conflicting access and no order, and can shuf
 | Render on a snapshot of the settled frame (5.2)? | Same frame; pipelined with Extract | **Owner direction 2026-11-14 (5.2a)**: no full copy; the scene's phase-flagged broadcasts feed differential patches into the render replica, and the graphics cycle runs on its own cadence across engine-loop stages. Open: the patch queue, coalescing, deferred removal and interpolation details |
 | Simulation at a fixed step, decoupled from the frame (5.1)? | Variable step per frame (today); fixed step with catch-up and interpolation | **Decided (owner, 2026-11-14)**: both, selectable per project with both time sources (5.1d); arguments in 5.1a, effect on the loop in 5.1b; motion-blur sub-frames deferred |
 | Network send per simulation step or per frame? | Per step; own rate; per trigger | **Decided (owner, 2026-11-15, 5.2c)**: per trigger. Action events and T0 acks flush inside the step; state goes from a quantised network replica patched at the end of each step, on the network cycle; change marks are step numbers and double as the replication sync point. Send on perceived error (C) and encode once per baseline (D) are measured in the W56.0 prototype |
-| Where do change marks live? | In the component; side array per chunk; subscribing system | Side array per chunk, epochs, setters only (5.2d); awaiting owner |
-| Where does the physics event queue live: physics readback or a stage of its own? | | Readback fills it, the callback stages drain it |
+| Where do change marks live? | In the component; side array per chunk; subscribing system | **Accepted pending measurement (owner, 2026-11-16, 5.2j)**: side array per chunk, epochs, setters only (5.2d); benchmark against an `unordered_dense` set |
+| Where does the physics event queue live: physics readback or a stage of its own? | | **Decided (owner, 2026-11-17, 5.2k)**: the tick collects into per-thread buffers, readback publishes a sorted batch per step, gameplay stages drain it; impulses go to a BodyID-keyed accumulator; sleep keeps contacts |
 | Animation: who owns pose evaluation and IK, and on which slots? | | Evaluation after the pre-physics scene sync, IK after readback |
 
 ## 7. Next
 
-Once the owner answers section 6, W02.11 continues: the stage sets per stage are agreed and written into the task graph design 8, then the edges after "world settled" are relaxed one at a time with the builder's conflict check. Stages that do not exist yet (animation, audio push, network) get their slots in the graph as declarations only when their systems land.
+Section 6 has one open row left, animation slots (next owner session). After that, W02.11 continues: the stage sets per stage are agreed and written into the task graph design 8, then the edges after "world settled" are relaxed one at a time with the builder's conflict check. Stages that do not exist yet (animation, audio push, network) get their slots in the graph as declarations only when their systems land.
 
 ## 8. Not covered
 
