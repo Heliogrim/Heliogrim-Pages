@@ -59,7 +59,7 @@ Consequence for ordering: the first missing piece is not a Windows batching back
 
 ## 6. Codec, Chunk and Drive Measurements (W03.5, 2026-11-17)
 
-**Status**: the drive and the 64 KiB codec run are measured. The chunk-size sweep has not run. The proposals below await the owner.
+**Status**: drive, codec and chunk-size runs are measured. The proposals below await the owner.
 
 ### 6.1 Drive: queue depth and unbuffered reads
 
@@ -133,7 +133,22 @@ Proposal for **Q03.3**:
 - Neither vendored zlib nor GDeflate goes in the package path.
 - The texture import pipeline (BCn encoding) belongs on its own chunk. It saves more than any codec choice.
 
-Chunk sizes 16 to 256 KiB: the sweep (`CHUNKS=16,32,128,256 ONLY=none,zstd,lz4,gdeflate`) has not run yet. Until it does, the 64 KiB unit rests on 6.1 and the GPU tile limits.
+**Chunk size**: the owner ran the sweep on 2026-11-17. The table gives the ratio over the whole corpus.
+
+| Codec | 16 KiB | 32 KiB | 64 KiB | 128 KiB | 256 KiB |
+|---|---|---|---|---|---|
+| zstd 19 | 1.56 | 1.58 | 1.60 | 1.63 | 1.65 |
+| zstd 3 | 1.45 | 1.45 | 1.47 | 1.49 | 1.54 |
+| libdeflate 12 | 1.53 | 1.56 | 1.58 | 1.59 | 1.60 |
+| GDeflate 12 | 1.50 | 1.54 | 1.58 | 1.58 | 1.58 |
+| LZ4HC 12 | 1.17 | 1.23 | 1.29 | 1.34 | 1.37 |
+
+- From 64 KiB to 256 KiB, zstd 19 gains 3%.
+- GDeflate stops improving at 64 KiB, its internal tile size.
+- Decode speed per thread barely changes with chunk size.
+- Plain LZ4 stores about 12% of chunks raw at 128 KiB and above (they don't shrink). LZ4HC does not have this problem.
+
+**Proposal**: keep the 64 KiB compression unit. Larger chunks would gain about 3% in size, but every partial read would decode more data, and the GPU decode limits would be lost.
 
 | Candidate | Version measured | Licence (from source) |
 |---|---|---|

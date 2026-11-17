@@ -90,7 +90,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 - **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` on the storage query and mutation path (registry removal excluded, see Scope).
 
-### W03.5 Codec and chunking benchmark · explore · done 2026-11-17; proposals await owner (chunk-size sweep not run)
+### W03.5 Codec and chunking benchmark · explore · done 2026-11-17; proposals await owner
 
 - **Result (codecs)**: the owner ran the 64 KiB codec benchmark ([storage exploration](../../architecture/storage-exploration.md) 6.2).
   - The corpus has no BCn textures: all 985 MiB are raw RGBA8, RGBA16F and RGBA32F, none supercompressed.
@@ -108,7 +108,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
     - Keep the 64 KiB compression unit, but coalesce IO requests to at least 256 KiB.
     - No DirectStorage backend now: its GPU path is D3D12-only and zstd on GPU is still a preview. Revisit when `VK_EXT_memory_decompression` is on AMD and NVIDIA.
   - The codec tool is built: zlib 1.3.1, libdeflate, GDeflate, LZ4 1.10.0 and zstd 1.5.7, 16 to 256 KiB chunks. Spike folder: engine checkout `docs/superpowers/spikes/w03-5-codec-io/` (untracked).
-  - The owner ran the codec benchmark, because it reads `assets/**`, which agents may not read. The chunk-size sweep (16 to 256 KiB) has not run; the 64 KiB unit rests on the drive numbers and the GPU tile limits.
+  - The owner ran the codec benchmark, because it reads `assets/**`, which agents may not read. The owner also ran the chunk-size sweep (16 to 256 KiB). Going from 64 KiB to 256 KiB gains only 3% for zstd 19, and GDeflate stops improving at 64 KiB, so the 64 KiB unit stays.
 
 - **Goal**: measure no compression, zlib (vendored), LZ4, zstd and GDeflate (the format DirectStorage decompresses on the GPU; open specification, permissive reference implementation) on the project's assets at 64 KiB chunks; record each candidate's licence; decide the chunk size and whether DirectStorage PC's GPU decompression is worth a backend. Commercial codecs (Oodle) are out.
 - **Output**: results in `architecture/storage-exploration.md`; answers Q03.3 by measurement.
