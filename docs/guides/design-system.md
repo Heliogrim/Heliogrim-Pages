@@ -1,14 +1,20 @@
-# Site Design System
+# Design System and Identity
 
-How the docs site applies the [brand identity](brand-identity.md). The brand page wins on the mark, palette and colour rules; this page records only how the site implements them. Source of truth for the implementation: `docs/stylesheets/heliogrim.css`, `docs/javascripts/diagrams.js`, `overrides/main.html`, `docs/assets/`. Change those and this page together.
+How this site looks and why. Source of truth: `docs/stylesheets/heliogrim.css`, `overrides/main.html`, `docs/assets/`. Change those and this page together.
 
 ## Idea
 
-The site reads like an engineering drawing set: bone-coloured paper in light mode, warm obsidian in dark mode, hairline rules, square corners. **Frost** is the rare accent: the masthead rule, section markers, the active tab, primary buttons, index numbers. **Ember** is state: links, hover and focus, pressed toggles. This flips the brand's roles (ember rare, frost state) on purpose: the owner chose it for the site on 2026-11-16, and it applies to the site only; the editor follows the [brand rules](brand-identity.md#rules). The site also keeps its warm neutrals (bone paper, obsidian) instead of the brand's cool coal ramp: the owner found the coal dark mode lost the site's feel (2026-11-16).
+The site reads like an engineering drawing set: bone-coloured paper (or obsidian in dark mode), hairline rules, square corners, one hot colour. The accent is **ember**, used for the few things that matter: the masthead rule, section markers, active tab, primary actions. If everything glows, nothing does.
 
-## Mark
+## Logo
 
-The brand [mark](brand-identity.md#mark): `assets/brand/mark.svg` in the header, `assets/brand/mark-16.svg` as favicon. The masthead is obsidian in both modes, so the mark always sits on dark. `assets/dial.svg` is the landing illustration, coloured as the splash art: grey line work, ember eclipse, frost glint on the outer ring. Do not recolour, outline, or add effects.
+A crescent inside a ring with four cardinal ticks: an eclipse, or a dial. Files: `assets/logo.svg` (header), `assets/favicon.svg`, `assets/dial.svg` (landing illustration, the same motif at large size). Plain geometric shapes, no third-party artwork. Always ember on dark or light backgrounds; do not recolour, outline, or add effects.
+
+!!! note "Superseded by the brand identity"
+    The owner accepted a refined mark and palette on 2026-11-16 in [Brand identity](brand-identity.md). The site was aligned to it on 2026-11-16, then reverted to this design on 2026-11-17 (owner): the brand identity applies to the engine and editor, and this page stays the source of truth for the web site. Its [site redesign brief](brand-identity.md#site-redesign-brief) records the reverted attempt.
+
+!!! note "Refinement open"
+    The mark is approved as a base. Candidates for refinement: optical balance of the crescent, tick length at 16 px, a stacked lockup with the wordmark. The brand image in the engine repository (`docs/brand.png`) was a prototype and is not the reference.
 
 ## Colour
 
@@ -18,26 +24,19 @@ The brand [mark](brand-identity.md#mark): `assets/brand/mark.svg` in the header,
 | Surface `--hg-surface` | `#ebe6db` | `#1b1815` | Table heads, code, callouts, hover |
 | Ink `--md-default-fg-color` | `#1b1917` | `#ece6da` | Text |
 | Ink light | `#5f594f` | `#aaa397` | Secondary text |
-| Ink lighter | `#8a8378` | `#756f65` | Muted text, closed and planned chips |
 | Rule `--hg-rule` | `#d6d0c4` | `#2e2a25` | Hairlines |
-| Accent `--hg-accent` | frost 600 `#1f7cb5` | frost 500 `#5cc8ff` | Accent fills, markers, index numbers (darker on paper for contrast); hover frost 700 / 400. The masthead rule and active tab are frost 500 in both modes, on the obsidian masthead |
-| Link `--md-typeset-a-color` | ember 600 `#b5390d` | ember 400 `#ff8a4a` | Text links (darker on paper for contrast) |
-| State `--md-accent-fg-color` | ember 700 `#7a2609` | ember 300 `#ffab7a` | Hover, focus, pressed toggles |
+| Ember `--hg-ember` | `#ff6a1a` | `#ff6a1a` | Accent fills and rules |
+| Link | `#b83a04` | `#ff8a47` | Text links (darker in light mode for contrast) |
 | Masthead | `#14110f` | `#14110f` | Header, both modes |
 
-The neutrals are warm in both modes; the brand's coal ramp (n0 to n12, [brand page](brand-identity.md#palette)) is for the engine and editor.
-
-Status chips use the brand's semantic set: exploration warning yellow, design info frost, accepted success green, placeholder danger red, planned dashed grey, closed and summary muted. Dark mode uses the brand values (`#f2c94c`, `#5cc8ff`, `#3fbf7f`, `#f0555a`); light mode uses darker steps of the same hues (`#7a5f00`, `#115079`, `#1f7a4d`, `#b3261e`) for contrast on paper. Always paired with the word, never colour alone.
-
-Diagrams: node fill is the surface, node borders are neutral (`#756f65` dark, `#8a8378` light), not ember.
+Status colours (chips): exploration amber, design teal, accepted green, planned dashed grey, placeholder red. Always paired with the word, never colour alone.
 
 ## Type
 
 | Role | Face | Use |
 |------|------|-----|
-| Wordmark | IBM Plex Sans 300, caps, tracking 0.42 em | Site title in the header ([wordmark A](brand-identity.md#wordmarks)) |
 | Display | Barlow Condensed 500 / 600 / 700 | Headings, tabs, buttons. Uppercase for H1, tabs, labels |
-| Text | IBM Plex Sans 300 / 400 / 400i / 700 | Body (300 only for the wordmark) |
+| Text | IBM Plex Sans 400 / 400i / 700 | Body |
 | Mono | IBM Plex Mono 400 / 500 | Code, table heads, eyebrows, chips |
 
 All three are SIL OFL 1.1 and served from `assets/fonts/`. Body text is set smaller than the theme default (`.78rem` base) because the faces are large on the x-height; tables are `.72rem`.

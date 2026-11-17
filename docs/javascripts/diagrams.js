@@ -109,7 +109,7 @@
         background: "transparent",
         primaryColor: dark ? "#1b1815" : "#ebe6db",
         primaryTextColor: dark ? "#ece6da" : "#1b1917",
-        primaryBorderColor: dark ? "#756f65" : "#8a8378",
+        primaryBorderColor: "#ff6a1a",
         lineColor: dark ? "#aaa397" : "#5f594f",
         edgeLabelBackground: dark ? "#12100e" : "#f4f1ea",
         clusterBkg: "transparent",

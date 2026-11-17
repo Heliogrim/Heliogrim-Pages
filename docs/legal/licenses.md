@@ -5,7 +5,7 @@
 !!! warning "Open decision"
     No license has been chosen for the documentation text or for the repository, and the repository has no `LICENSE` file. Until the owner picks one, all rights are reserved by default. Decide for the text (for example CC BY 4.0) and for the site code separately, then record it here.
 
-The mark (`assets/brand/mark.svg`, `assets/brand/mark-16.svg`) and the dial illustration (`assets/dial.svg`) were drawn for this project from plain geometric shapes and contain no third-party artwork.
+The logo (`assets/logo.svg`), favicon and the dial illustration (`assets/dial.svg`) were drawn for this project from plain geometric shapes and contain no third-party artwork.
 
 ## Third-party components
 

@@ -1,6 +1,6 @@
 # Brand Identity
 
-**Status**: accepted by the owner on 2026-11-16 (editor UI brainstorm). This is the source of truth for the Heliogrim mark, palette, wordmarks and splash. The docs site follows it since 2026-11-16; how is recorded in the [site design system](design-system.md) (see [Site redesign brief](#site-redesign-brief)).
+**Status**: accepted by the owner on 2026-11-16 (editor UI brainstorm). This is the source of truth for the Heliogrim mark, palette, wordmarks and splash. It does not apply to the docs web site: the site was aligned on 2026-11-16 and reverted to its original [site design system](design-system.md) on 2026-11-17 (owner), which wins for the site (see [Site redesign brief](#site-redesign-brief)).
 
 **Preview**: [identity-preview.html](../assets/brand/identity-preview.html) shows everything on this page in one place: splash, title bar, app icon, mark sizes, wordmarks, UI icon style and palette. The editor UI mockups behind it are listed in the [editor UI exploration](../architecture/editor-ui-exploration.md).
 
@@ -83,9 +83,9 @@ The footer makes the splash useful on the test bench. The final art, the editor 
 
 ## Site redesign brief
 
-What the docs site needed in order to follow this identity. Done on 2026-11-16; the owner kept the bone paper and flipped the roles on the site: frost is the rare accent, ember marks links and state (the editor keeps the rules above). The [site design system](design-system.md) has the resulting tokens.
+**Reverted on 2026-11-17 (owner)**: the site went back to its original [design system](design-system.md); the table below is kept as a record. What the docs site needed in order to follow this identity. Done on 2026-11-16; the owner kept the bone paper and flipped the roles on the site: frost is the rare accent, ember marks links and state (the editor keeps the rules above). The [site design system](design-system.md) has the resulting tokens.
 
-| Area | Site before | Target (done) |
+| Area | Site (original, current again) | Target (done, then reverted) |
 |------|-------------|---------------|
 | Logo, favicon | All-ember crescent, ring and four ticks | Mark above: no ticks, grey hairline with frost glint (`mark.svg`, `mark-16.svg`) |
 | Dark mode | Obsidian `#12100e`, warm surfaces `#1b1815`, rule `#2e2a25` | Kept warm (owner): the coal dark mode lost the site's feel, so the site keeps obsidian; coal is for the engine and editor |
