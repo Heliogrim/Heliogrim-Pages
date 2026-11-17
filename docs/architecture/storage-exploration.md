@@ -59,7 +59,7 @@ Consequence for ordering: the first missing piece is not a Windows batching back
 
 ## 6. Codec, Chunk and Drive Measurements (W03.5, 2026-11-17)
 
-**Status**: drive, codec and chunk-size runs are measured. The proposals below await the owner.
+**Status**: drive, codec and chunk-size runs are measured. Owner rulings of 2026-11-18 are on the [storage work page](../plan/work/storage-streaming.md) (Decisions): LZ4HC 9 per 64 KiB chunk, not the zstd proposal below; cap 32 as a setting; request size still open.
 
 ### 6.1 Drive: queue depth and unbuffered reads
 
