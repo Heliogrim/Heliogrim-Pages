@@ -90,7 +90,18 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 - **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` on the storage query and mutation path (registry removal excluded, see Scope).
 
-### W03.5 Codec and chunking benchmark · explore · ready
+### W03.5 Codec and chunking benchmark · explore · in progress: drive half measured 2026-11-17; codec run waits for owner OK to read `assets/**`
+
+- **Result (drive half)**: [storage exploration](../../architecture/storage-exploration.md) section 6.
+  - Samsung 970 NVMe, one IOCP thread, unbuffered: 64 KiB requests saturate at QD 8, at about 2.7 GiB/s. 256 KiB requests reach the 3.3 GiB/s ceiling at QD 4.
+  - Buffered reads on a cold cache reach 713 MiB/s at QD 64, 3.8 times slower than unbuffered.
+  - Proposals:
+    - Q03.5: lower the cap to 32 requests, or a byte cap of about 4 MiB, because QD 64 only adds latency (p50 1.4 ms at 64 KiB).
+    - Read package chunks unbuffered.
+    - Keep the 64 KiB compression unit, but coalesce IO requests to at least 256 KiB.
+    - No DirectStorage backend now: its GPU path is D3D12-only and zstd on GPU is still a preview. Revisit when `VK_EXT_memory_decompression` is on AMD and NVIDIA.
+  - The codec tool is built: zlib 1.3.1, libdeflate, GDeflate, LZ4 1.10.0 and zstd 1.5.7, 16 to 256 KiB chunks. Spike folder: engine checkout `docs/superpowers/spikes/w03-5-codec-io/` (untracked).
+  - The codec run is not done. It reads `assets/**`, which agents may not read. Q03.3 stays open until the owner runs `build.sh` or allows the read.
 
 - **Goal**: measure no compression, zlib (vendored), LZ4, zstd and GDeflate (the format DirectStorage decompresses on the GPU; open specification, permissive reference implementation) on the project's assets at 64 KiB chunks; record each candidate's licence; decide the chunk size and whether DirectStorage PC's GPU decompression is worth a backend. Commercial codecs (Oodle) are out.
 - **Output**: results in `architecture/storage-exploration.md`; answers Q03.3 by measurement.
