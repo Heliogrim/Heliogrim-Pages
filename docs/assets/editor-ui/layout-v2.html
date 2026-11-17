@@ -1,0 +1,145 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Editor UI mockup: layout-v2</title><style>body{margin:0;padding:24px;background:#16171a;color:#ececee;font:14px system-ui,sans-serif}h2{margin:0 0 4px}.subtitle{color:#9a9aa2;margin:0 0 18px}.mockup{border:1px solid #2e2e34;border-radius:8px;margin:12px 0;overflow:hidden}.mockup-header{padding:6px 10px;color:#9a9aa2;font-size:12px;border-bottom:1px solid #2e2e34}.mockup-body{padding:10px}</style><script>function toggleSelect(){}</script></head><body>
+<h2>Layout v2: islands, asset tiles, toasts</h2>
+<p class="subtitle">Structure plus a first hint of feel. Colours are still placeholders. Items tagged <b>guess</b> are mine.</p>
+
+<style>
+  .ed{font:12px/1.35 system-ui,sans-serif;color:#d4d7dd;background:#0e0f12;border-radius:8px;overflow:hidden;position:relative}
+  .ed *{box-sizing:border-box}
+  .row{display:flex}
+  .hdr{height:36px;align-items:center;gap:14px;padding:0 10px}
+  .logo{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,#e8833a,#c2452d)}
+  .menu span{margin-right:12px;color:#aab0ba}
+  .search{margin:0 auto;width:340px;height:24px;border-radius:6px;background:#1a1c21;display:flex;align-items:center;padding:0 9px;color:#7d838e}
+  .kbd{margin-left:auto;font-size:10px;border:1px solid #3a3f49;border-radius:3px;padding:0 4px}
+  .tabs{height:30px;align-items:center;gap:4px;padding:0 40px}
+  .tab{padding:4px 11px;border-radius:6px;color:#8d939d}
+  .tab.on{background:#1b1d22;color:#fff}
+  .body{height:520px;padding:0 4px 4px 0}
+  .stripe{width:34px;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:6px}
+  .stripe i{width:22px;height:22px;border-radius:5px;display:block;background:#1c1e23;opacity:.6}
+  .stripe i.on{background:#2b2f37;opacity:1;box-shadow:inset 2px 0 0 #e8833a}
+  .isl{background:#1b1d22;border-radius:9px;margin:3px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+  .ph{height:28px;display:flex;align-items:center;padding:0 10px;font-weight:600;font-size:11.5px;color:#c9cdd4}
+  .ph .r{margin-left:auto;color:#6c727c;font-weight:400}
+  .flt{margin:2px 8px 6px;height:22px;border-radius:5px;background:#24272d;color:#737984;padding:0 7px;display:flex;align-items:center}
+  .tree div{padding:3px 10px;color:#b4b9c2;border-radius:4px;margin:0 4px}
+  .tree .sel{background:#2c3a52;color:#fff}
+  .vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 75%,#46505e,#1d2128 72%)}
+  .vpbar{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:4px}
+  .vpbar span{background:#15171bcc;border-radius:5px;padding:3px 8px;font-size:10.5px}
+  .gz{position:absolute;top:8px;left:50%;transform:translateX(-50%);display:flex;gap:2px;background:#15171bdd;border-radius:6px;padding:3px}
+  .gz span{width:22px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px}
+  .gz .on{background:#e8833a33;color:#f3a46b}
+  .bc{display:flex;gap:6px;align-items:center;color:#8d939d}
+  .bc b{color:#d4d7dd;font-weight:500}
+  .tagtree{width:150px;padding-top:2px}
+  .tagtree div{padding:2px 10px;color:#a3a9b3}
+  .tagtree .h{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#6c727c;padding-top:6px}
+  .tagtree .on{color:#fff;background:#2c3a52;border-radius:4px;margin:0 4px}
+  .tiles{display:flex;flex-wrap:wrap;gap:10px;padding:4px 10px;align-content:flex-start}
+  .t{width:84px;border-radius:7px;background:#23262c;overflow:hidden;position:relative}
+  .t:hover{outline:1px solid #e8833a}
+  .t.sel{outline:2px solid #e8833a}
+  .pv{height:76px;display:flex;align-items:center;justify-content:center;position:relative}
+  .ball{width:52px;height:52px;border-radius:50%}
+  .ty{position:absolute;left:5px;bottom:4px;width:15px;height:15px;border-radius:4px;background:#0e0f12cc;font-size:9px;display:flex;align-items:center;justify-content:center;color:#cfd3da}
+  .ed2{position:absolute;right:5px;top:4px;font-size:10px;color:#9aa0aa;opacity:.8}
+  .nm{padding:4px 6px 6px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c8cf}
+  .fold{height:76px;display:flex;align-items:center;justify-content:center}
+  .fold div{width:46px;height:34px;border-radius:4px 4px 6px 6px;background:#4b5260;box-shadow:inset 0 6px 0 #5c6474}
+  .prop .sec{padding:6px 10px 2px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#6c727c}
+  .prop .kv{display:flex;align-items:center;padding:2px 10px;gap:4px}
+  .prop .kv span:first-child{width:62px;color:#9aa0aa}
+  .prop .f{flex:1;height:20px;border-radius:4px;background:#24272d;padding:0 5px;display:flex;align-items:center;font-size:10.5px}
+  .x{box-shadow:inset 2px 0 0 #d9534f}.y{box-shadow:inset 2px 0 0 #6bb04f}.z{box-shadow:inset 2px 0 0 #4f8fd9}
+  .status{height:24px;align-items:center;gap:14px;padding:0 12px;font-size:10.5px;color:#8d939d}
+  .bar{width:110px;height:4px;border-radius:2px;background:#24272d;overflow:hidden}
+  .bar i{display:block;width:62%;height:100%;background:#e8833a}
+  .toasts{position:absolute;right:14px;bottom:36px;display:flex;flex-direction:column;gap:6px;width:250px}
+  .toast{background:#262930;border-radius:8px;padding:8px 10px;box-shadow:0 8px 24px #0009;display:flex;gap:8px}
+  .toast .ic{width:16px;height:16px;border-radius:50%;flex:none;margin-top:1px}
+  .toast small{display:block;color:#8d939d}
+  .tag{font-size:9px;background:#5b4a1d;color:#f5d58a;border-radius:3px;padding:0 4px;margin-left:6px;font-weight:400}
+</style>
+
+<div class="mockup">
+  <div class="mockup-header">Main window: scene tab, panels as islands on a dark base, collapsed tool stripes at the edges</div>
+  <div class="mockup-body" style="padding:0">
+    <div class="ed">
+      <div class="row hdr">
+        <div class="logo"></div>
+        <div class="menu"><span>File</span><span>Edit</span><span>Actions</span><span>View</span><span>Settings</span></div>
+        <div class="search">Search actions, assets, anything… <span class="kbd">Ctrl K</span></div>
+        <span style="color:#6c727c">▶ Play</span>
+      </div>
+      <div class="row tabs">
+        <div class="tab on">Sponza</div><div class="tab">Brick_01 (Material)</div><div class="tab">PlayerController (Graph)</div><div class="tab">+</div>
+      </div>
+      <div class="row body">
+        <div class="stripe"><i class="on"></i><i></i><i></i><div style="flex:1"></div><i></i></div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div class="row" style="flex:1;min-height:0">
+            <div class="isl" style="width:190px">
+              <div class="ph">Scene<span class="r">⋯</span></div>
+              <div class="flt">Filter…</div>
+              <div class="tree"><div>▾ Sponza</div><div>&nbsp;&nbsp;▸ Architecture</div><div>&nbsp;&nbsp;▾ Lights</div><div class="sel">&nbsp;&nbsp;&nbsp;&nbsp;Sun</div><div>&nbsp;&nbsp;&nbsp;&nbsp;Point_03</div><div>&nbsp;&nbsp;▸ Props</div><div>&nbsp;&nbsp;Camera</div></div>
+            </div>
+            <div class="isl vp">
+              <div class="vpbar"><span>View</span><span>Select</span><span>Add</span><span>Object</span><span style="margin-left:auto">Lit ▾</span><span>Perspective ▾</span></div>
+              <div class="gz"><span>⬚</span><span class="on">✥</span><span>⟳</span><span>⤢</span></div>
+            </div>
+            <div class="isl prop" style="width:220px">
+              <div class="ph">Properties: Sun<span class="r">⋯</span></div>
+              <div class="sec">Local transform</div>
+              <div class="kv"><span>Position</span><div class="f x">0</div><div class="f y">12</div><div class="f z">0</div></div>
+              <div class="kv"><span>Rotation</span><div class="f x">-45</div><div class="f y">30</div><div class="f z">0</div></div>
+              <div class="kv"><span>Scale</span><div class="f x">1</div><div class="f y">1</div><div class="f z">1</div></div>
+              <div class="sec">Directional light</div>
+              <div class="kv"><span>Intensity</span><div class="f">3.2</div></div>
+              <div class="kv"><span>Shadows</span><div class="f">On</div></div>
+            </div>
+          </div>
+          <div class="isl" style="height:215px">
+            <div class="ph"><div class="bc">Content <span>›</span> Materials <span>›</span> <b>Fabric</b></div><div class="flt" style="margin:0 0 0 auto;width:210px">t:Material  weave</div><span class="r" style="margin-left:8px">Import ⋯</span></div>
+            <div class="row" style="min-height:0;flex:1">
+              <div class="tagtree">
+                <div class="h">Type</div><div>All</div><div class="on">Materials</div><div>Meshes</div><div>Textures</div>
+                <div class="h">Tags</div><div>Bricks</div><div>Fabric</div><div>Metal</div><div>Wood</div><div style="color:#6c727c">Unassigned</div>
+              </div>
+              <div class="tiles">
+                <div class="t"><div class="fold"><div></div></div><div class="nm">Woven</div></div>
+                <div class="t"><div class="pv"><div class="ball" style="background:radial-gradient(circle at 35% 30%,#e9c46a,#8a6a1c)"></div><span class="ty">M</span><span class="ed2">✎</span></div><div class="nm">Fabric - Weave 04</div></div>
+                <div class="t sel"><div class="pv"><div class="ball" style="background:radial-gradient(circle at 35% 30%,#9c8873,#4a3b2c)"></div><span class="ty">M</span><span class="ed2">✎</span></div><div class="nm">Fabric - Weave 05</div></div>
+                <div class="t"><div class="pv"><div class="ball" style="background:radial-gradient(circle at 35% 30%,#c79a63,#6b4a26)"></div><span class="ty">M</span><span class="ed2">✎</span></div><div class="nm">Boards - Randomized Long</div></div>
+                <div class="t"><div class="pv"><div class="ball" style="background:radial-gradient(circle at 35% 30%,#dcdcdc,#3c3c3c)"></div><span class="ty">M</span><span class="ed2" style="opacity:.35">🔒</span></div><div class="nm">Metal - Brushed</div></div>
+                <div class="t"><div class="pv" style="background:repeating-conic-gradient(#2b2e34 0 25%,#23262c 0 50%) 0 0/12px 12px"><div style="width:50px;height:50px;background:#a2763f;border-radius:3px"></div><span class="ty">I</span></div><div class="nm">Weave_Albedo</div></div>
+                <div class="t"><div class="pv"><div style="width:0;height:0;border-left:28px solid transparent;border-right:28px solid transparent;border-bottom:48px solid #7d8796"></div><span class="ty">G</span></div><div class="nm">Curtain_Mesh</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stripe"><i></i><i></i></div>
+      </div>
+      <div class="row status"><span>Importing lion.glb</span><div class="bar"><i></i></div><span>3 queued</span><span>Shaders 112 / 340</span><span style="margin-left:auto">0 errors · 2 warnings</span></div>
+      <div class="toasts">
+        <div class="toast"><span class="ic" style="background:#6bb04f"></span><div>Saved Sponza<small>2.1 MB · just now</small></div></div>
+        <div class="toast"><span class="ic" style="background:#e8833a"></span><div>Compiling shaders 112 / 340<small>Pipeline cache cold · ~40 s</small><div class="bar" style="width:200px;margin-top:5px"><i style="width:33%"></i></div></div></div>
+        <div class="toast"><span class="ic" style="background:#4f8fd9"></span><div>Importing lion.glb<small>Geometry · 3 more queued</small></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:22px">Asset tile anatomy (from your 2025 mock)</h3>
+<div class="mockup"><div class="mockup-body" style="display:flex;gap:30px;align-items:center;background:#1b1d22">
+  <div class="ed" style="background:none;overflow:visible"><div class="t" style="width:120px"><div class="pv" style="height:110px"><div class="ball" style="width:76px;height:76px;background:radial-gradient(circle at 35% 30%,#e9c46a,#8a6a1c)"></div><span class="ty">M</span><span class="ed2">✎</span></div><div class="nm">Fabric - Weave 04 Long Name</div></div></div>
+  <ul style="color:#c3c8cf;font:12px system-ui;line-height:1.8">
+    <li>Portrait tile; the preview sits on the tile's own colour (transparent background)</li>
+    <li>Type badge bottom left: material, image, geometry, landscape…</li>
+    <li>Top right: quick edit, or a lock when read-only</li>
+    <li>One title row, ellipsis on overflow</li>
+    <li>Previews come from a preview service that renders on demand and caches</li>
+    <li>Folders use the same tile with a folder glyph</li>
+  </ul>
+</div></div>
+</body></html>

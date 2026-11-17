@@ -1,0 +1,114 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Editor UI mockup: inplace-v4</title><style>body{margin:0;padding:24px;background:#16171a;color:#ececee;font:14px system-ui,sans-serif}h2{margin:0 0 4px}.subtitle{color:#9a9aa2;margin:0 0 18px}.mockup{border:1px solid #2e2e34;border-radius:8px;margin:12px 0;overflow:hidden}.mockup-header{padding:6px 10px;color:#9a9aa2;font-size:12px;border-bottom:1px solid #2e2e34}.mockup-body{padding:10px}</style><script>function toggleSelect(){}</script></head><body>
+<h2>v4: denser menu, icon toolbar for in-place landscape editing</h2>
+<p class="subtitle">Hover the toolbar icons for tooltips. Everything on this page is my guess.</p>
+<style>
+  .ed{font:12px/1.35 system-ui,sans-serif;color:#d4d7dd;background:#0e0f12;border-radius:8px;position:relative}
+  .ed *{box-sizing:border-box}
+  .isl{background:#1b1d22;border-radius:9px;margin:3px;display:flex;flex-direction:column;overflow:hidden}
+  .ph{height:26px;display:flex;align-items:center;padding:0 10px;font-weight:600;font-size:11.5px;color:#c9cdd4}
+  .tb{display:flex;gap:2px;align-items:center;background:#15171be6;border-radius:8px;padding:3px}
+  .ib{width:28px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#b9bec7;transition:background .12s}
+  .ib:hover{background:#2a2e35;color:#fff}
+  .ib.on{background:#e8833a2e;color:#f3a46b}
+  .ib svg{width:16px;height:16px}
+  .ib .tt{display:none;position:absolute;top:31px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#2c3038;color:#e6e8eb;border-radius:6px;padding:4px 8px;font-size:11px;box-shadow:0 6px 18px #0009;z-index:5}
+  .ib .tt small{color:#8d939d;margin-left:6px}
+  .ib:hover .tt{display:block}
+  .gsep{width:1px;height:16px;background:#ffffff14;margin:0 4px}
+  .glab{font-size:10px;color:#6c727c;text-transform:uppercase;letter-spacing:.06em;padding:0 6px}
+  .t{width:72px;border-radius:6px;background:#23262c;cursor:pointer}
+  .t:hover{background:#2a2e35}
+  .t.on{outline:2px solid #e8833a}
+  .pv{height:58px;display:flex;align-items:center;justify-content:center}
+  .nm{padding:3px 6px 5px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c8cf}
+  .menu{width:220px;background:#23262c;border-radius:10px;padding:4px;box-shadow:0 14px 40px #000b,0 0 0 1px #ffffff0d;font-size:12px}
+  .mi{display:flex;align-items:center;gap:9px;height:26px;padding:0 8px;border-radius:6px;cursor:pointer}
+  .mi:hover{background:#30343c}
+  .mi svg{width:14px;height:14px;opacity:.75}
+  .mi .k{margin-left:auto;font-size:10.5px;color:#7d838e}
+  .mi.dng{color:#ef7a73}
+  .sep{height:1px;background:#ffffff0f;margin:3px 6px}
+  .mh{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;color:#6c727c;padding:4px 8px 2px}
+</style>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="s-raise" viewBox="0 0 16 16"><path d="M1.5 13c3 0 3-8 6.5-8s3.5 8 6.5 8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v3M6.5 3L8 1.5 9.5 3" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="s-smooth" viewBox="0 0 16 16"><path d="M1.5 10c2-3 4 1 6.5-1s4.5-2 6.5 0" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 13.5h13" stroke="currentColor" stroke-width="1" opacity=".5"/></symbol>
+  <symbol id="s-flat" viewBox="0 0 16 16"><path d="M1.5 12c2 0 2-4 4-4h5c2 0 2 4 4 4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 5.5h6" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="s-ramp" viewBox="0 0 16 16"><path d="M1.5 13h3l7-8h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-erode" viewBox="0 0 16 16"><path d="M1.5 12c2-4 3-6 6.5-6s4.5 2 6.5 6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6 9v3M9 8v4M11.5 10v2" stroke="currentColor" stroke-width="1.1"/></symbol>
+  <symbol id="s-hole" viewBox="0 0 16 16"><path d="M1.5 9h13" stroke="currentColor" stroke-width="1.4"/><ellipse cx="8" cy="9" rx="3" ry="1.6" fill="currentColor"/></symbol>
+  <symbol id="s-tex" viewBox="0 0 16 16"><path d="M2 14l3-1 7.5-7.5-2-2L3 11z" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="4.5" height="4.5" rx="1" fill="currentColor" opacity=".7"/></symbol>
+  <symbol id="s-place" viewBox="0 0 16 16"><path d="M8 1.5v6M5 4.5h6" stroke="currentColor" stroke-width="1.4"/><path d="M3 10.5l5 3 5-3-5-3z" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="s-scatter" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/><circle cx="6" cy="6.5" r="1.2" fill="currentColor"/><circle cx="10" cy="7" r="1.2" fill="currentColor"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="s-erase" viewBox="0 0 16 16"><path d="M6 13.5l-3.5-3.5 7-7 5 5-5.5 5.5zM6 13.5h8" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="s-open" viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7 9M11 10v3H3V5h3" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-win" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-edit" viewBox="0 0 16 16"><path d="M3 13l1-3 7-7 2 2-7 7z" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-copy" viewBox="0 0 16 16"><rect x="5" y="5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 10V3h7" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-del" viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="s-ref" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.4"/></symbol>
+</svg>
+
+<div class="mockup"><div class="mockup-header">Scene tab, landscape in edit: three tool groups, a placement palette when Foliage is active</div>
+<div class="mockup-body" style="padding:0">
+  <div class="ed" style="display:flex;height:360px;padding:4px">
+    <div class="isl" style="flex:1;position:relative;overflow:visible;background:linear-gradient(#2a3442,#1d2128 50%,#3c4a2e 51%,#2b3522)">
+      <div style="position:absolute;top:6px;left:6px;right:6px;display:flex;gap:6px;align-items:center">
+        <div class="tb"><span class="glab">Terrain_Main</span></div>
+        <div class="tb">
+          <span class="glab">Shape</span>
+          <div class="ib"><svg><use href="#s-raise"/></svg><span class="tt">Sculpt<small>raise / lower · B</small></span></div>
+          <div class="ib"><svg><use href="#s-smooth"/></svg><span class="tt">Smooth<small>S</small></span></div>
+          <div class="ib"><svg><use href="#s-flat"/></svg><span class="tt">Flatten<small>F</small></span></div>
+          <div class="ib"><svg><use href="#s-ramp"/></svg><span class="tt">Ramp</span></div>
+          <div class="ib"><svg><use href="#s-erode"/></svg><span class="tt">Erosion</span></div>
+          <div class="ib"><svg><use href="#s-hole"/></svg><span class="tt">Holes</span></div>
+          <div class="gsep"></div>
+          <span class="glab">Surface</span>
+          <div class="ib"><svg><use href="#s-tex"/></svg><span class="tt">Texture layers<small>paint material layers · T</small></span></div>
+          <div class="gsep"></div>
+          <span class="glab">Populate</span>
+          <div class="ib on"><svg><use href="#s-scatter"/></svg><span class="tt">Foliage brush<small>procedural scatter rules</small></span></div>
+          <div class="ib"><svg><use href="#s-place"/></svg><span class="tt">Place asset<small>single, snapped to surface</small></span></div>
+          <div class="ib"><svg><use href="#s-erase"/></svg><span class="tt">Erase instances</span></div>
+        </div>
+        <div class="tb" style="margin-left:auto"><div class="ib" style="width:auto;padding:0 8px;font-size:11px">Done <span style="color:#7d838e;margin-left:5px">Esc</span></div></div>
+      </div>
+      <div style="position:absolute;left:44%;top:56%;width:110px;height:46px;border:2px dashed #e8833a;border-radius:50%"></div>
+      <div class="isl" style="position:absolute;left:8px;right:8px;bottom:8px;background:#1b1d22f2">
+        <div class="ph">Foliage set: Forest_Floor<span style="margin-left:auto;font-weight:400;color:#6c727c">+ add from asset browser (drag)</span></div>
+        <div style="display:flex;gap:8px;padding:2px 10px 10px">
+          <div class="t on"><div class="pv"><div style="width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-bottom:36px solid #4f7a3a"></div></div><div class="nm">Fern_01 · 40%</div></div>
+          <div class="t on"><div class="pv"><div style="width:30px;height:20px;border-radius:50% 50% 30% 30%;background:#6e7466"></div></div><div class="nm">Rock_Small · 15%</div></div>
+          <div class="t"><div class="pv"><div style="width:6px;height:40px;background:#6b4e33;box-shadow:0 -14px 0 10px #3f6a32"></div></div><div class="nm">Birch_02 · 5%</div></div>
+          <div class="t on"><div class="pv"><div style="width:40px;height:12px;border-radius:40%;background:#7b9a52"></div></div><div class="nm">Grass_Clump · 80%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="isl" style="width:190px">
+      <div class="ph">Foliage brush</div>
+      <div style="padding:0 10px;color:#9aa0aa;line-height:1.9;font-size:11.5px">Radius <span style="float:right;color:#ddd">8 m</span><br>Density <span style="float:right;color:#ddd">0.6 / m²</span><br>Slope limit <span style="float:right;color:#ddd">35°</span><br>Only on layer <span style="float:right;color:#ddd">Grass</span><br>Rules <span style="float:right;color:#ddd">Forest_Floor ▾</span></div>
+    </div>
+  </div>
+</div></div>
+
+<h3 style="margin-top:20px">Context menu: 32 px rows (v3) vs 26 px rows (v4)</h3>
+<div class="mockup"><div class="mockup-body" style="background:#1b1d22;display:flex;gap:30px;align-items:flex-start">
+  <div class="ed" style="background:none">
+    <div class="menu">
+      <div class="mi"><svg><use href="#s-open"/></svg>Open<span class="k">Enter</span></div>
+      <div class="mi"><svg><use href="#s-win"/></svg>Open in new window</div>
+      <div class="sep"></div>
+      <div class="mi"><svg><use href="#s-edit"/></svg>Rename<span class="k">F2</span></div>
+      <div class="mi"><svg><use href="#s-copy"/></svg>Duplicate<span class="k">Ctrl D</span></div>
+      <div class="mi"><svg><use href="#s-ref"/></svg>Find references</div>
+      <div class="sep"></div>
+      <div class="mh">Create</div>
+      <div class="mi"><svg><use href="#s-tex"/></svg>Material<span class="k">›</span></div>
+      <div class="sep"></div>
+      <div class="mi dng"><svg><use href="#s-del"/></svg>Delete<span class="k">Del</span></div>
+    </div>
+  </div>
+  <p style="font-size:12.5px;color:#aaa;max-width:300px">Row height 26 px, padding 4 px, radius 10 px outside and 6 px per item. The title row of a tile and a property field are 20–22 px, so menu rows now read as one step larger, not two.</p>
+</div></div>
+</body></html>
