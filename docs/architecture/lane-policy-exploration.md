@@ -80,3 +80,46 @@ When background demand exceeds the time the frame leaves free, no ordering helps
 - **Slice discipline**: how a long task marks its step boundaries (`yield` with a budget check), and how a violation is noticed (a debug counter of slices over budget).
 - **Model**: the allocation rules change the pop path that `Schedule.tla` checks; the model gains lanes, the per-lane counters and the floor.
 - **Migration**: `TaskMask` to lanes for every `exec` caller, `graph::toMask` replaced, `Schedule::tick` and its call removed.
+
+## 6. Prior art (2026-11-18, for the design)
+
+Research run for [the design](lane-policy-design.md) before execution, by three read-only research agents. **Read** = the primary source was fetched and read; **recalled** = stated from memory, not verified, and not to be cited as evidence. PDFs could not be read by the fetch tool, so the papers and the GDC slide decks are all recalled. No severe finding; the changes it caused are in the design's section 14.
+
+### 6.1 Priority escalation on await
+
+| System | What it does | Source |
+|---|---|---|
+| Swift concurrency | Awaiting a task escalates it and its children, permanently; never lowered. Automatic only for structured tasks; continuations are not escalated ("we don't know who will resume the continuation"). A queued task is not searched for: the runtime enqueues a second "stealer" job at the higher priority and the task's status word decides which copy runs. A running task gets a thread override that ends when it suspends. A task that publishes a new dependency escalates it at publish time with its current priority. Escalation returns early when the stored priority is already high enough | SE-0304 (2021), SE-0462 (2025), `stdlib/public/Concurrency/TaskStatus.cpp` (read, files truncated at about 100k characters) |
+| libdispatch | Override QoS is a maximum in the queue state; a new override on an enqueued queue "redrives" a new stealer; `dispatch_block_wait` boosts the queue or overrides the running thread | `swift-corelibs-libdispatch/src/queue.c` (read, first 100k of 240k characters) |
+| XNU turnstiles | Inheritance is a chain walk that stops early when nothing changed and is capped by `turnstile_max_hop`; a running owner ends the walk | `osfmk/kern/turnstile.c` (read, truncated) |
+| Linux rt-mutex | Chain walk with at most two locks held and a maximum depth; boosts and de-boosts (on unlock, on a waiter leaving) | kernel.org `locking/rt-mutex-design` (read) |
+| Tokio, Seastar, Unreal Tasks | No priority inheritance. Seastar scheduling groups are share-based; Unreal 5.5 replaced busy-waiting by oversubscription (standby threads woken during a wait) | Tokio scheduler article 2019, Seastar tutorial, Epic Tasks System page (read) |
+| Sha, Rajkumar, Lehoczky 1990; Naughty Dog GDC 2015; Unreal task retraction; proxy execution | Not obtained | recalled or not checked |
+
+What it means here: raising on await, following the chain, never lowering, stopping at a value nobody produces, and applying the raise to a running producer at its next scheduling point all match Swift and the kernels. Two things the draft lacked are standard: the walk ends when a hop changes nothing (which also makes a cycle terminate) and has a depth cap; a dependency is escalated when it is linked. One thing differs: Swift and libdispatch enqueue a duplicate instead of moving the queued entry. The engine's tasks delete themselves after running and are not reference counted, so a stale duplicate would dangle; the design keeps the move and measures its scan.
+
+### 6.2 Keeping capacity for high-priority work
+
+| System | What it does | Source |
+|---|---|---|
+| Go runtime | No priorities. `sysmon` preempts a goroutine after 10 ms judged by an unchanged `schedtick`, and retakes a processor stuck in a syscall after two observations when work is queued; signals are observed non-progress and queue state | `runtime/proc.go` (read) |
+| .NET thread pool | A gate thread every 500 ms injects one thread when work is outstanding and nothing was dequeued for a threshold; signal is dequeue delay plus CPU use | `PortableThreadPool.GateThread.cs` (read) |
+| Java ForkJoinPool | Compensation threads for declared blocking; `minimumRunnable` defaults to 1 "to ensure liveness" | SE 21 javadoc (read) |
+| Windows thread pool | Callers mark long waits so the pool adds threads; the advice for priority isolation is a separate pool | Microsoft Learn (read) |
+| Unreal Tasks | Five priorities, oversubscription during waits. The foreground and background worker split (background workers take only background priorities) is recalled, not read | Epic Tasks System page (read for the first sentence only) |
+| Unity jobs | Worker count setting; no priorities or reservation on the page read | Unity scripting reference (read) |
+| Shenango NSDI 2019, Caladan OSDI 2020, Arachne OSDI 2018, Concord SOSP 2023 | Core allocation for latency-critical work from a queueing-delay signal with short hysteresis; compiler-inserted cooperative preemption | recalled, PDFs unreadable |
+
+What it means here: holding capacity back for the urgent class is established (a minimum runnable count, separate pools, and, recalled, Unreal's worker split). No source that was read sizes it by a count of runnable tasks; the ones that adapt use a delay or non-progress signal, raise in steps and damp the way down. The owner's metric (time until a fan-out is picked up) is a delay as well. The design therefore adds a wait-time trigger beside the peak count, and reports the Frame queue wait.
+
+### 6.3 Wake-up, slices, tasks that do not yield
+
+| System | What it does | Source |
+|---|---|---|
+| Tokio | Notifies on push only when no worker is "searching"; a woken searcher that finds work notifies the next; at most half the workers search. Chosen against a "thundering herd". Cooperative budget of 128 operations per task per tick, a counter, no clock; blocking detection with thread injection was rejected for "stuttering" | scheduler article 2019, coop article 2020, docs (read) |
+| Go | `wakep` wakes one when a processor is idle and none is spinning; the last spinner to find work wakes a replacement | `runtime/proc.go` (read) |
+| Rayon | A push of k jobs wakes up to `min(k, sleepers)` directly; idle workers yield 32 rounds before sleeping | `rayon-core/src/sleep/README.md`, `mod.rs` (read) |
+| Seastar | `need_preempt()` is two relaxed loads against a flag set by a timer, no clock read; a stall detector reports "Reactor stalled for N ms" with a backtrace and adds no capacity. The 500 µs quota and 25 ms threshold are recalled | `preempt.hh`, `reactor.cc` (read) |
+| BWoS OSDI 2023, any measurement of chained against direct wakes | Not obtained | not checked |
+
+What it means here: a wake-one chain is what Tokio and Go do, but their hops run through spinning workers; the engine's hops are kernel parks of 5 to 10 µs each, so 8 children reach their last worker after up to 7 hops. Rayon wakes directly. Nothing read measures the difference, so the design makes the direct wake a switch and measures it. A 1 ms slice lies between Seastar's quota and Go's 10 ms. The runtimes read use a flag or a counter for the yield check, not a clock; at one call per work step the clock read is kept, and a timer-set flag is the known replacement if it shows. Reporting a stalled task while it is stuck (Seastar) is better than counting it afterwards; that is left as a follow-up.

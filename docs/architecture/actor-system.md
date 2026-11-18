@@ -90,6 +90,9 @@ Open: whether concurrent and sequential hooks are one virtual with a policy tag 
 
 ## 4. Causality Within a Frame
 
+!!! warning "Under revision (owner, 2026-11-18)"
+    How user and engine code are held to this pattern (deep-readonly access to other actors, a mutation interface that records intents, events, per-source ordering) is reopened as [W02.18](../plan/work/concurrency-fibers.md).
+
 ### 4.1 What the external review proposed
 
 Read, compute, barrier and validate, then mutate. Each emitted event carries a generational handle. Events for dead handles are dropped at the barrier. This removes ghost events caused by death in the same frame.
@@ -119,6 +122,33 @@ Open: whether read and write sets are declared by the user or inferred from the 
 - **Generational handles are a prerequisite**, and the engine has none (section 0). GUIDs can stay for serialization and editor identity. Runtime handles for events and commands need an index plus a generation, mapped to the GUID.
 - **Determinism caveat.** A stable sort key gives reproducible ordering only if the sort key itself is stable. Emission index per thread-local buffer depends on how work is split across workers. Use the source handle plus a per-source counter, not the per-thread index.
 - **Cap semantics.** Deferring leftover commands to the next frame turns a logic cycle into a silent one-frame delay. Default to an assert in debug and a deferral plus a counter in release, so the problem is visible.
+
+### 4.4 Revision: who may write what (owner, 2026-11-18, W02.18)
+
+The owner's point: Unity and Unreal user code calls into other objects and the write lands at once. That is safe there only because it runs on one thread in one order. Here ticks run in parallel with no order (8.4), so the question is how user and engine code are held to the resolver pattern, not only whether the resolver exists. Desk research: [cross-object mutation research](sources/actor-mutation-research.md).
+
+What the survey found:
+
+- **Immediate cross-object writes exist only on one thread** (Unity `MonoBehaviour`, Unreal default ticks, Godot main thread). Unreal ticks with `bRunOnAnyThread` lose safe `UObject` access.
+- **Every parallel engine defers**: Unity `EntityCommandBuffer`, Bevy `Commands`, flecs stages, Unreal Mass `Defer()`, Godot `call_deferred`, VRage `InvokeOnGameThread`, Overwatch's deferred side effects. Roblox Parallel Luau splits read and write phases and tags members; its *Local Safe* tag means "writable from the same actor, read-only from others", which is this page's own-slot rule.
+- **Deterministic order across producers is rare**: Unity sorts by a scheduling-independent key (and documents the cost), Factorio merges per-thread requests by a fixed group order, flecs merges stages by index (deterministic only for a fixed thread count), Bevy only detects ambiguity. No engine documents a key of source handle plus per-source counter, which supports the 4.3 caveat.
+- **Per-sender order** ("A writes B several times, then calls a mutating function on B") holds only if all of A's intents to B travel in one ordered channel. A sort by `(target, source, seq)` keeps it; a sort by kind, as in the physics batch (engine loop exploration 5.2k), does not for mixed kinds. Order is not transitive across hops: what B then does to C is a new intent with source B.
+- **Known costs**: one barrier of latency per hop, one record per write, mostly single-threaded playback, no read-your-writes on the target (flecs documents `has, add, has` returning false), and unbounded recursion without a cap (Godot, Bevy).
+- **Snowdrop**: no public source on gameplay mutation; a GDC 2024 talk (Avatar) points at gameplay systems with fine-grained locking, not deferral [summary].
+
+Candidate models (**Proposal**, for the owner to pick or blend):
+
+| Model | Shape | For | Against |
+|---|---|---|---|
+| (a) Read-only views plus mutation interface | `other.read()` gives a deep-const view; `other.mutate()` gives a proxy that records `(target, source, seq, micro-cycle, op)` into a thread-local buffer; the barrier drops dead handles, sorts by `(target, source, seq)`, applies per target in parallel | Deterministic for any worker count, no ghosts, per-sender order by construction, fits 4.2 and 5.2k | No read-your-writes on others, one micro-cycle per hop, every mutating member needs a recordable form (codegen or reflection opcode), concurrent writers resolve by key order |
+| (b) Events only | Target owns all its writes, reacts to typed events in its own tick | Simplest invariants, target validates, fits network action events | Verbose (event plus handler, no return values), still needs the same sort key: (a) without the sugar |
+| (c) Own slot immediate, declared cross-actor sets | A tick writes its own actor freely; cross-actor writes need a declared write set and the task graph serialises conflicts | Zero latency, no buffers, familiar inside one actor | Dynamic targets ("whoever I hit") cannot be declared; serialising kills parallelism; order and ghosts stay open |
+
+The research's suggested blend: (c) inside the own actor, (a) for every cross-actor write, commutative accumulators where an operation commutes (the 5.2k impulse accumulator needs no sort), (b) for the existing physics, network and audio fan-out. That is where the "actor messaging framework" line sits: one record type and one sorted apply, not mailboxes per actor.
+
+Enforcement in C++23: a `const` view or `ref<const T>` stops direct member writes but is shallow (pointer members stay mutable); a proxy view type is deep for what it exposes but costs one type per component; `propagate_const` is not standard; an access token constructible only by the scheduler gates the mutating API but can leak if copyable. Nothing closes `const_cast` or `mutable`, so the layers are: views for the common path, a review lens or clang-tidy rule against `const_cast` and `mutable` in components, and a debug write guard (thread-local current actor, generation check on write).
+
+Open for the owner: which model or blend; whether the mutation proxy is generated (layout descriptor, 7.1 of the archetype design) or hand-written; whether event and command application is sorted by default or only in deterministic mode (W02.6).
 
 ## 5. Serialization
 
@@ -200,6 +230,18 @@ Working notes from a design conversation. **Team** marks what the team stated; *
 - **Team (agreed)**: every storage reports **spans** `(base, count, stride)` per component type; compaction works on the same base and stride.
 - **Team**: primary users are engine systems, but game code may run mass queries ("all components of type T"); expose something like the scene storages' `forEach` / `remove` with `FnRef` callbacks.
 - **Proposal**: a component type → storages index; `forEach<T>(FnRef)` per element and `forEachSpan<T>(FnRef)` per span; parallel by span; derived component types included unless a sealed-exact flag is set; span lists valid for one phase. Several same-type components in an archetype = one span per member offset; each has a **role** (member name), which also identifies archetype components for serialization.
+
+#### 8.5.1 Revision: repeated types and many-component actors (owner, 2026-11-18, W02.17)
+
+The owner's point: one span per member offset means `k` strided passes for `k` same-type components (`VehicleLayout`'s four wheels). Is leap-frogging faster than a micro-loop per slot, are same-type components dense-packed inside a slot, and how do many-component actors (editor-composed collection actors of immutable static geometry, instanced geometry) promote or de-optimize? Desk research: [archetype iteration research](sources/archetype-iteration-research.md).
+
+- **Prefetchers** (Intel manuals, verified): the L1 IP stride prefetcher follows strides up to 2 KB inside one 4 KB page; the L2 streamer tracks 32 streams, at most one forward and one backward per page, up to 20 lines ahead, and never crosses a page; both need a few misses to start. AMD Zen 4 names its five prefetchers but publishes no limits; Zen 5's "2D stride" prefetcher is undocumented.
+- **Inference, to be measured**: walked chunk by chunk with a chunk at most half of L1, leap-frog and micro-loop should cost about the same, since the second to `k`-th pass hits L1. Walked pass by pass across a region, with chunks larger than L1, or with components sharing cache lines, leap-frog fetches each line up to `k` times. Slots over 2 KB lose the Intel stride prefetcher, over 4 KB the streamer.
+- **Other engines keep N of one type dense**: none uses a per-entity array-of-structs slot. Unity `DynamicBuffer` packs N elements densely per entity inside the chunk (128 B inline by default; overflow leaves for good and wastes the inline space); flecs pairs and EnTT named pools make N columns; Bevy 0.16 makes N child entities. The evidence favours **type-grouped runs inside the slot** and a two-level span `(outer base, stride, count; inner stride, count)` instead of `k` spans (**Proposal**).
+- **Many-component actors**: Unreal (Packed Level Actor, ISM/HISM, the 5.5 immutable-mesh gathering, 5.6 FastGeo) and Snowdrop (GDC 2024: static objects packed into groups at stream time, 17 B per instance in SoA, full object rebuilt only on destruction) both drop per-object identity and move such content into per-mesh dense pools. That is the de-optimize-into-pools direction, with identity restored on demand. No source publishes promotion thresholds or *hysteresis*; those stay ours to measure.
+- **Benchmark matrix** (research section 4, input to W02.17): component size 16, 48, 64, 256 B; `k` 1, 2, 4, 16, 64; slot stride below and above 2 KB and 4 KB; type-grouped versus per-element sub-blocks; shapes leap-frog chunk-major, leap-frog pass-major, micro-loop (`k` compile-time and runtime), sorted gather, and a dense SoA baseline; chunk 16 KiB, 64 KiB, 2 MiB; residency L1, L2, LLC, DRAM; kernels read-reduce, read-modify-write, one field of a large component; occupancy 100 % and 50 %; hardware counters where available.
+
+Open for the owner: type-grouped runs as the in-slot rule; the two-level span; whether collection and instanced geometry actors leave the archetype path for per-type pools (Snowdrop and Unreal practice) or stay as shape clusters with micro-loops. All three wait on the benchmark.
 
 ### 8.6 Transforms
 

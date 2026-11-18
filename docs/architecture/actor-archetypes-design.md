@@ -123,6 +123,9 @@ template class InheritArchetype<Tank, Vehicle>;   // one line per archetype
 
 ## 7. Memory: clusters
 
+!!! warning "Under revision (owner, 2026-11-18)"
+    Traversal of layouts with repeated component types (strided passes versus per-slot micro-loops), the in-slot packing rule (declaration order versus dense per type) and promotion or de-optimization of many-component actors are reopened as [W02.17](../plan/work/concurrency-fibers.md). Sections 6.1, 7 and 7.0 may change with its measurements.
+
 - One **cluster region** per archetype: a list of chunks. A chunk holds `n` slots of the archetype's stride.
 - Slot: `[component block][actor object]`, with component offsets negative from the actor.
 - Chunk size: **Builder's call**, measured (start at 16 KiB or one page multiple; large archetypes may need larger chunks). Chunk memory comes from a page allocator so whole chunks can be returned.
