@@ -4,7 +4,7 @@
 
 ## The engine in one paragraph
 
-Heliogrim is a general-purpose engine and editor for games that are large, dense and alive: open worlds up to a single-shard MMO, photoreal or stylised, with weather, oceans, deformable multi-level terrain and crowds, built by teams that write C++ and expect the tools to keep up with them. The engine is written in the project; third parties supply platform access (Vulkan, OS), a few proven algorithms (ankerl, Jolt) and standard codecs (PNG, KTX, FLAC, Ogg, glTF/FBX). Quality is the product: a failure anywhere returns a diagnostic that names the fix.
+Heliogrim is a general-purpose engine and editor for games that are large, dense and alive: open worlds up to a single-shard MMO, photoreal or stylised, with weather, oceans, deformable multi-level terrain and crowds, built by teams that write C++ and expect the tools to keep up with them. The quality target is that of a high-end, next-generation single-player game (models, textures, simulation and gameplay), delivered while the same world runs as an MMO (owner, 2026-11-18). The engine is written in the project; third parties supply platform access (Vulkan, OS), a few proven algorithms (ankerl, Jolt) and standard codecs (PNG, KTX, FLAC, Ogg, glTF/FBX). Quality is the product: a failure anywhere returns a diagnostic that names the fix.
 
 ## Acceptance bars
 

@@ -77,9 +77,17 @@ Placement: `Engine.Canvas/{CanvasCommand,CanvasBackend,AnimatedValue}`, `Engine.
 - **Output**: `architecture/uikit-design.md`; plan grouped by issue cluster.
 - **Questions**: Q43.1.
 
-### W43.2 Implement invalidation protocol and inputs (#27 to #36) · execute · after W43.1, W42.2
+### W43.2 Implement invalidation protocol and inputs (#27 to #36) · execute · runtime core in review ([PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205) into `feat/wip`); inputs open
 
 - **Done when**: an unchanged frame lays out no widget (#10), render-version propagation stops early (#43), and the input widgets are uikit components.
+- **Result (runtime core, 2026-11-18)**: [uikit design](../../architecture/uikit-design.md) migration step 1. Nine signed commits on `feat/reflow-runtime-core`, rebased onto `feat/wip` `f9ee8b8f`, head `77c87a2c`:
+    - **Subtree skipping:** an `eSubtreePending` bit lets prefetch and compute skip clean subtrees.
+    - **Layout boundary:** a `BoxLayout` with absolute `min == max` on both axes stops upward propagation.
+    - **Phase-typed attributes:** `ReflowPhase` lives in `Engine.Reflow`, and `AttributeOwnerLink` plus `AttributeBatch` mark the owning widget.
+    - **Render-version early exit:** propagation stops at the first ancestor that already has the version. When the u16 tick wraps, every widget's versions reset, so the tree renders fully once every 2^16 ticks.
+    - **Numbers (Debug, live editor):** the idle reflow tick is ~1.1 ms on the base and 60 to 90 µs on the branch, with 0 layout calls in idle frames. What remains is the O(n) ticker walk.
+    - **Tests:** Engine.Reflow.Test 86 pass, 1 skip that is older than the branch.
+    - **Still open:** the input widgets (#27 to #36) are not uikit components yet. Leaf writes (`get<>().update()`, `DataWatcher`) still mark by hand, which is a `shortcut:` until the step 2 bindings. Asset-browser scroll is broken on the base too (#204).
 
 ### W43.3 Implement lists, trees, tables, docking, dialogs, menus, notifications · execute · after W43.2
 

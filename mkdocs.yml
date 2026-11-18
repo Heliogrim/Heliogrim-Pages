@@ -94,6 +94,8 @@ nav:
           - Affine threads: architecture/affine-thread-design.md
           - Task graph: architecture/task-graph-design.md
           - Worker policy: architecture/worker-policy-design.md
+          - Scheduler lanes and priority: architecture/lane-policy-design.md
+          - Scheduler lanes, owner review: architecture/lane-policy-review.md
           - GPU test harness: architecture/gpu-test-harness-design.md
           - Storage: architecture/storage-design.md
           - Accel Lang: architecture/accel-lang-design.md
@@ -124,6 +126,8 @@ nav:
           - Audio tools and libraries: architecture/sources/audio-research-tools-libs.md
           - Audio review: architecture/sources/audio-dsp-gemini-review.md
           - Bounding volumes review: architecture/sources/bounding-volumes-gemini-review.md
+          - Cross-object mutation: architecture/sources/actor-mutation-research.md
+          - Archetype iteration: architecture/sources/archetype-iteration-research.md
   - Battle plan:
       - plan/index.md
       - Vision: plan/vision.md

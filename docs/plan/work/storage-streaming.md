@@ -90,7 +90,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 - **Done when**: 1,000 concurrent requests across three priorities complete through the IO thread with priorities honoured; cancellation observed; no `todo_panic` on the storage query and mutation path (registry removal excluded, see Scope).
 
-### W03.5 Codec and chunking benchmark · explore · done 2026-11-17; proposals await owner
+### W03.5 Codec and chunking benchmark · explore · done 2026-11-17; owner ruled 2026-11-18 (see Decisions)
 
 - **Result (codecs)**: the owner ran the 64 KiB codec benchmark ([storage exploration](../../architecture/storage-exploration.md) 6.2).
   - The corpus has no BCn textures: all 985 MiB are raw RGBA8, RGBA16F and RGBA32F, none supercompressed.
@@ -110,8 +110,23 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
   - The codec tool is built: zlib 1.3.1, libdeflate, GDeflate, LZ4 1.10.0 and zstd 1.5.7, 16 to 256 KiB chunks. Spike folder: engine checkout `docs/superpowers/spikes/w03-5-codec-io/` (untracked).
   - The owner ran the codec benchmark, because it reads `assets/**`, which agents may not read. The owner also ran the chunk-size sweep (16 to 256 KiB). Going from 64 KiB to 256 KiB gains only 3% for zstd 19, and GDeflate stops improving at 64 KiB, so the 64 KiB unit stays.
 
+- **Rulings (owner, 2026-11-18)**: see Decisions, rows Q03.3, Q03.5 and Q03.7 to Q03.10. Follow-up chunks: W03.6 and W03.7.
+
 - **Goal**: measure no compression, zlib (vendored), LZ4, zstd and GDeflate (the format DirectStorage decompresses on the GPU; open specification, permissive reference implementation) on the project's assets at 64 KiB chunks; record each candidate's licence; decide the chunk size and whether DirectStorage PC's GPU decompression is worth a backend. Commercial codecs (Oodle) are out.
 - **Output**: results in `architecture/storage-exploration.md`; answers Q03.3 by measurement.
+
+### W03.6 IO tuning: package read path · execute · after W03.5
+
+- **Goal**: the in-flight cap defaults to 32 and becomes a setting (kept as a constructor argument, read from config). Package chunks are read unbuffered (`FILE_FLAG_NO_BUFFERING`, sector-aligned buffers, offsets and lengths); metadata and editor files stay buffered. Adjacent wanted chunks coalesce into requests of about 256 KiB, never past what was requested (Q03.9). There is a byte budget in flight next to the 32-request cap.
+- **Burst check (Q03.9)**: a mixed burst of bulk low-priority reads (start or level-load sized) with high-priority reads arriving during it, at byte budgets of 1, 2, 4 and 8 MiB. Record the burst makespan and the high-priority p50 and p99 per budget, then pick the default.
+- **Later, own chunk if wanted**: a per-device auto-tune that grows the in-flight byte budget while throughput still rises and p50 latency stays under a target, and stops at the knee.
+- **Done when**: the cap is configurable; a streamed package read is unbuffered; the W03.5 drive spike shows no throughput loss against its unbuffered numbers; the burst check has picked the default byte budget.
+
+### W03.7 Texture import format and positional sub-region reads · design · after W03.5
+
+- **Goal**: change the default texture import format, lossless while authoring in the editor (owner, Q03.10), with a block format (BCn) left to cook. Update the image loader and stream chain: today they rely on predictable tiling and memory layout to read a sub-region by reading only its byte ranges. With per-chunk compression and new formats, byte offsets are no longer computable, so the chain needs a positional reconstruction per format: an index from (mip, layer, tile) to chunk(s), with the compression chunk aligned to the tile so a sub-region read decodes only whole wanted chunks.
+- **Output**: design section in `architecture/storage-exploration.md` or its own design page; plan.
+- **Then**: re-check the codec on the new corpus (Q03.3 left the shipping codec open).
 
 ### W08.1 Memory model design · design · after W04.1
 
@@ -159,6 +174,12 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 | Q03.6 (2026-11-09) | A dropped batch future never cancels. `IoRequest` carries an optional `Arci<void> keepAlive` that the batch holds until the request completes, so a dropped future with an owned buffer is safe. `IoFileBlob` leaves it empty. [Storage design](../../architecture/storage-design.md) 2.4. |
 | Q40.2 (input) | World scope stated by the owner for the partition design: massive terrains; multi-layered terrain-scale tunnel systems; gigantic caves holding whole kingdoms; giant forests with villages inside trees; wide grasslands, swamps, volcanoes, mountain ranges and borders; wide oceans. The 2D versus 3D cell question (and the cell-size question Q40.1) is decided against this scope; pros and cons are in the conversation record of 2026-11-09. |
 | Q40.1 | Recommendation accepted as the starting point: fixed leaf cells (256 m to start; forest and cave interiors decide the final size) under a quadtree used for streaming priority and server interest, with persistence and ownership at the leaf only. Empty leaves hold no package. The design must get the split right between extreme actor and asset density and wide open, loosely populated regions; the owner points at a VSBVH as the kind of structure that shines there. |
+| Q03.3 (2026-11-18) | **LZ4HC 9 per 64 KiB chunk**, not the zstd proposal: about one core at full drive speed (ratio 1.29) and fast reads. The chunk table records the codec per chunk, so a later switch is a re-cook. DirectStorage, if it comes, needs GDeflate anyway. The codec for cook and shipping builds is searched later (W03.7 corpus). [Storage exploration](../../architecture/storage-exploration.md) 6.2. |
+| Q03.5 (2026-11-18) | Default cap lowered from 64 to **32** and made a setting (W03.6). Measuring the drive at runtime to auto-adjust, for shipped games, is a candidate follow-up. |
+| Q03.7 (2026-11-18) | Package chunks are read unbuffered; buffered reads stay for metadata and editor files. Decided on the measurement (cold buffered reads 3.8 times slower). |
+| Q03.8 (2026-11-18) | No DirectStorage backend now; kept in view (GDeflate, `VK_EXT_memory_decompression`). |
+| Q03.9 (2026-11-18) | Adjacent wanted chunks coalesce into requests of about 256 KiB. Never read more than was requested to make a request bigger: a 64 KiB request stays 64 KiB. A byte budget in flight (1 to 2 MiB proposed for this drive) next to the 32-request backstop. Owner caveat: higher latency is not automatically bad. In a burst (engine start, level load, cooking), 32 × 256 KiB finishes in about the same time as a shallow window (8 MiB at 3,311 against 3,272 MiB/s, about 0.03 ms apart), and a deep queue absorbs refill stalls on our side. So the budget is not fixed at the knee before W03.6 measures burst makespan against the latency of a high-priority request that arrives during the burst. |
+| Q03.10 (2026-11-18) | Texture import default changes; lossless while authoring in the editor. The image loader and stream chain need a positional reconstruction per format for sub-region reads (W03.7). |
 | Q40.2 | 2D columns with explicit, authored height layers (surface, cave levels), each with its own height band and packages; terrain and ocean stay on the 2D grid; streaming picks layers by player height and known connections. 3D cubes rejected for now. |
 
 ## Questions for the owner

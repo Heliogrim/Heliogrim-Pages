@@ -36,6 +36,9 @@ BRDF
 Cancellation token
 :   A shared flag a task polls to learn that its result is no longer wanted; the fiber scheduler's cancellation model (Q02.1).
 
+CAS / RMW
+:   Compare-and-swap and read-modify-write: atomic operations that read a memory location and write it in one indivisible step. An RMW (`fetch_add`, `exchange`, `fetch_or`) always writes; a CAS (`compare_exchange`) writes only if the location still holds the expected value, and otherwise reports what it found, so it is retried in a loop. Both cost more than a plain atomic store and contend on the cache line, which is why designs here prefer a store where one suffices (change marks, lane floor turns).
+
 Cascade (ocean)
 :   One FFT height field at one world scale. Four cascades at roughly 1 km, 250 m, 60 m and 15 m patch sizes cover swell to ripples without visible tiling (Q30.2).
 
@@ -111,6 +114,9 @@ GDeflate
 
 Height layer
 :   A named vertical band inside a *cell* column (surface, cave level 1, cave level 2) with its own packages, so a player underground does not stream the city above (Q40.2).
+
+Hysteresis
+:   A switch that uses different thresholds for entering and leaving a state (enter at `r`, leave at `r + h`), so a value hovering at the border does not flip the state every frame. Used for trigger volumes, sync tier changes, reparenting between frames, compaction and shape-cluster promotion.
 
 Horizon (volumetrics)
 :   The distance to which fog and clouds are modelled, 32 km; beyond the *froxel* far plane it uses analytic, not voxelised, scattering (Q21.1).
