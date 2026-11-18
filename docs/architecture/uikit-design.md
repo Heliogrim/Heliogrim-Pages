@@ -225,7 +225,11 @@ A reviewer read this revision as a builder would. Answered from the brainstorm: 
 
 ## Migration
 
-1. **Runtime core** (W43.2): phase flags and phase-typed attributes, layout skipping and layout boundaries (#10), render-version early exit (#43). Existing widgets keep working; their attributes get phases. Paint caching and compose follow the canvas (see above).
+1. **Runtime core** (W43.2): phase flags and phase-typed attributes, layout skipping and layout boundaries (#10), render-version early exit (#43). Existing widgets keep working; their attributes get phases. Paint caching and compose follow the canvas (see above). Built 2026-11-18, in review as [PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205). As built:
+    - The only layout boundary for now is a `BoxLayout` with absolute `min == max` on both axes.
+    - Theme cascades stay conservative and mark layout.
+    - A wrap of the u16 render tick resets every widget's render versions, so the tree renders fully once.
+    - Leaf writes still mark by hand until step 2.
 2. **Authoring and data**: flat named attribute sets, the cascade (with an adapter so existing atoms read resolved styles), description tree and mount, sources with polling and pipes, contexts, the action registry; scene hierarchy rewritten as the proof.
 3. **Events**: hit path with clip and transforms, tunnel and bubble, replies, full drag and drop.
 4. **Virtualisation and animation**: virtualiser with the asset browser and hierarchy; channels, timelines, FLIP layout transitions, enter and exit.
