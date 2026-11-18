@@ -117,9 +117,10 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 
 ### W03.6 IO tuning: package read path · execute · after W03.5
 
-- **Goal**: the in-flight cap defaults to 32 and becomes a setting (kept as a constructor argument, read from config). Package chunks are read unbuffered (`FILE_FLAG_NO_BUFFERING`, sector-aligned buffers, offsets and lengths); metadata and editor files stay buffered. Adjacent wanted chunks coalesce into one request, up to the size Q03.9 settles.
+- **Goal**: the in-flight cap defaults to 32 and becomes a setting (kept as a constructor argument, read from config). Package chunks are read unbuffered (`FILE_FLAG_NO_BUFFERING`, sector-aligned buffers, offsets and lengths); metadata and editor files stay buffered. Adjacent wanted chunks coalesce into requests of about 256 KiB, never past what was requested (Q03.9). There is a byte budget in flight next to the 32-request cap.
+- **Burst check (Q03.9)**: a mixed burst of bulk low-priority reads (start or level-load sized) with high-priority reads arriving during it, at byte budgets of 1, 2, 4 and 8 MiB. Record the burst makespan and the high-priority p50 and p99 per budget, then pick the default.
 - **Later, own chunk if wanted**: a per-device auto-tune that grows the in-flight byte budget while throughput still rises and p50 latency stays under a target, and stops at the knee.
-- **Done when**: the cap is configurable; a streamed package read is unbuffered; the W03.5 drive spike shows no throughput loss against its unbuffered numbers.
+- **Done when**: the cap is configurable; a streamed package read is unbuffered; the W03.5 drive spike shows no throughput loss against its unbuffered numbers; the burst check has picked the default byte budget.
 
 ### W03.7 Texture import format and positional sub-region reads · design · after W03.5
 
@@ -177,7 +178,7 @@ Placement: `Engine.Storage.Backend/{IoRequest,IoQueue,IoBackend,Iocp}.{hpp,cpp}`
 | Q03.5 (2026-11-18) | Default cap lowered from 64 to **32** and made a setting (W03.6). Measuring the drive at runtime to auto-adjust, for shipped games, is a candidate follow-up. |
 | Q03.7 (2026-11-18) | Package chunks are read unbuffered; buffered reads stay for metadata and editor files. Decided on the measurement (cold buffered reads 3.8 times slower). |
 | Q03.8 (2026-11-18) | No DirectStorage backend now; kept in view (GDeflate, `VK_EXT_memory_decompression`). |
-| Q03.9 (open) | IO request size: the "at least 256 KiB" proposal and its relation to the cap. Owner asked whether 256 KiB at 32 in flight already over-saturates the drive; answered in the conversation of 2026-11-18, ruling pending. |
+| Q03.9 (2026-11-18) | Adjacent wanted chunks coalesce into requests of about 256 KiB. Never read more than was requested to make a request bigger: a 64 KiB request stays 64 KiB. A byte budget in flight (1 to 2 MiB proposed for this drive) next to the 32-request backstop. Owner caveat: higher latency is not automatically bad. In a burst (engine start, level load, cooking), 32 × 256 KiB finishes in about the same time as a shallow window (8 MiB at 3,311 against 3,272 MiB/s, about 0.03 ms apart), and a deep queue absorbs refill stalls on our side. So the budget is not fixed at the knee before W03.6 measures burst makespan against the latency of a high-priority request that arrives during the burst. |
 | Q03.10 (2026-11-18) | Texture import default changes; lossless while authoring in the editor. The image loader and stream chain need a positional reconstruction per format for sub-region reads (W03.7). |
 | Q40.2 | 2D columns with explicit, authored height layers (surface, cave levels), each with its own height band and packages; terrain and ocean stay on the 2D grid; streaming picks layers by player height and known connections. 3D cubes rejected for now. |
 
