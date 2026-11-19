@@ -225,7 +225,7 @@ A reviewer read this revision as a builder would. Answered from the brainstorm: 
 
 ## Migration
 
-1. **Runtime core** (W43.2): phase flags and phase-typed attributes, layout skipping and layout boundaries (#10), render-version early exit (#43). Existing widgets keep working; their attributes get phases. Paint caching and compose follow the canvas (see above). Built 2026-11-18, in review as [PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205). As built:
+1. **Runtime core** (W43.2): phase flags and phase-typed attributes, layout skipping and layout boundaries (#10), render-version early exit (#43). Existing widgets keep working; their attributes get phases. Paint caching and compose follow the canvas (see above). Built 2026-11-18, merged into `feat/wip` on 2026-11-19 as [PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205) (`c1b79c8d`). As built:
     - The only layout boundary for now is a `BoxLayout` with absolute `min == max` on both axes.
     - Theme cascades stay conservative and mark layout.
     - A wrap of the u16 render tick resets every widget's render versions, so the tree renders fully once.

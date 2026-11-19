@@ -7,6 +7,7 @@ How-to documents for working on the project.
 <a class="hg-row" href="docs-workflow/"><span class="n">01</span><span class="t">Docs workflow</span><span class="d">Preview the site locally, commit conventions, what the build checks.</span><span class="a">→</span></a>
 <a class="hg-row" href="writing-explorations/"><span class="n">02</span><span class="t">Explorations</span><span class="d">The structure every exploration page follows, and when to close one.</span><span class="a">→</span></a>
 <a class="hg-row" href="writing-adrs/"><span class="n">03</span><span class="t">ADRs</span><span class="d">When and how an accepted decision becomes a record.</span><span class="a">→</span></a>
+<a class="hg-row" href="work-and-release/"><span class="n">04</span><span class="t">Work and release</span><span class="d">Vision to code, branches, history, releases, security and legal (D7, D8, D10 to D12 open).</span><span class="a">→</span></a>
 <a class="hg-row" href="brand-identity/"><span class="n">04</span><span class="t">Brand identity</span><span class="d">Mark, palette, wordmarks and splash for engine, editor and site.</span><span class="a">→</span></a>
 </div>
 

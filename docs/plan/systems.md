@@ -102,7 +102,7 @@ Issue column: existing issues are linked by number; `new` means an issue is crea
 
 ## Progress (checked 2026-11-10)
 
-Every battle-plan issue carries a comment "Battle-plan sync from Heliogrim-Pages (2026-11-10)" with its chunk statuses, decisions and engine state; this table is the same state per system. Systems not listed have no chunk started. Chunk detail lives on the [work pages](work/index.md).
+Every battle-plan issue carries a comment "Battle-plan sync from Heliogrim-Pages (2026-11-10)" with its chunk statuses, decisions and engine state; this table is the same state per system. Systems not listed have no chunk started. Chunk detail lives on the [work pages](work/index.md); the generated [progress board](progress.md) is current where this table is not.
 
 | ID | Chunks done | Engine state |
 |----|-------------|--------------|

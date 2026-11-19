@@ -175,7 +175,7 @@ Module warnings (from parse and typecheck) never fail a compose; they are logged
 ## Limits
 
 - **Only profile toggles are fed.** `resolveStageIr` passes empty pass and material toggle sources; the precedence rules are implemented in `fixToggles` but nothing supplies those values yet.
-- **Inert pass contract.** The pass side is built as "provides every bind input, requires nothing". Hooking the render-graph declarations (`declareInputs`, `declareOutputs`) into `StageContract` is open.
+- **Inert pass contract.** The pass side is built as "provides every bind input, requires nothing". Hooking the render-graph declarations (`declareInputs`, `declareOutputs`) into `StageContract` is open. Since W11.4 (`1cc9e75c`, after the verified commit) a specification can declare a contract through `EffectSpecification::stageContract()` and `resolveStageIr` checks it (`ASL0075`, `ASL0076`); none declares one yet, render-graph wiring is W14.
 - **Graphics only.** `VkPipelineCompiler` builds graphics pipelines; compute, geometry and tessellation modules emit and pass glslang but have no pipeline creation.
 - **Legacy loader.** `makeIrIntermediate` is a temporary helper reading files directly; `Engine.Accel.Loader` (`EffectLoader`, `EffectCache`) does not know about `.asl` yet.
 - **Leftover TODOs** in `EffectCompiler::compile` describe the old design (text composition, symbol aliasing as a "temporary solution"); they predate the IR and are not a plan.
