@@ -1,8 +1,8 @@
 # Scheduler Lanes and Priority (Owner Review)
 
-**Status**: review sheet, 2026-11-18. Work chunk [W02.14](../plan/work/concurrency-fibers.md), issue [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84), draft PR [#208](https://github.com/Heliogrim/Heliogrim-Engine/pull/208) into `feat/wip` (ten signed commits: nine plan tasks and a profiling workload that was added after the reviews and is itself unreviewed). The [design](lane-policy-design.md) was built on `feat/lane-policy` in one autonomous run while the owner was away. This page lists what the owner has to decide, every ruling that was made on the owner's behalf during the run, and what is left to do. Nothing here is decided by the owner yet. Revise a ruling by writing the new decision into its row; the row says what code it touches.
+**Status**: closed 2026-11-19. Work chunk [W02.14](../plan/work/concurrency-fibers.md), issue [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84), PR [#208](https://github.com/Heliogrim/Heliogrim-Engine/pull/208) merged into `feat/wip` on 2026-11-19 (ten signed commits, head `fd5affa5`). The [design](lane-policy-design.md) was built on `feat/lane-policy` in one autonomous run while the owner was away; this page then collected what the owner had to decide and every ruling made on the owner's behalf. All questions Q02.11 to Q02.22 are decided (table below section 1); the open ones moved to W02.15 and W02.16. The system page is [Lanes and Priority](../systems/scheduler/lanes.md).
 
-Sources: the [design](lane-policy-design.md) (sections 15.1 to 15.6 hold the numbers), the [prior-art record](lane-policy-exploration.md) section 6, the plan `docs/superpowers/plans/2026-11-18-lane-policy.md` and the run ledger `.superpowers/sdd/2026-11-18-lane-policy/progress.md` in the engine checkout (both untracked).
+Sources: the [design](lane-policy-design.md) (sections 15.1 to 15.6 hold the numbers), the [prior-art record](lane-policy-exploration.md) section 6, and PR [#208](https://github.com/Heliogrim/Heliogrim-Engine/pull/208). The plan and the run ledger were local scratch files and were deleted after the merge; their rulings are in section 2.
 
 ## 1. Decisions for the owner
 
@@ -31,7 +31,7 @@ Each has a suggested default. "Measured" refers to the Debug build on the 5900X;
 | Q02.12 | 250 µs for now | applied |
 | Q02.13 | No cap for now. Measure again with the 250 µs limit; if a cap is needed, cap at the observed fan-out peak plus one. No multi-frame approximation (no one raise per frame) | open, measure (W02.16) |
 | Q02.14 | k known: wake `min(k, parked)`; k unknown: wake two while tasks are still queued. Counted ramp-up for batches and fan-outs, faster ramp-up for task streams. Separate work package | W02.15 |
-| Q02.15 | Check where to integrate first; does not block the implementation or the PR | open |
+| Q02.15 | Check where to integrate first; does not block the implementation or the PR | open, editor run |
 | Q02.16 | Profile first. Lane-lock contention grows with the worker count; a lock-free FIFO work set is a candidate, decided by measurement only | open, W02.16 |
 | Q02.17 | As suggested: together with Q02.14 | open, W02.15 |
 | Q02.18 | As suggested: a wait-trigger raise refreshes the staleness clock. A 250 ms frame is a stalled process | applied |
@@ -109,12 +109,12 @@ Minor unless marked. Each is one line in the run ledger with its file and line.
 
 ## 4. Left to do
 
-In order. A new session can start at step 1 from this page, the design's section 15 and the PR.
+Done 2026-11-19: the `/review-branch` lenses (findings folded into the owning commits, see the PR), owner decisions Q02.11 to Q02.22 (Q02.12 and Q02.18 applied), merge into `feat/wip`, the [Lanes and Priority](../systems/scheduler/lanes.md) system page, removal of the worktree, the run workspace and the backup refs.
 
-1. `/review-branch origin/feat/wip..HEAD 84` on `feat/lane-policy` (the lenses; not run in the autonomous session). Fixes go in as fixups onto the commit that owns the line.
-2. Owner decisions Q02.11 to Q02.22 above; apply the accepted ones (Q02.12 and Q02.18 are one-line changes).
-3. Profile with the workload `LaneFloodBenchmark.DISABLED_Profile` in `Performance.Test` (W02.16); see the PR for the command.
-4. Owner editor run in Debug: frame time idle and during an asset import; every logged overrun becomes an issue (Q02.15).
-5. `graphify update .` on the branch, then mark the PR ready and merge it into `feat/wip`.
-6. After the merge: the scheduler system page (lanes section), the ADR for Q02.8 with the decisions taken here, deletion of the worktree, the run workspace and the ref `backup/lane-policy-prefold`.
-7. Follow-up chunks: W02.15 (wake-up fan-out), W02.16 (profile and optimise).
+Left, each with an owner:
+
+1. Profile `LaneFloodBenchmark.DISABLED_Profile` and act on it: [W02.16](../plan/work/concurrency-fibers.md) (holds the owner's first uProf numbers, Q02.13 and Q02.16).
+2. Wake rule `min(k, parked)` / two while queued: [W02.15](../plan/work/concurrency-fibers.md) (Q02.14 and Q02.17).
+3. Where `hg::checkpoint()` goes first (Q02.15): an owner editor run in Debug, frame time idle and during an asset import; every logged overrun becomes an issue.
+4. The ADR for Q02.8 with the decisions taken here.
+5. `graphify update .` on `feat/wip`; an MSVC `cl` and a Release build of the scheduler tests.

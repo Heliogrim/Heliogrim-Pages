@@ -1,6 +1,6 @@
 # Scheduler Lanes and Priority (Design)
 
-**Status**: design, accepted by the owner on 2026-11-18 as the starting point to iterate on (work chunk [W02.14](../plan/work/concurrency-fibers.md), issue [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84)). Built on `feat/lane-policy` the same day; results and what changed while building are in section 15, the open points in 15.5. Implements the direction of the [lane policy exploration](lane-policy-exploration.md) section 3 (agreed 2026-11-13, decision Q02.8) on top of the [worker policy](worker-policy-design.md), the [waitables](scheduler-waitable-design.md) and the [task graph](task-graph-design.md) as built.
+**Status**: design, accepted by the owner on 2026-11-18 as the starting point to iterate on (work chunk [W02.14](../plan/work/concurrency-fibers.md), issue [#84](https://github.com/Heliogrim/Heliogrim-Engine/issues/84)). Built on `feat/lane-policy` the same day and merged into `feat/wip` on 2026-11-19 (PR [#208](https://github.com/Heliogrim/Heliogrim-Engine/pull/208), head `fd5affa5`); results and what changed while building are in section 15, the owner's decisions in 15.7. How it works as built: [Lanes and Priority](../systems/scheduler/lanes.md). Implements the direction of the [lane policy exploration](lane-policy-exploration.md) section 3 (agreed 2026-11-13, decision Q02.8) on top of the [worker policy](worker-policy-design.md), the [waitables](scheduler-waitable-design.md) and the [task graph](task-graph-design.md) as built.
 
 Markers: **Decided** = owner decision (exploration or work page Decisions table). **Proposal** = this document's call, open to correction. **Builder's call** = left to the implementer.
 
@@ -74,7 +74,7 @@ One function decides, at the point a task or a continuation is created:
 
 - **Decided**: inherit on spawn, lower only, never higher; `exec` without a lane is Interactive off the workers.
 - `Scheduler::exec(task)` resolves and pushes. `hg::execute`, `hg::async`, `make_task` and its siblings default to `eInherit`.
-- Futures resolve in `then()` (and `Future<void>::ready(lane)`), on the thread that builds the chain, and store the result in `FutureState::lane`. The continuation task is pushed with that lane as is, through a second entry `Scheduler::execResolved(task)`, because the completing thread (often the IO thread) says nothing about who wants the result. **Proposal 5.1**: today the successor copies the predecessor's mask; it now takes the lower of the predecessor's lane and the lane resolved at `then()`.
+- Futures resolve in `then()` (and `Future<void>::ready(lane)`), on the thread that builds the chain, and store the result in `FutureState::lane`. The continuation task is pushed with that lane as is, through a second entry `Scheduler::execResolved(task)` (as built: `Scheduler::execBoostable(task, cell)`, which also queues it under its boost cell), because the completing thread (often the IO thread) says nothing about who wants the result. **Proposal 5.1**: today the successor copies the predecessor's mask; it now takes the lower of the predecessor's lane and the lane resolved at `then()`.
 - The pipeline (`CompositeSlot::submit`), the worker's re-push and `unpark` call `Schedule::push` directly with the lane the task already has. Slots stamp `eFrame`.
 
 ## 6. Worker allocation
@@ -185,7 +185,7 @@ struct BoostCell {
 
 ```
 boost(cell, lane):
-  for hop in 1..boostMaxHops (16):
+  for hop in 1..boostMaxHops (16; as built 1,024, section 15.6):
     if not cell: return
     if not raise(cell.lane, lane): return      # compare-and-swap to the higher lane; already there: someone else walked on
     if t = cell.task: schedule.promote(t, lane)
@@ -234,7 +234,7 @@ A Frame task that waits for a `FiberMutex` held by a Background task is not boos
 
 ## 9. Observability and config
 
-- `Schedule::queued(Lane)`, `Schedule::overruns(Lane)`, `Schedule::maxRun(Lane)`, `Schedule::frameWaitMax()`, `Schedule::reserve()`; `Scheduler::queued(Lane)` on the module interface for producers. **Decided**: depth per lane is exposed; throttling is the producer's.
+- `Schedule::queued(Lane)`, `Schedule::overruns(Lane)`, `Schedule::maxRunMicros(Lane)`, `Schedule::frameWaitMaxMicros()` (names as built), `Schedule::reserve()`; `Scheduler::queued(Lane)` on the module interface for producers. **Decided**: depth per lane is exposed; throttling is the producer's.
 - `SchedulerConfigProperty` gains `eLaneSlice`, `eInteractiveFloor`, `eBackgroundFloor`, `eFrameWaitLimit` (microseconds), `eLaneReserve` (workers; 0 = sized by demand) and `eWakeOnFramePush` (bool), read where the worker count is read. Defaults live beside `default_worker_reserve`.
 
 ## 10. Verification
@@ -299,11 +299,11 @@ The file split inside `Engine.Scheduler/Process`; whether `ScheduleWorkSet` keep
 | 6.3, 6.4 | Start values: slice 1 ms, floors 8 ms and 100 ms; final values from the sweep | Proposal |
 | 7.1, 7.2 | Boost through a `BoostCell` on future continuations; the queued producer is moved by `promote` | Proposal |
 | 7.1 | The forwarding step of a continuation that returns a future runs inline on the completing thread | Proposal, changes "never inline" for this engine-internal step only |
-| 7.2 | A stale task pointer may promote one unrelated task once | Proposal |
+| 7.2 | A stale task pointer may promote one unrelated task once | Proposal; superseded: a queued entry matches only under the boosting cell, so this cannot happen (`BoostCell.tla` `NoForeignPromote`, 2026-11-19) |
 | 7.3 | Effective lane through the fiber, so a running producer is boosted at its next re-push | Proposal, extends the exploration |
 | 7.5 | No boost through fiber mutexes; rule and optional assert instead | Proposal |
-| 6.4 | Reserve also rises by one on an observed Frame wait above 100 µs; direct wake at a Frame push is a switch decided by measurement | Proposal, from the prior-art pass |
-| 7.2 | Boost walk ends at an already raised cell, 16 hops at most; the linker escalates a new dependency; boosts are never withdrawn | Proposal, from the prior-art pass |
+| 6.4 | Reserve also rises by one on an observed Frame wait above 100 µs (default 250 µs since 2026-11-19, Q02.12); direct wake at a Frame push is a switch decided by measurement | Proposal, from the prior-art pass |
+| 7.2 | Boost walk ends at an already raised cell, 16 hops at most (1,024 as built); the linker escalates a new dependency; boosts are never withdrawn | Proposal, from the prior-art pass |
 | 11.1 | Frame bound on the benchmark: idle p99 plus two slices plus the largest overrun | Proposal |
 
 Builder check (2026-11-18, against the engine source): found that a continuation returning a future and a producer that had already yielded were not boosted by the first draft's claim scheme, and that the floor's compare could reopen a period with a stale clock read; section 7 was rewritten around `promote` and 6.1 corrected. Its remaining question, what the caps were meant to bound, was answered by the owner the same day (6.4). The demand-sized reserve was written after the check and has not been checked by a second reader.
@@ -427,7 +427,7 @@ Left open by that review, in addition to 15.5: after 250 ms without a frame star
 
 ### 15.7 Owner decisions (2026-11-19)
 
-From the [owner review](lane-policy-review.md) Q02.11 to Q02.22; applied on `feat/lane-policy` unless marked open.
+From the [owner review](lane-policy-review.md) Q02.11 to Q02.22; applied before the merge (PR [#208](https://github.com/Heliogrim/Heliogrim-Engine/pull/208)) unless marked open.
 
 - **Reserve clamp** (Q02.11): stays at `workers - 1`; the lifted clamp is measured once long tasks call `checkpoint()`.
 - **Wait limit** (Q02.12): default 250 µs for now.

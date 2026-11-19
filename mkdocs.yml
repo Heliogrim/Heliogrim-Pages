@@ -214,6 +214,7 @@ nav:
       - Scheduler:
           - systems/scheduler/index.md
           - Fibers and workers: systems/scheduler/fibers-and-workers.md
+          - Lanes and priority: systems/scheduler/lanes.md
           - Waitables: systems/scheduler/waitables.md
           - Futures: systems/scheduler/futures.md
           - Affine threads: systems/scheduler/affine-threads.md
