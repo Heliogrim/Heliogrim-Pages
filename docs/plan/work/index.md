@@ -51,7 +51,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Storage, memory, virtual textures, partition](storage-streaming.md) | S03, S08, S17, S40 | W03.1 to W03.7, W08.1, W08.2, W17.1, W17.2, W40.1, W40.2 | W03.5 ruled 2026-11-18, W03.6 and W03.7 next (W03.1 to W03.5 done; W03.4 merged via PR #180 into `feat/wip`) | Q03.1 to Q03.4, Q08.1, Q17.1, Q40.1 to Q40.3 |
 | [Serialisation, reflection, packages](serialization-and-reflection.md) | S01, S09, S41 | W01.1 to W01.5, W09.1, W09.2, W41.1, W41.2 | W01.1, W09.1 | Q01.1 to Q01.3, Q09.1, Q09.2, Q41.1, Q41.2 |
 | [Quality and process](quality-and-process.md) | S10, S26, S61 to S64 | W10.1, W10.2, W26.1 to W26.4, W61.1 to W61.3, W62.1 to W62.3, W63.1, W63.2, W64.1 to W64.3 | W63.1, W62.1, W26.1, W61.1, W64.1 (W10.1 code done, W10.3 done) | Q10.1, Q26.1, Q62.1 to Q62.3, Q63.1, Q63.2, Q64.1 |
-| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.7, W12.1 to W12.3, W13.1, W13.2, W60.1 | W11.4 in review (PR #207 into `feat/wip`), W11.3 done (PR #203 merged into `feat/wip`; W11.0 to W11.2 done) | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
+| [Accel Lang](accel-lang.md) | S11, S12, S13, S60 | W11.0 to W11.7, W12.1 to W12.3, W13.1, W13.2, W60.1 | W11.4 done (PR #207 merged into `feat/wip`), W11.3 done (PR #203 merged into `feat/wip`; W11.0 to W11.2 done) | Q11.1 to Q11.3, Q12.1, Q12.2, Q13.1, Q60.1 |
 | [Render graph, GPU-driven, large world](render-graph-gpu-driven.md) | S07, S14, S15 | W07.1, W07.2, W14.0 to W14.2, W15.0 to W15.3 | W14.0, W07.1, W15.0 | Q07.1, Q07.2, Q14.1, Q14.2, Q15.1 to Q15.3 |
 | [Materials, transparency, post](materials-post.md) | S16, S22, S23 | W16.1, W16.2, W22.1, W22.2, W23.1 to W23.3 | none | Q16.1, Q16.2, Q22.1, Q23.1, Q23.2 |
 | [Micropolygon](micropolygon.md) | S18 | W18.1 to W18.7 | none | Q18.1 to Q18.3 |
@@ -66,7 +66,7 @@ Session prompt that works for any kind: *"Pick up `W<id>` from Heliogrim-Pages `
 | [Navigation](navigation.md) | S37 | W37.0 to W37.4 | none (W37.0 done) | Q37.1, Q37.2 |
 | [Audio](audio.md) | S38 | W38.0 to W38.7 | W38.0 | Q38.1 to Q38.4 |
 | [Input](input.md) | S39 | W39.0 to W39.4 | W39.1 (W39.0 done) | Q39.1, Q39.2 (decided) |
-| [Vector canvas and uikit](vector-ui-uikit.md) | S42, S43 | W42.0 to W42.5, W43.0 to W43.4 | W42.0, W43.0 ready, W43.2 runtime core in review (PR #205 into `feat/wip`), inputs open | Q42.1, Q42.2, Q43.1 |
+| [Vector canvas and uikit](vector-ui-uikit.md) | S42, S43 | W42.0 to W42.5, W43.0 to W43.4 | W42.0, W43.0 ready, W43.2 runtime core done (PR #205 merged into `feat/wip`), inputs open | Q42.1, Q42.2, Q43.1 |
 | [Editor workflows](editor-workflows.md) | S44, S45, S46, S54 | W44.0 to W44.4, W45.1 to W45.3, W46.1, W46.2, W54.1, W54.2 | W44.0, W44.1 | Q44.1 to Q44.3, Q45.1, Q46.1, Q54.1 |
 | [Visual scripting and hot reload](visual-scripting-hmr.md) | S47, S48 | W47.0 to W47.4, W48.0 to W48.3 | W47.0 | Q47.1, Q47.2, Q48.1, Q48.2 |
 | [DCC, plugins, VCS](dcc-plugins-vcs.md) | S49, S50, S51 | W49.1 to W49.4, W50.1 to W50.3, W51.1, W51.2 | none | Q49.1, Q50.1, Q51.1 |
