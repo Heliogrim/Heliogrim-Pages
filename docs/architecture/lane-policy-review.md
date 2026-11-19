@@ -23,6 +23,23 @@ Each has a suggested default. "Measured" refers to the Debug build on the 5900X;
 | Q02.21 | A boosted task entering Frame counts as Frame demand and can lift the reserve for the 8-frame window. Intended? | It is Frame work a stage waits for | Yes, state it in the design |
 | Q02.22 | `Schedule.tla` did not finish: liveness under a racing stop, liveness with a rising reserve, 3 workers. Invest in a smaller model or accept? | Safety is complete in all of them; 2 workers complete with eight mutations | Accept; revisit when the wake rule changes (Q02.14) |
 
+**Owner decisions, 2026-11-19** (design 15.7):
+
+| ID | Decision | State |
+|---|---|---|
+| Q02.11 | As suggested: keep `workers - 1`, measure the lifted clamp after `checkpoint()` adoption | no change |
+| Q02.12 | 250 µs for now | applied |
+| Q02.13 | Explanation asked; open | open |
+| Q02.14 | k known: wake `min(k, parked)`; k unknown: wake two while tasks are still queued. Counted ramp-up for batches and fan-outs, faster ramp-up for task streams | open, W02.15 |
+| Q02.15 | Check where to integrate first; does not block the implementation or the PR | open |
+| Q02.16 | Profile first. Lane-lock contention grows with the worker count; a lock-free FIFO work set is a candidate, decided by measurement only | open, W02.16 |
+| Q02.17 | As suggested: together with Q02.14 | open, W02.15 |
+| Q02.18 | As suggested: a wait-trigger raise refreshes the staleness clock. A 250 ms frame is a stalled process | applied |
+| Q02.19 | As suggested: documented, no `timeBeginPeriod` | documented |
+| Q02.20 | As suggested: constructors and destructors do not take part in concurrent execution | futures page |
+| Q02.21 | As suggested and designed | design 15.7 |
+| Q02.22 | As suggested: accept, revisit with the wake rule change | no change |
+
 Also for the owner, not questions:
 
 - The two engines read the lane configuration with the same duplicated block (`GameEngine.cpp`, `EditorEngine.cpp`); the scheduler bundle does not link the config bundle.

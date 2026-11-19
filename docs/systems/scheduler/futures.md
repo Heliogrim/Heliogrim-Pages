@@ -185,6 +185,7 @@ Tests in `Heliogrim-Engine.Async.Test`, `Future.cpp`: resolve and await in both 
 Model: `Engine.Async/Future/FutureState.tla` + `.cfg` (K = 3: a promise state, two `then` links, each possibly through an inner future) checks that every continuation runs once and only after both its value and its `then`, and that the chain completes. A change to `complete`, `store` or the order of `done.set()` and the exchange must be re-checked there.
 
 ### Pitfalls
+- **A value type must not suspend in its move constructor or destructor.** When a continuation returns a future, the forwarding step moves and destroys values inline on the completing thread, which may be the IO thread. Constructors and destructors do not take part in concurrent execution: no `await`, no lock that can park, no `checkpoint()` there. Debug builds assert; release builds would lose completions.
 
 - **`then` and `await` need `std::move`.** Both consume the future (`then` is `&&`-qualified); using the moved-from future afterwards asserts.
 - **Continuations never run inline.** Code that resolves and then expects the continuation's side effect before the next line is wrong, even if `then` was registered first.
