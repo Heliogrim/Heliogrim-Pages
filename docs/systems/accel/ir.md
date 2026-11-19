@@ -245,7 +245,7 @@ flowchart LR
 - `checkContract`: every bind input must have a class and be provided by the material or the pass; every requirement of the pass must be met by some shader output.
 - `checkStageChain`: every forward input of stage N+1 must match a non-implicit forward output of stage N by id and type. Extra outputs are fine; vertex inputs are attributes and not checked.
 
-Intended rule (battle plan S11): when the pass and the shader disagree, the shader interface is the contract and the pass gets the diagnostic. Today the compiler builds the pass side as "provides every bind input, requires nothing" (see [compiler integration](compiler.md#limits)), so only a missing bind class and unknown target symbols fail.
+Intended rule (battle plan S11): when the pass and the shader disagree, the shader interface is the contract and the pass gets the diagnostic. Today the compiler builds the pass side as "provides every bind input, requires nothing" (see [compiler integration](compiler.md#limits)), so only a missing bind class and unknown target symbols fail. Since W11.4 (`1cc9e75c`, after the verified commit) entries carry their declaration span and contract and stage-chain errors label both sides; see [compiler integration](compiler.md#limits) for the declared contract.
 
 ### assignLayout and assignPipelineLayout
 
