@@ -185,3 +185,11 @@
 /* Tables: let long cells wrap so later columns stay in view; long code paths may break anywhere. */
 .md-typeset table:not([class]) td { overflow-wrap: break-word; }
 .md-typeset table:not([class]) td code { overflow-wrap: anywhere; }
+
+/* Progress board chunk dots (tools/gen_progress.py): one box size for every state. */
+.hg-chunk { display: inline-block; box-sizing: border-box; width: .7em; height: .7em; margin: 0 .12em; border-radius: 50%; border: .12em solid var(--md-accent-fg-color); vertical-align: -.05em; }
+.hg-chunk.done { background: var(--md-accent-fg-color); }
+.hg-chunk.flight { background: linear-gradient(90deg, var(--md-accent-fg-color) 50%, transparent 50%); }
+.hg-chunk.ready { background: transparent; }
+.hg-chunk.blocked { border-color: var(--md-default-fg-color--lighter); border-style: dotted; }
+.hg-chunk.deferred { border-color: var(--md-default-fg-color--lightest); background: var(--md-default-fg-color--lightest); }

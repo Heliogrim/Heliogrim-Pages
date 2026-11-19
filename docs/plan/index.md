@@ -18,6 +18,7 @@ This section turns that brief into a plan that survives sessions and people:
 | [Gap analysis](gap-analysis.md) | Per target: what the engine has, what is missing, how far the distance is |
 | [Systems to build](systems.md) | The catalog of systems with IDs, dependencies, track, milestone and issue |
 | [Roadmap](roadmap.md) | Dependency line and milestones; which order the work can go in and why |
+| [Progress board](progress.md) | Generated: per milestone and system, chunks done, in flight, ready and blocked, and how much code is on `master` |
 | [Topics](topics/index.md) | One page per topic: research with sources, and guidance for building it here |
 | [Sources](sources/index.md) | Raw research reports behind the topic pages |
 | [Work packages](work/index.md) | Per topic: cross-reference with the explorations and designs, architecture and code design, chunks of work (explore, design, execute) with status, and the [questions](work/questions.md) for the owner in batches |
@@ -35,6 +36,7 @@ These come from the engine project's `CLAUDE.md`, `STYLE.md` and the owner's rec
 
 - The GitHub issue is the spec. Each system here has, or gets, an issue with "done when" and "covered now / left for later" sections.
 - Measure before design. A system whose benefit rests on an unmeasured claim starts with a benchmark or a spike, listed in its issue.
+- The stages from vision to code, branches, history and releases: [work and release workflow](../guides/work-and-release.md), [ADR-0012](../adr/0012-trunk-based-linear-history.md) to [ADR-0014](../adr/0014-security-policy.md).
 - No ephemeral specs or plans on `master`. Designs live here; implementation plans stay untracked in the engine checkout.
 - A problem found mid-change becomes its own issue; its fix is an atomic commit.
 - Enterprise grade means: every public contract documented and tested, every failure path returns a diagnostic a human can act on, every subsystem observable, every change reviewable in isolation. [Quality and process](topics/quality-and-process.md) spells it out.

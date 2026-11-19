@@ -136,6 +136,7 @@ nav:
       - Gap analysis: plan/gap-analysis.md
       - Systems to build: plan/systems.md
       - Roadmap: plan/roadmap.md
+      - Progress board: plan/progress.md
       - Topics:
           - plan/topics/index.md
           - Quality and process: plan/topics/quality-and-process.md
@@ -241,6 +242,9 @@ nav:
       - "0009: explicit allocators": adr/0009-explicit-allocators.md
       - "0010: navmesh library": adr/0010-navmesh-recastnavigation.md
       - "0011: input backends": adr/0011-input-backend-sdl3-base.md
+      - "0012: trunk and linear history": adr/0012-trunk-based-linear-history.md
+      - "0013: versioned releases": adr/0013-versioned-forward-only-releases.md
+      - "0014: security policy": adr/0014-security-policy.md
       - Template: adr/template.md
   - Guides:
       - guides/index.md
@@ -248,6 +252,7 @@ nav:
       - Working on these docs: guides/docs-workflow.md
       - Writing an exploration: guides/writing-explorations.md
       - Writing an ADR: guides/writing-adrs.md
+      - Work and release workflow: guides/work-and-release.md
       - Design system: guides/design-system.md
       - Brand identity: guides/brand-identity.md
   - Contribute:

@@ -1,6 +1,6 @@
 # Work Packages
 
-**Status**: <span class="hg-status summary">plan</span>. The battle plan broken into chunks a single agent session can pick up. Written 2026-11-08 from the [systems catalog](../systems.md), the 27 [topic pages](../topics/index.md), the existing [explorations and designs](../../architecture/index.md) and the engine-side notes (Accel IR milestones, audio brainstorm, viewport and canvas requirements, test notes). Nothing here is a decision.
+**Status**: <span class="hg-status summary">plan</span>. The battle plan broken into chunks a single agent session can pick up. Written 2026-11-08 from the [systems catalog](../systems.md), the 27 [topic pages](../topics/index.md), the existing [explorations and designs](../../architecture/index.md) and the engine-side notes (Accel IR milestones, audio brainstorm, viewport and canvas requirements, test notes). Nothing here is a decision. The [progress board](../progress.md) is generated from the chunk headings on these pages; keep them in the form the [workflow guide](../../guides/work-and-release.md#chunk-status-grammar) gives.
 
 ## What a chunk is
 

@@ -17,6 +17,9 @@ This repository is the home of the engine's ADRs. A record is written when the o
 | [0009](0009-explicit-allocators.md) | Explicit allocators with a debug-only global hook | <span class="hg-status accepted">accepted</span> | 2026-11-08 |
 | [0010](0010-navmesh-recastnavigation.md) | Vendor recastnavigation for navmesh build and queries | <span class="hg-status accepted">accepted</span> | 2026-11-09 |
 | [0011](0011-input-backend-sdl3-base.md) | SDL3 as base input backend, native capability side channels | <span class="hg-status accepted">accepted</span> | 2026-11-09 |
+| [0012](0012-trunk-based-linear-history.md) | Trunk-based development with linear history | <span class="hg-status accepted">accepted</span> | 2026-11-19 |
+| [0013](0013-versioned-forward-only-releases.md) | Versioned, forward-only releases from immutable tags | <span class="hg-status accepted">accepted</span> | 2026-11-19 |
+| [0014](0014-security-policy.md) | Security policy: private reports, latest release supported | <span class="hg-status accepted">accepted</span> | 2026-11-19 |
 
 Records 0001 to 0011 were decided between 2026-11-04 and 2026-11-09 and recorded on 2026-11-16; the date column is the decision date.
 

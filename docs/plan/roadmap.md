@@ -1,6 +1,6 @@
 # Roadmap: Dependency Line and Milestones
 
-**Status**: <span class="hg-status summary">plan</span>. An ordering, not a schedule. Milestones are integration points reached when their systems pass their "done when" checks. Tracks run in parallel where the dependency line allows; the line is the constraint, the milestone grouping is the recommendation.
+**Status**: <span class="hg-status summary">plan</span>. An ordering, not a schedule. Milestones are integration points reached when their systems pass their "done when" checks. Tracks run in parallel where the dependency line allows; the line is the constraint, the milestone grouping is the recommendation. Where each milestone stands: [progress board](progress.md).
 
 ## The dependency line
 
