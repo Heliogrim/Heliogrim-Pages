@@ -77,10 +77,10 @@ Placement: `Engine.Canvas/{CanvasCommand,CanvasBackend,AnimatedValue}`, `Engine.
 - **Output**: `architecture/uikit-design.md`; plan grouped by issue cluster.
 - **Questions**: Q43.1.
 
-### W43.2 Implement invalidation protocol and inputs (#27 to #36) · execute · runtime core in review ([PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205) into `feat/wip`); inputs open
+### W43.2 Implement invalidation protocol and inputs (#27 to #36) · execute · in progress (runtime core done 2026-11-19, [PR #205](https://github.com/Heliogrim/Heliogrim-Engine/pull/205) merged into `feat/wip`, `c1b79c8d`; inputs open)
 
 - **Done when**: an unchanged frame lays out no widget (#10), render-version propagation stops early (#43), and the input widgets are uikit components.
-- **Result (runtime core, 2026-11-18)**: [uikit design](../../architecture/uikit-design.md) migration step 1. Nine signed commits on `feat/reflow-runtime-core`, rebased onto `feat/wip` `f9ee8b8f`, head `77c87a2c`:
+- **Result (runtime core, 2026-11-18)**: [uikit design](../../architecture/uikit-design.md) migration step 1. Nine signed commits on `feat/reflow-runtime-core`, rebase-merged into `feat/wip` on 2026-11-19 (nine commits on `1cc9e75c`, head `c1b79c8d`); #10 and #43 closed:
     - **Subtree skipping:** an `eSubtreePending` bit lets prefetch and compute skip clean subtrees.
     - **Layout boundary:** a `BoxLayout` with absolute `min == max` on both axes stops upward propagation.
     - **Phase-typed attributes:** `ReflowPhase` lives in `Engine.Reflow`, and `AttributeOwnerLink` plus `AttributeBatch` mark the owning widget.
