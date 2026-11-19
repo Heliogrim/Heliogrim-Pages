@@ -29,8 +29,8 @@ Each has a suggested default. "Measured" refers to the Debug build on the 5900X;
 |---|---|---|
 | Q02.11 | As suggested: keep `workers - 1`, measure the lifted clamp after `checkpoint()` adoption | no change |
 | Q02.12 | 250 µs for now | applied |
-| Q02.13 | Explanation asked; open | open |
-| Q02.14 | k known: wake `min(k, parked)`; k unknown: wake two while tasks are still queued. Counted ramp-up for batches and fan-outs, faster ramp-up for task streams | open, W02.15 |
+| Q02.13 | No cap for now. Measure again with the 250 µs limit; if a cap is needed, cap at the observed fan-out peak plus one. No multi-frame approximation (no one raise per frame) | open, measure (W02.16) |
+| Q02.14 | k known: wake `min(k, parked)`; k unknown: wake two while tasks are still queued. Counted ramp-up for batches and fan-outs, faster ramp-up for task streams. Separate work package | W02.15 |
 | Q02.15 | Check where to integrate first; does not block the implementation or the PR | open |
 | Q02.16 | Profile first. Lane-lock contention grows with the worker count; a lock-free FIFO work set is a candidate, decided by measurement only | open, W02.16 |
 | Q02.17 | As suggested: together with Q02.14 | open, W02.15 |

@@ -205,12 +205,12 @@ Rules that come with it: `thread_local` is banned across suspension points (debu
 - **Output**: an exploration section with 2 to 4 candidate models, their costs (one micro-cycle of latency, memory) and the C++ enforcement each allows and where it leaks (`mutable`, `const_cast`, pointers inside components); then a design.
 - **Done when**: the owner picks a model; the ordering rule (what is sorted, by which key) is written down; W02.11's per-stage sets reflect it.
 
-### W02.15 Wake-up fan-out · explore · after W02.14 is merged
+### W02.15 Wake-up fan-out · design+execute · after W02.14 is merged, own branch
 
-- **Goal**: decide how workers are woken when one worker makes several tasks runnable at once. Today a worker that pops wakes one peer, which pops and wakes one, and so on: N helpers arrive after N hops of 5 to 10 µs each plus a pop (owner note 2026-11-18). Candidates: two wakes per pop while two or more tasks are queued (a tree, about log2 N hops); a push of k tasks waking `min(k, parked)` directly (Rayon); a wake on every push from a worker, all lanes (Q02.17). Also the futile wake per pop while only reserve-blocked lower work is queued.
-- **Inputs**: [owner review](../../architecture/lane-policy-review.md) Q02.14 and Q02.17, [lane policy design](../../architecture/lane-policy-design.md) 6.4 and 15.2, [worker policy design](../../architecture/worker-policy-design.md) 6, [prior art](../../architecture/lane-policy-exploration.md) 6.3, `Worker::handle`, `Schedule::push`, `Schedule.tla`.
-- **Output**: measurement of fan-out pickup latency (`LaneFloodBenchmark`, widths 8 and 32, 3 and 20 workers) per candidate, idle CPU per candidate, a recommendation; the wake rule in `Schedule.tla` updated for the chosen one.
-- **Done when**: pickup p99 for a fan-out of 8 and of 32 is stated per candidate with its idle cost, and the owner has picked one.
+- **Goal**: implement the owner's wake rule (2026-11-19, Q02.14 with Q02.17). Today a worker that pops wakes one peer, which pops and wakes one, and so on: N helpers arrive after N hops of 5 to 10 µs each plus a pop. The rule: when the number k of tasks made runnable is known (a batch, a fan-out), wake `min(k, parked)` directly; when it is not known (a task stream), wake two while tasks are still queued. Batches and fan-outs ramp up by count, streams ramp up faster than the chain. It covers pushes from a running worker in every lane (Q02.17), and should remove the futile wake per pop while only reserve-blocked lower work is queued.
+- **Inputs**: [owner review](../../architecture/lane-policy-review.md) Q02.14 and Q02.17, [lane policy design](../../architecture/lane-policy-design.md) 6.4, 15.2 and 15.7, [worker policy design](../../architecture/worker-policy-design.md) 6, [prior art](../../architecture/lane-policy-exploration.md) 6.3, `Worker::handle`, `Schedule::push`, `Schedule.tla`.
+- **Output**: a design for where k is known (batch push, task graph fan-out, `execOnStage`) and how a push passes it; the code on its own branch; `Schedule.tla` re-run with the new wake rule and a mutation; fan-out pickup latency (`LaneFloodBenchmark`, widths 8 and 32, 3 and 20 workers) and idle CPU before and after.
+- **Done when**: pickup p99 for a fan-out of 8 and of 32 is stated before and after with its idle cost, the model passes with the rule and fails with one wake removed, and the owner accepts the numbers.
 
 ### W02.16 Profile and optimise the lane policy · explore+execute · ready (branch `feat/lane-policy`)
 
